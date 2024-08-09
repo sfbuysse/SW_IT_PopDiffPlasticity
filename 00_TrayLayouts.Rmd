@@ -1,0 +1,251 @@
+---
+title: "00_TrayLayouts"
+author: "Sophie Buysse"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Description
+This code sets up the randomized tray layouts for the 2021 and 2022 experiments.Trays were also rotated at least once a week in both experiments. In 2021, pots started next to each other and were spread out due to plant size after vernalization, and were re-randomized when they were spread out.
+
+The 2021 experiment had an additional treatment where plants experienced the current treatment before vernalization and the future treatment after vernalization. This treatment is not included in the analysis presented in the paper but the randomization is presented here to make this code repeatable.
+
+# 2021 Experiment
+
+Set seed and define how many lines I have
+```{r}
+set.seed(602)
+lines <- c(1:50)
+```
+
+First, randomly organize before planting.
+```{r}
+line_names <- c('B1-1-C','B1-2-C','B1-3-C','B1-4-C','B1-5-C','B1-6-C','B2-1-C','B2-2-C','B3-1-C','B3-2-C','B4-1-C','B4-2-C','B8-1-C','B8-2-C','B12-1-C','B12-2-C','B13-1-C','B13-2-C','B15-1-C','B15-2-C','R2-1-C','R2-2-C','R5-1-C','R5-2-C','R8-1-C','R8-2-C','R9-1-C','R9-2-C','R11-1-C','R11-2-C','R15-1-C','R15-2-C','R21-1-C','R21-2-C','R26-1-C','R26-2-C','R29-1-C','R29-2-C','R33-1-C','R33-2-C','R35-1-C','R35-2-C','R40-1-C','R40-2-C','R47-1-C','R47-2-C','R47-3-C','R47-4-C','R47-5-C','R47-6-C','Empty1', 'Empty2', 'Empty3', 'Empty4', 'Empty5', 'Empty6', 'Empty7', 'Empty8', 'Empty9', 'Empty10', 'Empty11', 'Empty12', 'Empty13', 'Empty14')
+
+# Current
+order <- sample(line_names, size = 64, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\nTray 2 \n",
+    order[33:36], "\n", 
+    order[37:40], "\n",
+    order[41:44], "\n",
+    order[45:48], "\n",
+    order[49:52], "\n",
+    order[53:56], "\n",
+    order[57:60], "\n",
+    order[61:64])
+
+#Current/Future
+
+order <- sample(line_names, size = 64, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\nTray 2 \n",
+    order[33:36], "\n", 
+    order[37:40], "\n",
+    order[41:44], "\n",
+    order[45:48], "\n",
+    order[49:52], "\n",
+    order[53:56], "\n",
+    order[57:60], "\n",
+    order[61:64])
+
+# Future
+order <- sample(line_names, size = 64, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\nTray 2 \n",
+    order[33:36], "\n", 
+    order[37:40], "\n",
+    order[41:44], "\n",
+    order[45:48], "\n",
+    order[49:52], "\n",
+    order[53:56], "\n",
+    order[57:60], "\n",
+    order[61:64])
+```
+
+Second, do it again after vernalization while spreading the plants out
+```{r}
+line_names2 <- c('B1-1-C','B1-2-C','B1-3-C','B1-4-C','B1-5-C','B1-6-C','B2-1-C','B2-2-C','B3-1-C','B3-2-C','B4-1-C','B4-2-C','B8-1-C','B8-2-C','B12-1-C','B12-2-C','B13-1-C','B13-2-C','B15-1-C','B15-2-C','R2-1-C','R2-2-C','R5-1-C','R5-2-C','R8-1-C','R8-2-C','R9-1-C','R9-2-C','R11-1-C','R11-2-C','R15-1-C','R15-2-C','R21-1-C','R21-2-C','R26-1-C','R26-2-C','R29-1-C','R29-2-C','R33-1-C','R33-2-C','R35-1-C','R35-2-C','R40-1-C','R40-2-C','R47-1-C','R47-2-C','R47-3-C','R47-4-C','R47-5-C','R47-6-C')
+
+# Current
+order <- sample(line_names2, size = 50, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:16],
+    "\nTray 2 \n",
+    order[17:32],
+    "\nTray 3 \n",
+    order[33:48], 
+    "\nFiller \n",
+    order[49:50]
+    )
+
+#Current/Future
+order <- sample(line_names2, size = 50, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:16],
+    "\nTray 2 \n",
+    order[17:32], 
+    "\nTray 3 \n",
+    order[33:48], 
+    "\nFiller \n",
+    order[49:50])
+
+# Future
+order <- sample(line_names2, size = 50, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Tray 1 \n",
+    order[1:16],
+    "\nTray 2 \n",
+    order[17:32], 
+    "\nTray 3 \n",
+    order[33:48], 
+    "\nFiller \n",
+    order[49:50])
+```
+
+# 2022 Experiment
+```{r}
+set.seed(220)
+lines <- c(1:64)
+```
+
+First, randomly organize before planting.
+```{r}
+line_names_1 <- c('B1-1','B1-2','B2-1','B2-2','B3-1','B3-2','B4-1','B4-2','B8-1','B8-2','B12-1','B12-2','B13-1','B13-2','B15-1','B15-2','R2-1','R2-2','R8-1','R8-2','R11-1','R11-2','R21-1','R21-2','R29-1','R29-2', 'R35-1','R35-2','R40-1','R40-2','R47-1','R47-2')
+line_names_2 <- c('B1-3','B1-4','B2-3','B2-4','B3-3','B3-4','B4-3','B4-4','B8-3','B8-4','B12-3','B12-4','B13-3','B13-4','B15-3','B15-4','R2-3','R2-4','R8-3','R8-4','R11-3','R11-4','R21-3','R21-4','R29-3','R29-4','R35-3','R35-4','R40-3','R40-4','R47-3','R47-4')
+
+# Current
+order <- sample(line_names_1, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Current Tray 1 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\n")
+
+order <- sample(line_names_2, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Current Tray 2 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\n")
+
+# Future
+order <- sample(line_names_1, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Future Tray 1 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\n")
+
+order <- sample(line_names_2, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("Future Tray 2 \n",
+    order[1:4], "\n", 
+    order[5:8], "\n",
+    order[9:12], "\n",
+    order[13:16], "\n",
+    order[17:20], "\n",
+    order[21:24], "\n",
+    order[25:28], "\n",
+    order[29:32], "\n")
+
+## and the practice plants (to practice root washing)
+extras <- c("B1-X-TEST", "B3-X-TEST", "B8-X-TEST", "B15-X-TEST", "R47-X-TEST", "R8-X-TEST", "R21-X-TEST", "R35-X-TEST")
+order <- sample(extras, size = 8, replace = FALSE)
+cat("Extras Tray \n",
+    order[1:2], "\n", 
+    order[3:4], "\n",
+    order[5:6], "\n",
+    order[7:8])
+
+```
+
+Second, do it again after vernalization while spreading the plants out.
+
+```{r}
+# redo the line names so only those that germinated are included
+
+line_names_C <- c('B1-1','B1-2','B1-5','B2-2','B3-1','B3-2','B3-5', 'B8-7', 'B8-1','B8-2','B13-5','B12-2','B13-1','B13-2','B15-1','B15-2','R2-1','R2-2','R8-1','R8-2','R11-1','R11-2','R21-1','R21-2','R29-1','R29-2', 'R35-1','R35-2','R40-1','R40-2','R47-1','R47-2')
+line_names_C2 <- c('B1-3','B1-4','B1-6','B15-5','B3-3','B3-4','B3-6','B8-8','B8-3','B8-4','B12-3','B12-4','B13-3','B13-4','B15-3','B15-4','R2-3','R2-4','R8-3','R8-4','R11-3','R11-4','R21-3','R21-4','R29-3','R29-4','R35-3','R35-4','R40-3','R40-4','R47-3','R47-4')
+
+line_names_F <- c('B1-1','B1-2','B1-5','B2-2','B3-1','B3-2','B4-2','B8-1','B8-2','B8-6','B12-1','B12-2','B13-1','B13-2','B15-1','B15-2','R2-1','R2-2','R8-1','R8-2','R11-1','R11-2','R21-1','R21-2','R29-1','R29-2', 'R35-1','R35-2','R40-1','R40-2','R47-1','R47-2')
+line_names_F2 <- c('B1-3','B1-4','B2-3','B15-5','B3-3','B3-4','B3-7','B8-3','B8-4','B8-5',  'B12-3','B12-4','B13-3','B13-4','B15-3','B15-4','R2-3','R2-4','R8-3','R8-4','R11-3','R11-4','R21-3','R21-4','R29-3','R29-4','R35-3','R35-4','R40-3','R40-4','R47-3','R47-4')
+
+# Current
+order <- sample(line_names_C, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("C Tray 1 \n",
+    order[1:16],
+    "\nC Tray 2 \n",
+    order[17:32]
+    )
+order <- sample(line_names_C2, size = 32, replace = FALSE)
+cat(
+    "\nC Tray 3 \n",
+    order[1:16], 
+    "\nC Tray 4 \n",
+    order[17:32]
+    )
+
+
+# Future
+order <- sample(line_names_F, size = 32, replace = FALSE)
+# this order is not saved as any object, just printed
+cat("F Tray 1 \n",
+    order[1:16],
+    "\nF Tray 2 \n",
+    order[17:32]
+    )
+order <- sample(line_names_F2, size = 32, replace = FALSE)
+cat(
+    "\nF Tray 3 \n",
+    order[1:16], 
+    "\nF Tray 4 \n",
+    order[17:32]
+    )
+```

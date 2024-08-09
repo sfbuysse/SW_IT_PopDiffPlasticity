@@ -1,0 +1,1391 @@
+---
+title: "02_Analysis"
+author: "Sophie Buysse"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Description
+
+This code runs all linear models for the 2021 and 2022 experiments. 
+
+# Set basic info for all code
+
+This chunk sets things that will be constant for the whole document.
+
+```{r, warning = FALSE, message = FALSE}
+#setup code here
+
+# read in packages
+library(dplyr)
+library(ggplot2)
+#library(car)
+library(lme4)
+library(lmerTest)
+library(tidyr)
+#library(MuMIn) 
+library(rcompanion)
+#library(stargazer)
+library(plotly)
+
+# prep for doing statistical analyses
+options(contrasts = c("contr.sum", "contr.poly"))
+
+# let's make some functions
+std_mean <- function(x){
+  sd(x, na.rm = TRUE)/sqrt(length(x))
+}
+
+# Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+
+conf_int <- function(x, conf.interval = 0.95){
+  ciMult <- qt((1+conf.interval)/2, length(x)-1)
+  ci <- std_mean(x) * ciMult
+  return(ci)
+}
+
+```
+# 2021
+
+## Read in data
+
+```{r sum1, eval = TRUE}
+Dat_2021 <- read.csv("data/CleanData_2021.csv")
+# set factors
+Dat_2021 <- Dat_2021 %>% dplyr::mutate(
+  Population = as.factor(Population),
+  Line = as.factor(Line),
+  Treatment = as.factor(Treatment),
+  Soil.Mix.Batch.Number.x = as.factor(Soil.Mix.Batch.Number.x),
+  BranchStructure = as.factor(BranchStructure),
+  DoneFlwr = as.factor(DoneFlwr),
+  FruitCounter = as.factor(FruitCounter),
+  SeedCounter = as.factor(SeedCounter)
+  
+)
+```
+
+## Summarize some data
+```{r}
+# for the things I can easily get a mean for (num or int)
+ByPop_21 <- Dat_2021 %>%
+  dplyr::group_by(Population) %>%
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+
+# transpose for easier viewing
+ByPop_21 <- data.frame(t(ByPop_21))
+
+# now do by treatment
+ByTrt_21 <- Dat_2021 %>%
+  dplyr::group_by(Treatment) %>%
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+ByTrt_21 <- data.frame(t(ByTrt_21))
+
+# Now I want population  means within each treatment
+ByTrt_Pop_21 <- Dat_2021 %>%
+  dplyr::group_by(Population) %>%
+  dplyr::group_by(Treatment, .add = TRUE) %>%
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+
+# for some ease of viewing
+ByTrt_Pop_21 <- data.frame(t(ByTrt_Pop_21))
+colnames(ByTrt_Pop_21) <- c("Belm_C", "Belm_CF", "Belm_F", "Roda_C", "Roda_CF", "Roda_F")
+
+# save this to keep means
+write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
+```
+## Two Treatment Anovas
+
+This experiment included a Current/Future treatment where plants were in the current treatment before vernalization and the future treatment after vernalization to see if early heat and drought was important. We are not analyzing this third treatment here.
+
+The initial model is was follows:
+trait ~ Treatment * Population + (1|Population:Line) + (1|Soil.Mix.Batch.Number.x)
+
+When removing the soil mix random effect, most p values and effect sizes were not meaningfully changed with the following 4 exceptions written as to what happened when soil  mix was removed from the model:\
+- dry weight of single leaf: population effect increased, p value decreased \
+- relative water content: interaction effect increased, p value decreased (makes sense because dry weight changed a little)\
+- rosette dry weight: p value cut in half effect size doubles \
+- fruit number: population p value increases, interaction p value decreases \
+
+In general these model changes were slight and soil mix explained very little variance - the exceptions are relative water content (soil mix explained half as much variance as genotype), number of fruits, and number of primary stalks (soil mix explained more variance than genotype but over half the variance is still residual). Thus, soil mix was removed as a random variable from the analysis.
+
+```{r stats}
+# subset to only the Current and Future treatments
+Dat_2021_TwoTrt <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
+
+# things I want to use as random variables; Line, soil mix batch number
+# for single leaf traits also include leaf_Collected
+# for traits at harvest I can use DoneFlwr
+
+# function to run models on 2021 data: 
+# the model itself is not saved to a global object. the anova table is saved.
+
+anov_lmer <- function(trait, data = Dat_2021_TwoTrt){
+  lm <- lmer(trait ~ Treatment * Population + (1|Population:Line) , data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+  print(plot(lm))
+  hist(residuals(lm), breaks = 15)
+  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(trait)]],
+       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(trait)]])
+  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
+  #legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
+  # plotting sanity check
+  print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
+  #title(trait)
+  qqnorm(resid(lm))
+  qqline(resid(lm))
+  print(summary(lm))
+  print(confint(lm))
+  anov <- anova(lm)
+  print(anov)
+  df <- as.data.frame(anov)
+  df$exp <- "2021"
+  return(df)
+}
+# things print out in the html slightly out of order
+
+```
+
+The modelling function runs a mixed model where each trait is predicted by population, treatment, and their interaction while accounting for random effects of line nested within population and soil mix batch number.
+
+If the interaction term in this model is significant, 4 additional models are run to identify differences between population in each treatment and differences between treatments for each population
+
+### Phenology
+
+Days to Emergence
+
+```{r}
+# Emergence
+emergence_21 <- anov_lmer(Dat_2021_TwoTrt$Emergence)
+emergence_21$trait <- "Emergence"
+```
+
+There is an interaction, so do post-hoc analyses to identify where there are differences between means within treatments and between treatments within populations.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(Emergence ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) # yes, difference between treatments for belm
+#roda
+as.data.frame(summary(lmer(Emergence ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients) # yes, difference between treatments for roda
+#cur
+as.data.frame(summary(lmer(Emergence ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) # yes but weak difference between pops in cur
+#fut
+as.data.frame(summary(lmer(Emergence ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients) # no difference between pops in fut
+```
+
+Days between emergence and bolting
+
+```{r}
+# days emergence to bolting
+bolting_21 <- anov_lmer(Dat_2021_TwoTrt$DayToBolt)
+bolting_21$trait <- "Bolting"
+# no significant interaction
+```
+
+Days between bolting and flowering
+
+```{r}
+# days bolting to flowering
+flowering_21 <- anov_lmer(Dat_2021_TwoTrt$DayToFlwr)
+flowering_21$trait <- "Flowering"
+# no significant interaction
+```
+
+### Single Leaf Collected At Flowering
+
+fresh weight
+```{r}
+# Fresh weight
+fresh_21 <- anov_lmer(Dat_2021_TwoTrt$l10_FreshWt)
+fresh_21$trait <- "l10_FreshWt"
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_FreshWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_FreshWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_FreshWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_FreshWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+saturated/hydrated weight
+
+```{r}
+# Saturated weight
+sat_21 <- anov_lmer(Dat_2021_TwoTrt$l10_SatWt)
+sat_21$trait <- "l10_SatWt"
+```
+
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_SatWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_SatWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_SatWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_SatWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+dried weight
+```{r}
+# Dried weight
+dry_21 <- anov_lmer(Dat_2021_TwoTrt$l10_DriedWt)
+dry_21$trait <- "l10_DriedWt"
+# no significant interaction term
+anov_lmer(Dat_2021_TwoTrt$DriedWt_g)
+anov_lmer(Dat_2021_TwoTrt$SQR_DriedWt)
+```
+
+leaf area
+
+```{r}
+# Leaf Area
+area_21 <- anov_lmer(Dat_2021_TwoTrt$l10_LeafArea)
+area_21$trait <- "l10_area"
+```
+
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_LeafArea ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_LeafArea ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_LeafArea ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_LeafArea ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+leaf perimeter
+
+```{r}
+# Leaf Perimeter
+per_21 <- anov_lmer(Dat_2021_TwoTrt$l10_LeafPer)
+per_21$trait <- "l10_Perimeter"
+```
+
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_LeafPer ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_LeafPer ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_LeafPer ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_LeafPer ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+specific leaf area
+
+```{r}
+# SLA
+SLA_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_SLA)
+SLA_2021$trait <- "l10_SLA"
+```
+
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_SLA ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_SLA ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_SLA ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_SLA ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+leaf dry matter content
+```{r}
+# LDMC
+LDMC_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_LDMC)
+LDMC_2021$trait <- "l10_LDMC"
+```
+
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_LDMC ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_LDMC ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_LDMC ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_LDMC ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+relative water content
+```{r}
+# RWC
+RWC_2021 <- anov_lmer(Dat_2021_TwoTrt$RWC)
+RWC_2021$trait <- "RWC"
+# no interaction
+```
+
+There is a weak interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(RWC ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(RWC ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+### Leaf Number
+Note that Basia is potentially interested in looking at growth curves or leaf number changes over time wth a shade or photoperiod response but would also probably be interested in a temperature response but I should do a bit more literature searching on that if we go that route. but that is all to say that all these leaf number traits could be the basis of why she does that, and I could go back and see what Tori did too.
+ 
+leaf num at 4 weeks
+```{r}
+# Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
+LN_PreVern_2021 <- anov_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
+LN_PreVern_2021$trait <- "LeafNum_4wks"
+# no interaction
+# diagonal lines in residual plot are artifact of discrete trait. none in left corner is indicative of zeros.
+# double check that residual lines all have same value
+lm <- lmer(LeafNum_.07222021 ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+
+plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)],
+       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)])
+legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
+legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
+text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = Dat_2021_TwoTrt$LeafNum_.07222021, cex = 0.7)
+
+```
+
+Leaf num 5 weeks into vernalization
+```{r}
+# LeafNumber from 08262021 - 5 weeks into vernalization... why did I choose this date? I think I was thinning on this day?
+LN_Vern_2021 <- anov_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
+LN_Vern_2021$trait <- "LeafNum_9wks"
+# no interaction
+```
+Leaf num about when bolting started
+```{r}
+# Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
+LN_PostVern_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
+LN_PostVern_2021$trait <- "LeafNum_14wks"
+# no interaction
+```
+
+```{r}
+# LN bolting - only on some plants, actually only for SW plants so not running the model.
+#LN_bolt_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_bolt)
+```
+
+```{r}
+# only on 16 plants, not going to run the model b/c so small of a sample size
+#LN_flower_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_Flower)
+```
+
+Leaf num at harvest
+```{r}
+# LN at harvest - from all plants - not sure totally accurate count
+LN_harv_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum)
+LN_harv_2021$trait <- "LeafNum_harvest"
+# no interaction
+```
+### Biomass
+
+Any biomass traits and biomass allocation
+
+Rosette biomass
+```{r}
+# dry rosette biomass
+Ros_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_DryRosG)
+Ros_2021$trait <- "l10_DryRosG"
+#no interaction
+
+```
+Reproductive biomass
+```{r}
+# dry reproductive biomass
+Repro_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_DryReproG)
+Repro_2021$trait <- "l10_DryReproG"
+
+```
+Above ground biomass (rosette + reproductive)
+```{r}
+# dry above ground biomass (ros + repro)
+AG_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
+AG_2021$trait <- "l10_AG_biomass"
+```
+
+Skipping dry root biomass because only have for a few plants. Also skipping root to shoot for the same reason.
+
+Above ground biomass allocation (repro/ros)
+```{r}
+# reproductive biomass divided by rosette biomass - above ground biomass allocation
+RR_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_R_to_R)
+RR_2021$trait <- "l10_Repro_to_Ros"
+
+```
+
+
+### Plant Structure
+branches and height. Branch structure is about damage so skip. but maybe should be a random effect in other models?
+
+```{r}
+# branch structure - damaged, bent, broken
+#BranchStruc_2021 <- anov_lmer(Dat_2021_TwoTrt$BranchStructure)
+```
+
+Num lateral branches
+```{r}
+# number of lateral branches
+LatBranch_2021 <- anov_lmer(Dat_2021_TwoTrt$LatBranches)
+LatBranch_2021$trait <- "Lateral Branches"
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(LatBranches ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(LatBranches ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(LatBranches ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(LatBranches ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+Num primary stalks
+```{r}
+# number of primary stalks
+PrimStalks_2021 <- anov_lmer(Dat_2021_TwoTrt$PrimaryStalks)
+PrimStalks_2021$trait <- "Primary Stalks"
+```
+
+There is a weak interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(PrimaryStalks ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(PrimaryStalks ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(PrimaryStalks ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(PrimaryStalks ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+Height main stalk
+```{r}
+# height of main stalk (cm)
+height_2021 <- anov_lmer(Dat_2021_TwoTrt$Height_cm)
+height_2021$trait <- "Height (cm)"
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(Height_cm ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(Height_cm ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(Height_cm ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(Height_cm ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+### Fitness
+
+Fruit Count
+only using IJ fruit count becuase of issue with skipping counter for other fruit count.
+```{r}
+# number fruits on plant
+# maybe would want to add done flower or not done flower as a random effect in this model?
+fruit_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
+fruit_2021$trait <- "FruitNum"
+## test to see if adding fruit counter changes the model results
+#tmp_fruit <- lmer(l10_IJ_Fruits ~ Treatment * Population + (1|Population:Line) + (1|FruitCounter), data = Dat_2021_TwoTrt, #contrasts = list(Treatment=contr.sum, Population = contr.sum))
+#
+#  hist(residuals(tmp_fruit), breaks = 15)
+#  plot(fitted(tmp_fruit), residuals(tmp_fruit, type = "pearson", scaled = TRUE),
+#       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(Dat_2021_TwoTrt$l10_IJ_Fruits)]],
+#       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(Dat_2021_TwoTrt$l10_IJ_Fruits)]])
+#    # plotting sanity check
+#  print(paste0("the number of complete cases is ", sum(complete.cases(Dat_2021_TwoTrt$l10_IJ_Fruits))))
+#  #title(trait)
+#  print(summary(tmp_fruit))
+#  anova(tmp_fruit)
+#  
+## no meaningful changes, so FruitCounter will not be a random effect and this code is commented out.
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+reproductive potential = number of fruits + number of flowers left on plant.
+
+Should this variable be included? One argument is that no, it should not because in the field all the plants might be killed at once and not allowed to flower until they make all fruits possible. 
+```{r, eval = FALSE}
+# repro potential
+Dat_2021_TwoTrt$ReproPotential <- (Dat_2021_TwoTrt$IJ_FruitCount + Dat_2021_TwoTrt$NumFlwrLeft)
+ReproPotential_2021 <- anov_lmer(Dat_2021_TwoTrt$ReproPotential)
+# some concern about the two groups of residuals at low and high values. are these the pops??
+```
+
+
+Average weight of a seed (collected seed weight / count of collected seeds)
+```{r}
+# weight of collected seeds - take weight divided by number of seeds counted
+# skipping weight of collected fruits beccause weight of 10 fruits means less than the actual weight of the seeds
+AvSeedWt_2021 <- anov_lmer(Dat_2021_TwoTrt$AvgSeedWt)
+AvSeedWt_2021$trait <- "Average Seed Wt"
+
+```
+
+average Seed number per fruit -
+```{r}
+# number seeds from collected fruits
+
+#seeds_2021 <- anov_lmer(Dat_2021_TwoTrt$AvgSeedNum)
+seeds_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_AvgSeedNum)
+seeds_2021$trait <- "l10_Average Seeds per Fruit"
+# why are residuals so odd? because population explains 0 variance.
+
+## test if SeedCounter matters
+#seeds_lm <- lmer(l10_AvgSeedNum ~ Treatment * Population + (1|Population:Line) + (1|SeedCounter), data = Dat_2021_TwoTrt, #contrasts = list(Treatment=contr.sum, Population = contr.sum))
+#plot(fitted(seeds_lm), residuals(seeds_lm, type = "pearson", scaled = TRUE),
+#       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)]],
+#       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)]])
+#summary(seeds_lm)
+#anova(seeds_lm)
+#
+## when including seed counter, it does explain some variance (0.0001) but there is more residual (0.0004) and population #still explains nothing. The significance levels don't change, and the effect sizes don't really change either though not the #standard error and df are different for each predictor
+## so, not going to include in the model.
+#
+## see if the nesting is doing something weird. if LineID was the random variable, does anything change?
+#Dat_2021_TwoTrt$Line.ID <- as.factor(paste0(Dat_2021_TwoTrt$Population, Dat_2021_TwoTrt$Line))
+#seeds_lm2 <- lmer(l10_AvgSeedNum ~ Treatment * Population + (1|Line.ID), data = Dat_2021_TwoTrt, contrasts = #list(Treatment=contr.sum, Population = contr.sum))
+#plot(fitted(seeds_lm2), residuals(seeds_lm2, type = "pearson", scaled = TRUE),
+#       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)]],
+#       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)]])
+#summary(seeds_lm2)
+#anova(seeds_lm2)
+#
+## no difference, as expected if the model was functioning as expected. All testing code is commented out and no changes were made to the model.
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_AvgSeedNum ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_AvgSeedNum ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_AvgSeedNum ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_AvgSeedNum ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+Total Fitness
+
+```{r}
+# total fitness 
+fitness_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_fitness)
+fitness_2021$trait <- "Total Fitness"
+
+```
+
+There is an interaction, so do posthoc analyses.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+### Results Table
+
+Messing around with the stargazer package, but it ultimately works for model outputs but not for anova tables.
+```{r, eval = FALSE}
+seeds_lm <- lmer(l10_AvgSeedNum ~ Treatment * Population + (1|Population:Line) + (1|SeedCounter), data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+anova(seeds_lm)
+class(seeds_lm) <- "lmerMod"
+
+stargazer(seeds_lm, align = TRUE, type = "text")
+
+stargazer(RR_2021,RWC_2021, type = "text")
+```
+
+I made a bunch of anova tables. Can I simply rbind them all together? Current plan is to r bind all these together, r bind all the 2022 models together, and then cbind the 2021 and 2022 models together.
+
+```{r}
+AnovaResults_2021 <- rbind(emergence_21, bolting_21, flowering_21, fresh_21, sat_21, dry_21, area_21, per_21, SLA_2021, LDMC_2021, RWC_2021, LN_PreVern_2021, LN_Vern_2021, LN_PostVern_2021, LN_harv_2021, Ros_2021, Repro_2021, RR_2021, LatBranch_2021, PrimStalks_2021, height_2021, fruit_2021, AG_2021, AvSeedWt_2021, seeds_2021, fitness_2021)
+
+write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TRUE)
+```
+
+
+## Adaptive?
+not sure any of this code is useful. doesn't include correlated traits just looks at plasticity. None of this is being run in July 2024.
+```{r, eval = FALSE}
+CleanData_TwoTrt$Line.ID <- as.factor(paste0(CleanData_TwoTrt$Population, CleanData_TwoTrt$Line))
+
+plasticity <- CleanData_TwoTrt %>% group_by(Treatment) %>% group_by(Line.ID, .add = TRUE) %>%summarize(mean_SLA = mean(SLA, na.rm = TRUE), mean_RR = mean(Repro_to_Ros, na.rm = TRUE), mean_height = mean(Height_cm, na.rm = TRUE), mean_fruit = mean(TotFruit, na.rm = TRUE), mean_emerge = mean(Emergence, na.rm = TRUE),mean_bolt = mean(DayToBolt, na.rm = TRUE), mean_LDMC = mean(LDMC, na.rm = TRUE), mean_RWC = mean(RWC, na.rm = TRUE), mean_flwr = mean(DayToFlwr, na.rm = TRUE), mean_dehis = mean(DayToDehis, na.rm = TRUE), mean_LeafNum = mean(RosetteLeafNum, na.rm = TRUE), mean_RosWt = mean(DryRosetteG, na.rm = TRUE), mean_LB = mean(LatBranches, na.rm = TRUE), mean_PS = mean(PrimaryStalks, na.rm = TRUE), )
+
+# need to calculate plasticity for each line.
+
+# first calcualte relative fitness
+fitness <- CleanData_TwoTrt %>% group_by(Treatment) %>% group_by(Line.ID, .add = TRUE) %>%
+  summarize(mean_fruits = mean(TotFruit, na.rm = TRUE))
+tmp2 <- merge(fitness, plasticity, by = c("Treatment", "Line.ID"))
+tmp2$Population <- substr(tmp2$Line.ID,1,4)
+# test with SLA
+Fut_SLA <- tmp2[tmp2$Treatment == "Future", c("Treatment", "Line.ID", "mean_fruits", "mean_SLA", "Population")]
+Cur_SLA <- tmp2[tmp2$Treatment == "Current", c("Treatment", "Line.ID", "mean_fruits", "mean_SLA", "Population")]
+
+# now everything:
+Fut_tmp <- tmp2[tmp2$Treatment == "Future", ]
+Cur_tmp <- tmp2[tmp2$Treatment == "Current", ]
+# make fitness relative
+Fut_tmp <- cbind(Fut_tmp, "rel_fitness" = Fut_tmp$mean_fruits/mean(Fut_tmp$mean_fruits))
+Cur_tmp <- cbind(Cur_tmp, "rel_fitness" = Cur_tmp$mean_fruits/mean(Cur_tmp$mean_fruits))
+# and standardize
+Fut_tmp[4:17] <- scale(Fut_tmp[4:17], center = TRUE, scale = TRUE)
+
+Cur_tmp[4:17] <- scale(Cur_tmp[4:17], center = TRUE, scale = TRUE)
+
+# test on just SLA
+summary(lm(rel_fitness ~ mean_SLA * Population, data = Fut_tmp))
+# so not significant, but trait term is barely positive, so positive selection
+summary(lm(rel_fitness ~ mean_SLA * Population, data = Cur_tmp))
+# hey, trait term is slightly negative! so different directions in different environments.
+# trait and pop terms are also significant.
+
+# now I want to include like all the traits
+# the interaction is only for the population term... maybe I need to fit each population separately? or type * population a million times?
+# I probably want to standardize everything too because the scales are so different.
+fit_fut <- lm(rel_fitness ~ mean_SLA*Population + mean_RR*Population + mean_height*Population + mean_emerge*Population + mean_bolt*Population + mean_LDMC*Population + mean_RWC*Population + mean_flwr*Population + mean_dehis*Population + mean_LeafNum*Population + mean_RosWt*Population + mean_LB*Population + mean_PS*Population, data = Fut_tmp)
+summary(fit_fut)
+# ahahahahaha the R2 is one. so some super overfitting which I already knew, and maybe the interaction effects are actually wrong too.
+
+# I think the model should actually be quite a bit more complicated?
+# I can also tell my committee that i haven't done these yet. I did a full regression for SLA but I haven't done partial regressions.
+
+tmp3 <- merge(Fut_tmp, Cur_tmp, by = c("Line.ID"))
+# not the cleanest data frame but whatever
+tmp3$mean_fit <- rowMeans(tmp3[, c("mean_fruits.x", "mean_fruits.y")], na.rm = TRUE)
+# difference is current minus future
+
+# calculate plasticity for SLA. I would need to do this for every trait which seems like a lot of work
+tmp3$dif_SLA <- tmp3$mean_SLA.y - tmp3$mean_SLA.x
+#tmp3 <- tmp3[,c("Line.ID", "Treatment.x", "Population.x", "mean_fruits.x", "mean_fit", "dif_SLA")]
+## mean fitness
+#summary(lm(mean_fit ~ dif_SLA * Population.x, data = tmp3))
+## negative and significant
+
+# future fitness
+summary(lm(rel_fitness.x ~ dif_SLA + mean_SLA.x + Population.x + dif_SLA:Population.x + mean_SLA.x:Population.x, data = tmp3))
+# negative on trait and on plasticity but not significant
+
+
+ggplot(data = tmp3, aes(x = dif_SLA, y = mean_fit)) +
+  geom_point(aes(col=Population.x), size = 4) +
+  labs(y="Mean fitness", 
+      x="SLA plasticity")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("maroon3", "darkgreen"))+
+  scale_linetype_manual(name = "Population",
+                        labels = c("IT", "SW"),
+                        values = c("solid", "dotted"))+
+  theme_classic() +
+  theme(
+    legend.title = element_text(family = "serif", color = "black", size = 20),
+    legend.text = element_text(family = "serif", color = "black", size = 20),
+    axis.title = element_text(family = "serif", color = "black", size = 20),
+    axis.text = element_text(family = "serif", color = "black", size = 20),
+    axis.line = element_line(colour = 'black', size = 1),
+    axis.ticks = element_line(color = 'black', size = 1),
+    axis.ticks.length=unit(.15, "cm"),
+    legend.spacing.y = unit(0.03, "cm"),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+    )
+
+ggplot(data = tmp3, aes(x = dif_SLA, y = mean_fruits.x)) +
+  geom_point(aes(col=Population.x), size = 4) +
+  labs(y="Future fitness", 
+      x="SLA plasticity")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("maroon3", "darkgreen"))+
+  scale_linetype_manual(name = "Population",
+                        labels = c("IT", "SW"),
+                        values = c("solid", "dotted"))+
+  theme_classic() +
+  theme(
+    legend.title = element_text(family = "serif", color = "black", size = 20),
+    legend.text = element_text(family = "serif", color = "black", size = 20),
+    axis.title = element_text(family = "serif", color = "black", size = 20),
+    axis.text = element_text(family = "serif", color = "black", size = 20),
+    axis.line = element_line(colour = 'black', size = 1),
+    axis.ticks = element_line(color = 'black', size = 1),
+    axis.ticks.length=unit(.15, "cm"),
+    legend.spacing.y = unit(0.03, "cm"),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+    )
+
+ggplot(data = Fut_SLA, aes(x = mean_SLA, y = mean_fruits)) +
+  geom_point(aes(col=Population), size = 4) +
+  labs(y="Future Fruit Number", 
+      x="Future SLA")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("maroon3", "darkgreen"))+
+  scale_linetype_manual(name = "Population",
+                        labels = c("IT", "SW"),
+                        values = c("solid", "dotted"))+
+  theme_classic() +
+  theme(
+    legend.title = element_text(family = "serif", color = "black", size = 20),
+    legend.text = element_text(family = "serif", color = "black", size = 20),
+    axis.title = element_text(family = "serif", color = "black", size = 20),
+    axis.text = element_text(family = "serif", color = "black", size = 20),
+    axis.line = element_line(colour = 'black', size = 1),
+    axis.ticks = element_line(color = 'black', size = 1),
+    axis.ticks.length=unit(.15, "cm"),
+    legend.spacing.y = unit(0.03, "cm"),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+    )
+
+ggplot(data = Cur_SLA, aes(x = mean_SLA, y = mean_fruits)) +
+  geom_point(aes(col=Population), size = 4) +
+  labs(y="Current Fruit Number", 
+      x="Current SLA")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("maroon3", "darkgreen"))+
+  scale_linetype_manual(name = "Population",
+                        labels = c("IT", "SW"),
+                        values = c("solid", "dotted"))+
+  theme_classic() +
+  theme(
+    legend.title = element_text(family = "serif", color = "black", size = 20),
+    legend.text = element_text(family = "serif", color = "black", size = 20),
+    axis.title = element_text(family = "serif", color = "black", size = 20),
+    axis.text = element_text(family = "serif", color = "black", size = 20),
+    axis.line = element_line(colour = 'black', size = 1),
+    axis.ticks = element_line(color = 'black', size = 1),
+    axis.ticks.length=unit(.15, "cm"),
+    legend.spacing.y = unit(0.03, "cm"),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+    )
+```
+
+# 2022
+
+## Read in data
+```{r}
+Dat_2022 <- read.csv("data/CleanData_2022.csv", header= TRUE)
+
+# make some things factors
+Dat_2022$Treatment <- as.factor(Dat_2022$Treatment)
+Dat_2022$Population <- as.factor(Dat_2022$Population)
+Dat_2022$PotID <- as.factor(Dat_2022$PotID)
+Dat_2022$Flat <- as.factor(Dat_2022$Flat)
+Dat_2022$Chamber <- as.factor(Dat_2022$Chamber)
+Dat_2022$Transplanted <- as.factor(Dat_2022$Transplanted)
+
+```
+
+## Summarize!
+
+```{r sum}
+# by population only
+ByPop_22 <- Dat_2022 %>%
+  dplyr::group_by(Population) %>%
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+
+# transpose for easier viewing
+ByPop_22 <- data.frame(t(ByPop_22))
+
+# now do by treatment
+ByTrt_22 <- Dat_2022 %>%
+  dplyr::group_by(Treatment) %>%
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+ByTrt_22 <- data.frame(t(ByTrt_22))
+
+# Now I want population  means within each treatment
+ByTrt_Pop_22 <- Dat_2022 %>%
+  dplyr::group_by(Population) %>%
+  dplyr::group_by(Treatment, .add = TRUE) %>%
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+
+# for some ease of viewing
+ByTrt_Pop_22 <- data.frame(t(ByTrt_Pop_22))
+colnames(ByTrt_Pop_22) <- c("Belm_C", "Belm_F", "Roda_C", "Roda_F")
+
+# save this to keep means
+write.csv(ByTrt_Pop_22,"data/PopMeansByTreatment_2022.csv", row.names = TRUE )
+```
+
+
+## Anovas
+Now, we can make some models. Initially there were three models for this analysis.
+
+For traits collected before bolting: trait ~ Treatment * Population + (1|Population:Line) + (1|Treatment:Chamber) + (1|Transplanted)
+
+For traits collected when a single leaf was harvesting: trait ~ Treatment * Population + (1|BoltingToHarvest) + (1|Population:Line) + (1|Treatment:Chamber) + (1|Transplanted)
+
+For root harvesting traits: trait ~ Treatment * Population + (1|BoltingToRootWashing) + (1|Population:Line) + (1|Treatment:Chamber) + (1|Transplanted)
+
+After discussing with Jeff, chamber nested within treatment was changed to a fixed effect because models struggle to fit a variance with few groups. The Bolting to harvest and bolting to root washing variables were also removed because they are continuous but being treated like categorical as a random effect. These two variables did explain some variation and removing sometimes increased and sometimes decreased both effect sizes and p values. 
+
+If included, the transplanting effect should be fixed. There is a population bias where only italian lines were transplanted. 17 plants from 6 genotypes were transplanted. They became 10 current plants and 7 future plants. **However, when included, the transplanting effect sometimes explains 0 variance** Because this is such a small number (17 plants of 127 plants), the transplanting effect was removed from the model. All models were run with and without transplanting as  a fixed effect, but only small changes were seen in 3 traits (see data/ModelResults_InitalModels.xlsx for notes.)
+
+Final model (only 1): trait ~ Treatment * Population + Treatment:Chamber + (1|Population:Line)
+
+
+```{r}
+# set contrasts for models to ensure we are doing the correct type of ANOVA (type-III)
+contrasts(Dat_2022$Population) <- contr.sum
+contrasts(Dat_2022$Treatment) <- contr.sum
+
+# make a modelling function to streamline analyses. This function runs a mixed model, then plots the residuals, the model summary, and runs an ANOVA
+anov_lmer2 <- function(trait, data = Dat_2022){
+  lm<- lmer(trait ~ Treatment * Population + Treatment:Chamber + (1|Population:Line), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+  print(plot(lm))
+  hist(residuals(lm), breaks = 15)
+  # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
+  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+       col = c("red", "blue")[as.numeric(Dat_2022$Population)[complete.cases(trait)]],
+       pch = c(16, 17)[as.numeric(Dat_2022$Treatment)[complete.cases(trait)]])
+  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
+  #legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
+  #plotting sanity check
+  print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
+  # make qq plot
+  qqnorm(resid(lm))
+  qqline(resid(lm))
+  print(summary(lm))
+  print(confint(lm))
+  anov <- anova(lm)
+  print(anov)
+  df <- as.data.frame(anov)
+  df$exp <- "2022"
+  return(df)
+}
+
+  
+```
+
+```{r, eval = FALSE, echo = FALSE}
+# no longer used functions
+# include days between bolting and harvesting as random effect
+anov_lmer3 <- function(trait, data = Dat_2022){
+  lm<- lmer(trait ~ Treatment * Population + (1|BoltingToHarvest) + (1|Population:Line) + (1|Treatment:Chamber) + (1|Transplanted), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+  print(plot(lm))
+  hist(residuals(lm), breaks = 15)
+  # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
+  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+       col = c("red", "blue")[as.numeric(Dat_2022$Population)],
+       pch = c(16, 17)[as.numeric(Dat_2022$Treatment)])
+  legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
+  legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
+  # make qq plot
+  qqnorm(resid(lm))
+  qqline(resid(lm))
+  print(summary(lm))
+  print(confint(lm))
+  anov <- anova(lm)
+  print(anov)
+  return(anov)
+}
+
+# include days between bolting and root washing as random effect
+anov_lmer4 <- function(trait, data = Dat_2022){
+  lm<- lmer(trait ~ Treatment * Population + (1|BoltingToRootWashing) + (1|Population:Line) + (1|Treatment:Chamber) + (1|Transplanted), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+  print(plot(lm))
+  hist(residuals(lm), breaks = 15)
+  # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
+  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+       col = c("red", "blue")[as.numeric(Dat_2022$Population)],
+       pch = c(16, 17)[as.numeric(Dat_2022$Treatment)])
+  legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
+  legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
+  # make qq plot
+  qqnorm(resid(lm))
+  qqline(resid(lm))
+  print(summary(lm))
+  print(confint(lm))
+  anov <- anova(lm)
+  print(anov)
+  return(anov)
+}
+```
+
+Run the models
+### Phenology
+
+Days to emergence
+```{r}
+# days to emergence
+emerge_22 <- anov_lmer2(Dat_2022$l10_DaysToEmergence)
+emerge_22$trait <- "Emergence"
+# no interaction
+```
+
+Days between emergence and bolting
+```{r}
+# days emergence to bolting
+bolting_22 <- anov_lmer2(Dat_2022$EmergenceToBolting)
+bolting_22$trait <- "Bolting"
+```
+
+There is an interaction, so do posthoc analyses.No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(EmergenceToBolting ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(EmergenceToBolting ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(EmergenceToBolting ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(EmergenceToBolting ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+ Not analyzing bolting to root washing or bolting to harvest. Those could be included as random effects, but most were close together. maybe should do analysis on if that should matter. should look at summary sheet to see. There do seem to be differences so the root washing traits (biomass) should have days to root wash as a random effect and other bolting day traits should have bolting to harvest as a random effect. might need to redo the model or not use the function to do this.
+ 
+Not looking an number emerged because doesn't have a 2021 comparison for emergence success... ignoring but might want to look at later.
+
+### Single Leaf Traits: bolting
+
+Fresh weight
+```{r}
+# single leaf fresh weight
+fresh_22 <- anov_lmer2(Dat_2022$l10_SL_FreshWt)
+fresh_22$trait <- "l10_FreshWt"
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_SL_FreshWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_SL_FreshWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_SL_FreshWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_SL_FreshWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+Saturated/Hydrated weight
+```{r}
+# single leaf hydrated (also called saturated) weight
+hyd_22 <- anov_lmer2(Dat_2022$l10_SL_HydWt)
+hyd_22$trait <- "l10_SatWt"
+# also has SQR transformation
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_SL_HydWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_SL_HydWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_SL_HydWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_SL_HydWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+Dried weight
+```{r}
+# single leaf dry weight
+dry_22 <- anov_lmer2(Dat_2022$SL_DryWt)
+dry_22$trait <- "DriedWt"
+# also has SQR transformation
+# no interaction
+
+# what about SQR transformation - no meaningful change
+#anov_lmer2(Dat_2022$SQR_SL_DryWt)
+
+# and what about l10 transformation - no meaningful change
+#anov_lmer2(log10(Dat_2022$SL_DryWt))
+```
+
+leaf area
+```{r}
+# single leaf area
+area_22 <- anov_lmer2(Dat_2022$SL_Area)
+area_22$trait <- "Area"
+# also has SQR
+```
+
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(SL_Area ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(SL_Area ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(SL_Area ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(SL_Area ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+leaf perimeter
+```{r}
+# single leaf perimeter
+per_22 <- anov_lmer2(Dat_2022$SL_Perim)
+per_22$trait <- "Perimeter"
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(SL_Perim ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(SL_Perim ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(SL_Perim ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(SL_Perim ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+specific leaf area
+```{r}
+# SLA
+sla_22 <- anov_lmer2(Dat_2022$l10_SLA)
+sla_22$trait <- "l10_SLA"
+```
+
+There is an interaction, so do posthoc analyses. There is a chamber effect in full model, so included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_SLA ~ Treatment + Treatment:Chamber + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerned about the warnings
+#roda
+as.data.frame(summary(lmer(l10_SLA ~ Treatment + Treatment:Chamber + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_SLA ~ Population + Chamber + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_SLA ~ Population + Chamber + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+leaf dry matter content
+```{r}
+# leaf dry matter content
+ldmc_22 <- anov_lmer2(Dat_2022$l10_LDMC)
+ldmc_22$trait <- "l10_LDMC"
+# conf int gives many warnings
+```
+
+There is an interaction, so do posthoc analyses. There is a chamber effect in full model, so included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_LDMC ~ Treatment + Treatment:Chamber + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerned about the warnings
+#roda
+as.data.frame(summary(lmer(l10_LDMC ~ Treatment + Treatment:Chamber + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_LDMC ~ Population + Chamber + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_LDMC ~ Population + Chamber + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+relative water content
+```{r}
+# relative water content
+rwc_22 <- anov_lmer2(Dat_2022$RWC)
+rwc_22$trait <- "RWC"
+# tori did log for RWC.
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(RWC ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(RWC ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+### Leaf Number
+
+leaf num at 4 weeks
+```{r}
+# pre vern leaf number
+LN_PreVern_22 <- anov_lmer2(Dat_2022$LeafNumber_PreVern)
+LN_PreVern_22$trait <- "LeafNum_5wks"
+# no interaction
+```
+leaf num first week post vern
+```{r}
+# june 6 leaf number(first week post vern?)
+LN_Jun6_22 <- anov_lmer2(Dat_2022$LeafNumber_Jun6)
+LN_Jun6_22$trait <- "LeafNum_9wks"
+# no interaction
+```
+leaf num second week post vern
+```{r}
+# june 14 leaf number (second week post vern?)
+LN_Jun13_22 <- anov_lmer2(Dat_2022$LeafNumber_Jun13)
+LN_Jun13_22$trait <- "LeafNum_10wks"
+# no interaction
+```
+leaf num at bolting
+```{r}
+# total leaf number counted at bolting when plants were harvested
+LN_bolt_22 <- anov_lmer2(Dat_2022$l10_LeafNumber_Total)
+LN_bolt_22$trait <- "LeafNumb_bolting"
+# no interaction
+```
+
+Not analyzing rosette leaf number or under leaves because this split was started partway through the experiment.
+
+
+### Biomass
+
+above ground biomass
+```{r}
+# above ground biomass (same as rosette biomass)
+AG_22 <- anov_lmer2(Dat_2022$l10_AG_DryBiomass)
+AG_22$trait <- "l10_Above Ground Biomass"
+# also has SQR transformation
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_AG_DryBiomass ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_AG_DryBiomass ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_AG_DryBiomass ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_AG_DryBiomass ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+below ground biomass
+```{r}
+# below ground biomass
+BG_22 <- anov_lmer2(Dat_2022$BG_DryBiomass)
+BG_22$trait <- "Below Ground Biomass"
+# also has SQR transformation
+# no interaction
+```
+Root to shoot ration (below ground / above ground)
+```{r}
+# Root to Shoot ratio
+RS_22 <- anov_lmer2(Dat_2022$l10_Root_to_Shoot)
+RS_22$trait <- "l10_Root to Shoot Ratio"
+
+```
+
+There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+### Stomatal Density
+Not analyzing stomata average becuase density is the average information with the viewing window area included in the calculation.
+```{r}
+# stomatal density - imaged on harvest day
+sto_den_22 <- anov_lmer2(Dat_2022$l10_Stomata_density)
+sto_den_22$trait <- "Stomatal Density"
+# no interaction
+```
+
+### Results Table
+
+```{r}
+AnovaResults_2022 <- rbind(emerge_22, bolting_22, fresh_22, hyd_22, dry_22, area_22, per_22, sla_22, ldmc_22, rwc_22, LN_PreVern_22, LN_Jun6_22, LN_Jun13_22, LN_bolt_22, AG_22, BG_22, RS_22, sto_den_22 )
+
+write.csv(AnovaResults_2022, file = "data/AnovaResults_2022.csv", row.names = TRUE)
+```
+
+The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis.
+
+The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. Post hoc analyses if there was an interaction between population and treatment are only recorded here (as of 7/19/2024) and are only done for 2021 as of 8/2/2024.
+
+# Problem Solve
+## Dry weight difference in signficance
+For dry weight, there is a huge difference in significance between 2021 (p value below 0.001) and 2022 (p value above 0.95). Quickly looking at the spreadsheets I can not tell a difference and the values are of similar magnitudes. I then did untransformed models and square root transformed models because those were reported as having the most normal residuals in the previous code. None of the models had differences in p values due to transformation that changed the interpretation of the results. I also excluded the "days between bolting and harvest" random effect for the 2022 data but did not find a major difference in the models but the denominator degrees of freedom for treatment did change a lot. As a final check for if there is a potential mistake, I am going to look at some data distributions.
+
+```{r}
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = DriedWt_g, fill = Population), alpha = 0.5, position = "identity")+
+  theme_classic()
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = DriedWt_g, fill = Treatment), alpha = 0.5, position = "identity")+
+  theme_classic()
+
+
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = SL_DryWt, fill = Population), alpha = 0.5, position = "identity")+
+  theme_classic()
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = SL_DryWt, fill = Treatment), alpha = 0.5, position = "identity")+
+  theme_classic()
+```
+
+Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference.Scales of both are comparable. 
+
+## 2022 B1 to B12
+
+I am trying to figure out if I need to adjust these things or not, so I want to look at how different their trait values are. so first let's subset down to just these from Dat_2022 and then we can summarize by line to see if the means are like identical or not identical. Could also make figures if I think it is needed. 
+```{r}
+B_comp <- Dat_2022[Dat_2022$Population == "B" & Dat_2022$Line %in% c(1,12), ]
+
+B_comp <- B_comp %>%
+  dplyr::group_by(Line) %>%
+  dplyr::group_by(Treatment, .add = TRUE) %>%
+  summarize(across(.col = c(DaysToEmergence:Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"))))
+
+# for some ease of viewing
+B_comp <- data.frame(t(B_comp))
+```
+
+They honestly don't seem to be close enough to the same for me to think they are the same genotype. So I am going to leave them as labelled because I don't know for sure that I planted stock center seeds instead of going of the labelled tubes. The only indication to me that B1 might be stock center seeds is the higher number of seeds that emerged, but in the later growing seasons B1 also had good emergence (1 and 3 in GS2, 7 and 7 in GS3). Also, since I fixed it immediately once found for the pilot results, I think I would have also fixed it immediately for Tori's results since we were still working together when I found the mistake.
+
+## 2021 Avg Seed per fruit
+Concerned that line does not explain any variance. Is it true that all the variation is within lines and not between lines? to check this: 1) make histogram of all the values (not line means) - done in CleanData but repeat here
+
+```{r}
+hist(Dat_2021_TwoTrt$AvgSeedNum)
+hist(Dat_2021_TwoTrt$l10_AvgSeedNum)
+```
+2) look within lines for difference in avg seeds/fruit - maybe do subtraction and histogram the differences? but won't work if more than two values
+
+```{r}
+# start with copy of code from 03_Figures that makes the by line plot
+Dat_2021_TwoTrt$Line.ID <- as.factor(paste0(Dat_2021_TwoTrt$Population, Dat_2021_TwoTrt$Line))
+Dat_2021_TwoTrt$Line.ID.T <- as.factor(paste0(Dat_2021_TwoTrt$Line.ID, Dat_2021_TwoTrt$Treatment))
+df_seed_line <- Dat_2021_TwoTrt %>%
+  dplyr::group_by(Line.ID.T, .add = TRUE) %>%
+  summarize(across(.col = c(AvgSeedNum, l10_AvgSeedNum), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.)))))
+df_seed_line$Population <- substr(df_seed_line$Line.ID.T, start = 1, stop = 4)
+
+hist(df_seed_line$AvgSeedNum_n)
+# some lines only have 1 pot per treatment -- 10 instances, 7 in Cur
+# some lines only have pots in one treatment 4 - all in Fut are the dead ones so only a rep in cur
+# 3 and 4 are Roda parent. 6 and 7 are Belm parent.
+
+# get list of Line.ID with 2 replicates
+two_reps <- df_seed_line[df_seed_line$AvgSeedNum_n == 2, "Line.ID.T"]$Line.ID.T
+# pull those out of the main dataframe
+two_reps_seeds <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Line.ID.T %in% two_reps, c("Treatment", "Population", "Line", "Replicate", "Line.ID", "Line.ID.T", "AvgSeedNum", "l10_AvgSeedNum")]
+
+# find the difference in values
+two_reps_diff <-  two_reps_seeds %>% 
+  group_by(Line.ID.T) %>% 
+  summarize(across(.col = c(AvgSeedNum, l10_AvgSeedNum), .fns = ~diff(.x)))
+
+
+# table of just RIL parent seed numbers
+ril_pars_seed <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Line.ID %in% c("BELM12", "RODA47"), c("Treatment", "Population", "Line", "Replicate", "Line.ID", "Line.ID.T", "AvgSeedNum", "l10_AvgSeedNum")]
+ril_pars_seed[order(ril_pars_seed$Line.ID.T), ]
+```
+
+
+3) figure out which genotypes are the outliers on the residuals plot.The low outlier on the residuals plot is B12. Note for interpretation that the residuals are scales (so not log scale but divided by the mean)
+```{r}
+# test out ggplotly
+tmp_seed <- lmer(l10_AvgSeedNum ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+
+df_seed <- data.frame(fitted = fitted(tmp_seed),
+                      resid = residuals(tmp_seed, type = "pearson", scaled = TRUE),
+                      pop = Dat_2021_TwoTrt$Population[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)],
+                      trt = Dat_2021_TwoTrt$Treatment[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)],
+                      line = Dat_2021_TwoTrt$Line[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)],
+                      pot.id = Dat_2021_TwoTrt$Pot.ID[complete.cases(Dat_2021_TwoTrt$l10_AvgSeedNum)])
+
+plot_seed <-  ggplot(df_seed) +
+  geom_point(aes(x=fitted, y=resid,
+       col = pop, shape = trt, text=pot.id))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme_classic()
+ggplotly(plot_seed)
+```
+

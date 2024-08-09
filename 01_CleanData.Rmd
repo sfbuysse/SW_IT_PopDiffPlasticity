@@ -1,0 +1,751 @@
+---
+title: "01_CleanData"
+author: "Sophie Buysse"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+  toc: true
+  toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# description
+
+This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder.
+
+# Set basic info for all code
+
+This chunk sets things that will be constant for the whole document.
+
+Load packages: \
+
+```{r, warning = FALSE, message = FALSE}
+#setup code here
+
+# read in packages
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(rcompanion)
+
+```
+
+Make functions: \
+
+```{r}
+# prep for doing statistical analyses
+options(contrasts = c("contr.sum", "contr.poly"))
+
+# for exploring transformations
+explore_trans <- function(trait){
+  plotNormalHistogram(trait)
+  plotNormalHistogram(log10(trait))
+  plotNormalHistogram(exp(trait))
+  plotNormalHistogram(sqrt(trait))
+  # want the one with the largest value
+  print(shapiro.test(trait))
+  print(shapiro.test(log10(trait)))
+  print(shapiro.test(exp(trait)))
+  print(shapiro.test(sqrt(trait))) 
+}
+
+# standard error of the mean
+std_mean <- function(x){
+  sd(x, na.rm = TRUE)/sqrt(length(x))
+}
+
+# Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+
+conf_int <- function(x, conf.interval = 0.95){
+  ciMult <- qt((1+conf.interval)/2, length(x)-1)
+  ci <- std_mean(x) * ciMult
+  return(ci)
+}
+
+```
+
+
+# 2021
+## Load in Data
+Raw Data files not on github.
+
+```{r data}
+SingleLeaf <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
+Harv_blue <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
+Harv_pink <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
+LeafNum <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
+Phenology <-read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
+PlantingDay <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
+```
+
+## Clean up data
+
+The goal of this code is to identify any entering errors and fix them, go through the notes and remove any traits that may not be accurate (i.e., if a plant was dropped or otherwise damaged before harvest), and create one data frame that includes all trait information for all individuals.
+
+Note: There was a labelling error that is fixed later on. IT RIL Parent seeds ordered from the stock center were labelled as B1 instead of the correct B12. This is fixed below. Fixed labels were given unique IDs so they did not overlap with already existing labels and could be identified later.
+
+```{r, merging}
+# there were steps to put things in notes columns and make sure NAs were missing values and zeros were zeros prior to this step that were done in excel.
+
+Harv_blue <- Harv_blue[!(is.na(Harv_blue$Line)), c(1:14)]
+colnames(Harv_blue) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "Harvest.Date", "RosetteLeafNum", "FreshRosetteG", "DryRosetteG", "FreshReproG", "DryReproG", "FreshRootG", "DryRootG", "Notes")
+
+# calculate some other traits
+# root to shoot ratio is the root mass devided by all above ground biomass (dry)
+Harv_blue$Root_to_Shoot <- Harv_blue$DryRootG/(Harv_blue$DryRosetteG + Harv_blue$DryReproG)
+# reproducive to rosette is the reproductive weight divided by the rosette weight. Decided to go this way so that a higher value indicates more investment in 
+# reproductive tissue relative to the rosette weight it has
+Harv_blue$Repro_to_Ros <- Harv_blue$DryReproG / Harv_blue$DryRosetteG
+
+# fix envelope labelling mistake and fill in with accurate values; while there was a mistake here, my lab notebook says " I put some of the R47-1-C reproductive in the R21-1-C reproductive envelope. I could kig of fix it, but R47-1 might be low and R21-1 might be high so I should discard both of these reproductive weights. Thus, commenting out these lines.
+#Harv_blue[Harv_blue$Pot.ID == "R21-1-C", "DryReproG"] <- 2.0414
+#Harv_blue[Harv_blue$Pot.ID == "R47-1-C", "DryReproG"] <- 1.2501
+
+#R35-2-C was dropped before flowering (on 10/14) so I am dropping the value on anything collected post the drop.
+Harv_blue <- Harv_blue[!(Harv_blue$Pot.ID == "R35-2-C"), ]
+
+colnames(Harv_pink) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "IJ_FruitCount", "FruitCounter", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "FruitCollected", "FruitColLocation", "DoneFlwr", "NumFlwrLeft", "Notes", "FruitColWt_mg", "SeedColWt_mg", "ScanPosition", "ScanPhotoName", "IJ_SeedCount", "SeedCounter", "Notes2")
+
+# remove extra rows in .csv + R35-2-C
+Harv_pink <- Harv_pink[!(is.na(Harv_pink$Line)), ]
+Harv_pink <- Harv_pink[!(Harv_pink$Pot.ID == "R35-2-C"), ]
+
+LeafNum <- LeafNum[!(is.na(LeafNum$Weigh.Order)), c(1:18)]
+
+Phenology <- Phenology[!(is.na(Phenology$Weigh.Order)), c(1:12)]
+Phenology[Phenology$Pot.ID == "R35-2-C", "Flowering"] <- NA
+# fix data entry error
+Phenology[Phenology$Pot.ID == "R35-1-C", "Bolting"] <- "10/12/2021"
+
+PlantingDay <- PlantingDay[c(1:150), c(1:18)]
+
+rm_these <- c("B13-2-CF", "B3-2-CF", "R35-2-C") # remove doubles (B13-2-CF from 9/22, B3-2-CF from 9/22, R35-2-C b/c dropped before flowering so I am dropping the value on anything collected post the drop
+SingleLeaf <- SingleLeaf[!(SingleLeaf$Pot.ID %in% rm_these), ]
+# then rename the doubles so they will merge correctly
+SingleLeaf[SingleLeaf$Pot.ID == "B13-2-CF2", "Pot.ID"] <- "B13-2-CF"
+SingleLeaf[SingleLeaf$Pot.ID == "B3-2-CF2", "Pot.ID"] <- "B3-2-CF"
+# and get rid of extra rows at the end
+SingleLeaf <- SingleLeaf[!(is.na(SingleLeaf$Line)), ]
+
+# Calculate other traits
+# SLA = leaf area / leaf dry mass
+SingleLeaf$SLA <- SingleLeaf$LeafArea/SingleLeaf$DriedWt_g
+# LDMC = dry mass / saturated mass
+SingleLeaf$LDMC = SingleLeaf$DriedWt_g / SingleLeaf$SatWt_g
+# RWC = (fresh mass - dry mass) / (saturated mass - dry mass)
+### Note: this is the one that would be impacted by not always collecting the leaves at the same time of day
+SingleLeaf$RWC = (SingleLeaf$FreshWt_g - SingleLeaf$DriedWt_g) / (SingleLeaf$SatWt_g - SingleLeaf$DriedWt_g)
+```
+
+At this point, sorted each dataframe by values to identify any high or low outliers. Did not find anything that was attributed to data entry errors. Also went through the notes columns to see if anything should be removed. 
+
+Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well.
+
+Leaf number is also variable with some counted at bolting and some at flowering so may need to toss that trait.
+
+B4-1-CF has a new emergent on 8/31/2024 but it was dead by bolting so don't need to remove anything.
+
+## Merge together
+
+Now, merge data frames together
+
+```{r}
+AllData_2021 <- merge(PlantingDay, Phenology, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
+AllData_2021 <- merge(AllData_2021, SingleLeaf, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
+AllData_2021 <- merge(AllData_2021, LeafNum, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
+AllData_2021 <- merge(AllData_2021, Harv_blue, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
+AllData_2021 <- merge(AllData_2021, Harv_pink, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
+# there's lots of notes columns at this point but that is okay.
+# notes column names are repeated
+
+# remove weigh.order columns b/c not relevant here
+AllData_2021$Weigh.Order.x <- NULL
+AllData_2021$Weigh.Order.y <- NULL
+
+# fix Pot.ID labelling error
+# Pop = BELM
+# Line = 1 - change to 12
+# Rep = 1:5 - change to 11:15
+# need to change Pot.IDs
+change.these <- c("B1-1-C", "B1-1-CF", "B1-1-F", "B1-2-C", "B1-2-CF", "B1-2-F", "B1-3-C", "B1-3-CF", "B1-3-F", "B1-4-C", "B1-4-CF", "B1-4-F", "B1-5-C", "B1-5-CF", "B1-5-F")
+AllData_2021[AllData_2021$Pot.ID %in% change.these, "Line"] <- 12
+AllData_2021[AllData_2021$Pot.ID %in% change.these & AllData_2021$Replicate == 1, "Replicate"] <- 11
+AllData_2021[AllData_2021$Pot.ID %in% change.these & AllData_2021$Replicate == 2, "Replicate"] <- 12
+AllData_2021[AllData_2021$Pot.ID %in% change.these & AllData_2021$Replicate == 3, "Replicate"] <- 13
+AllData_2021[AllData_2021$Pot.ID %in% change.these & AllData_2021$Replicate == 4, "Replicate"] <- 14
+AllData_2021[AllData_2021$Pot.ID %in% change.these & AllData_2021$Replicate == 5, "Replicate"] <- 15
+AllData_2021[AllData_2021$Pot.ID %in% change.these, "Pot.ID"] <- c("B12-11-C", "B12-11-CF", "B12-11-F", "B12-12-C", "B12-12-CF", "B12-12-F", "B12-13-C", "B12-13-CF", "B12-13-F", "B12-14-C", "B12-14-CF", "B12-14-F", "B12-15-C", "B12-15-CF", "B12-15-F")
+
+str(AllData_2021)
+
+# and write this out
+write.csv(AllData_2021,"data/AllData_2021.csv", row.names = FALSE)
+
+#note NumRemoved_08262021 -> I can use this column to only include things that were still alive after 8/26. if y in this column, pot was dead/removed on this date. If "n", then plant alive and kept
+
+```
+
+
+
+Now clean up environment
+```{r}
+rm("Harv_blue", "Harv_pink", "LeafNum", "Phenology", "PlantingDay", "SingleLeaf", "change.these", "rm_these")
+```
+
+Now clean up AllData dataframe
+```{r sum_all}
+# first make some factors
+AllData_2021$Population <- as.factor(AllData_2021$Population)
+AllData_2021$Treatment <- as.factor(AllData_2021$Treatment)
+AllData_2021$Soil.Mix.Batch.Number.x <- as.factor(AllData_2021$Soil.Mix.Batch.Number.x)
+AllData_2021$BranchStructure <- as.factor(AllData_2021$BranchStructure)
+AllData_2021$DoneFlwr <- as.factor(AllData_2021$DoneFlwr)
+AllData_2021$FruitCounter <- as.factor(AllData_2021$FruitCounter)
+AllData_2021$SeedCounter <- as.factor(AllData_2021$SeedCounter)
+
+# and some num
+AllData_2021$TotFruit <- as.numeric(AllData_2021$TotFruit) # forces columns with "some fruit" or similar to NA which is OK because these were harvested early (root washed)
+
+sum(is.na(AllData_2021$NumFlwrLeft))
+# expect 10 more
+AllData_2021$NumFlwrLeft <- as.numeric(AllData_2021$NumFlwrLeft)
+sum(is.na(AllData_2021$NumFlwrLeft))
+
+# format as dates, calculated from planting day
+AllData_2021$Emergence <- julian(as.Date(AllData_2021$Emergence, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+AllData_2021$Bolting <- julian(as.Date(AllData_2021$Bolting, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+AllData_2021$Flowering <- julian(as.Date(AllData_2021$Flowering, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+AllData_2021$Wilted_Died <- julian(as.Date(AllData_2021$Wilted_Died, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+AllData_2021$Leaf_Collected <- julian(as.Date(AllData_2021$Leaf_Collected, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+AllData_2021$Harvest.Date <- julian(as.Date(AllData_2021$Harvest.Date, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
+
+# Calculate the days between each phenological timepoint
+# days to bolt - days to emergence
+AllData_2021$DayToBolt = AllData_2021$Bolting - AllData_2021$Emergence
+
+# days to flower - days to bolt
+AllData_2021$DayToFlwr = AllData_2021$Flowering - AllData_2021$Bolting
+
+# make a separate notes dataframe
+Notes <- AllData_2021[, c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Notes.x", "notes.x", "Notes.y", "Notes.1", "Notes.x", "notes.y","notes.1", "notes.2", "Notes.y", "Notes", "Notes2")]
+
+# then remove the notes columns for this part
+CleanData_2021 <- AllData_2021
+CleanData_2021$Notes.x <- NULL
+CleanData_2021$notes.x <- NULL
+CleanData_2021$Notes.y <- NULL
+CleanData_2021$Notes.1 <- NULL
+CleanData_2021$Notes.x <- NULL
+CleanData_2021$notes.y <- NULL
+CleanData_2021$notes.1 <- NULL
+CleanData_2021$notes.2 <- NULL
+CleanData_2021$Notes.y <- NULL
+CleanData_2021$Notes <- NULL
+CleanData_2021$Notes2 <- NULL
+
+# add zeros to TotFruit so it is a better measure of fitness and includes the plants that died.
+CleanData_2021$TotFruit[is.na(CleanData_2021$TotFruit)] <- 0
+# but not the ones where they were harvested, so would have made fruits if not harvested
+CleanData_2021[CleanData_2021$Pot.ID %in% c('R47-4-C', 'R47-5-C', 'R47-3-CF', 'R47-4-CF', 'R47-3-F', 'R47-4-F'), "TotFruit"] <- NA
+
+# Also remove columns that won't be used in analysis. Here is a list of columns names to keep. Some of these leaf number counts might not be used later on, but keep at this point in time.
+myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "Emergence","DayToBolt", "DayToFlwr", "FreshWt_g", "SatWt_g", "DriedWt_g", "LeafArea", "LeafPerimeter", "SLA", "LDMC", "RWC", "LeafNum_.07222021", "LeafNum_08262021","NumRemoved_08262021", "RosetteLeafNum_10042021", "RosetteLeafNum_bolt", "RosetteLeafNum_Flower", "RosetteLeafNum", "DryRosetteG", "DryReproG", "DryRootG", "Root_to_Shoot", "Repro_to_Ros", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "IJ_FruitCount", "FruitCounter", "FruitCollected", "DoneFlwr","NumFlwrLeft","FruitColWt_mg","SeedColWt_mg", "IJ_SeedCount", "SeedCounter")
+
+CleanData_2021 <- CleanData_2021[ ,myCols]
+
+# add another trait: Above ground biomass
+CleanData_2021$AG_biomass <- CleanData_2021$DryRosetteG + CleanData_2021$DryReproG
+```
+
+## Transformations
+
+This code is determining which traits may need to be transformed when I run model analysis in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
+
+Start with big overview of everything
+
+```{r histograms}
+# get a giant view of all the traits, not a super helpful figure honestly
+CleanData_2021 %>% select_if(is.numeric) %>% gather(cols, value) %>% 
+  ggplot(aes(x = value)) + 
+  geom_histogram() + 
+  facet_wrap(.~cols, scales = "free")
+```
+
+Start to go through traits one at a time. Make each one its own code chunk for ease of viewing figures. 
+
+Fresh weight of Single Leaf
+```{r}
+explore_trans(CleanData_2021$FreshWt_g)
+
+# add column of log transformed information to dataframe
+CleanData_2021$l10_FreshWt <- log10(CleanData_2021$FreshWt_g)
+```
+
+Saturated Weight of Single Leaf
+
+```{r}
+explore_trans(CleanData_2021$SatWt_g)
+CleanData_2021$l10_SatWt <- log10(CleanData_2021$SatWt_g)
+
+```
+
+Dried Weight of Single Leaf
+```{r}
+explore_trans(CleanData_2021$DriedWt_g)
+# sqrt is the best here, also do log for consistency
+CleanData_2021$l10_DriedWt <- log10(CleanData_2021$DriedWt_g)
+CleanData_2021$SQR_DriedWt <- sqrt(CleanData_2021$DriedWt_g)
+```
+
+Leaf Area of Single Leaf
+```{r}
+explore_trans(CleanData_2021$LeafArea)
+# log ten is the best
+CleanData_2021$l10_LeafArea <- log10(CleanData_2021$LeafArea)
+```
+
+Leaf Perimeter of Single Leaf
+```{r}
+explore_trans(CleanData_2021$LeafPerimeter)
+CleanData_2021$l10_LeafPer <- log10(CleanData_2021$LeafPerimeter)
+```
+
+Specific Leaf Area
+```{r}
+#explore_trans(CleanData_2021$SLA)
+#function throws an error so did it by hand (probably because of NAs, issue with exponential transformation)
+plotNormalHistogram(CleanData_2021$SLA)
+  plotNormalHistogram(log10(CleanData_2021$SLA))
+  hist(exp(CleanData_2021$SLA))
+  plotNormalHistogram(sqrt(CleanData_2021$SLA))
+  # want the one with the largest value
+  print(shapiro.test(CleanData_2021$SLA))
+  print(shapiro.test(log10(CleanData_2021$SLA)))
+  print(shapiro.test(exp(CleanData_2021$SLA)))
+  print(shapiro.test(sqrt(CleanData_2021$SLA))) 
+# log10 is the best
+CleanData_2021$l10_SLA <- log10(CleanData_2021$SLA)
+```
+
+Leaf Dry Matter Content
+```{r}
+explore_trans(CleanData_2021$LDMC)
+CleanData_2021$l10_LDMC <- log10(CleanData_2021$LDMC)
+```
+
+Relative Water Content
+```{r}
+explore_trans(CleanData_2021$RWC)
+# none of these are really good. leave alone.
+```
+
+Leaf Number, early stages
+```{r}
+print(shapiro.test(CleanData_2021$LeafNum_.07222021))
+print(shapiro.test(log10(CleanData_2021$LeafNum_.07222021)))
+print(shapiro.test(exp(CleanData_2021$LeafNum_.07222021)))
+print(shapiro.test(sqrt(CleanData_2021$LeafNum_.07222021))) 
+```
+
+Leaf number, during winter
+```{r}
+print(shapiro.test(CleanData_2021$LeafNum_08262021))
+print(shapiro.test(log10(CleanData_2021$LeafNum_08262021)))
+print(shapiro.test(exp(CleanData_2021$LeafNum_08262021)))
+print(shapiro.test(sqrt(CleanData_2021$LeafNum_08262021))) 
+```
+
+leaf number about bolting time
+```{r}
+explore_trans(CleanData_2021$RosetteLeafNum_10042021)
+```
+
+leaf number at bolting
+```{r}
+explore_trans(CleanData_2021$RosetteLeafNum_bolt)
+```
+
+Leaf number at flowering
+```{r}
+explore_trans(CleanData_2021$RosetteLeafNum_Flower)
+```
+
+Rosette Leaf Num at Harvest
+```{r}
+explore_trans(CleanData_2021$RosetteLeafNum)
+
+```
+
+Dry Rosette Biomass
+
+```{r}
+explore_trans(CleanData_2021$DryRosetteG)
+#sqrt is the best but not quite normal but l10 okay so do both
+CleanData_2021$SQR_DryRosG <- sqrt(CleanData_2021$DryRosetteG)
+CleanData_2021$l10_DryRosG <- log10(CleanData_2021$DryRosetteG)
+```
+
+Dry Reproductive Biomass
+```{r}
+explore_trans(CleanData_2021$DryReproG)
+# log10 does the best job but not fantastic. 
+
+CleanData_2021$l10_DryReproG <- log10(CleanData_2021$DryReproG)
+
+#full above ground
+explore_trans(CleanData_2021$AG_biomass)
+CleanData_2021$l10_AG_biomass <- log10(CleanData_2021$AG_biomass)
+```
+
+Dry Root Biomass - few samples
+```{r}
+explore_trans(CleanData_2021$DryRootG)
+# leave as it
+```
+
+Dry Root_to_Shoot ratio - few samples
+```{r}
+explore_trans(CleanData_2021$Root_to_Shoot)
+# leave as is
+```
+
+Reproductive to Rosette biomass ratio
+```{r}
+explore_trans(CleanData_2021$Repro_to_Ros)
+# log is the best
+CleanData_2021$l10_R_to_R <- log10(CleanData_2021$Repro_to_Ros)
+```
+
+Number of Lateral Branches
+```{r}
+explore_trans(CleanData_2021$LatBranches)
+# leave it alone
+```
+
+Number of Primary Stalks
+```{r}
+explore_trans(CleanData_2021$PrimaryStalks)
+# leave it alone
+```
+
+```{r}
+explore_trans(CleanData_2021$Height_cm)
+# none are great, so I'm going to leave it alone for now.
+```
+Fruit Number
+```{r}
+# Counts at Harvest
+  print(shapiro.test(CleanData_2021$TotFruit))
+  print(shapiro.test(log10(CleanData_2021$TotFruit)))
+  print(shapiro.test(exp(CleanData_2021$TotFruit)))
+  print(shapiro.test(sqrt(CleanData_2021$TotFruit))) 
+  
+# counts from ImageJ
+print(shapiro.test(CleanData_2021$IJ_FruitCount))
+print(shapiro.test(log10(CleanData_2021$IJ_FruitCount)))
+print(shapiro.test(exp(CleanData_2021$IJ_FruitCount)))
+print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
+CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
+```
+
+```{r}
+  print(shapiro.test(CleanData_2021$NumFlwrLeft))
+  print(shapiro.test(log10(CleanData_2021$NumFlwrLeft)))
+  print(shapiro.test(exp(CleanData_2021$NumFlwrLeft)))
+  print(shapiro.test(sqrt(CleanData_2021$NumFlwrLeft))) 
+```
+
+```{r}
+explore_trans(CleanData_2021$FruitColWt_mg)
+```
+
+```{r}
+explore_trans(CleanData_2021$SeedColWt_mg)
+# what actually matters is the average seed weight, not the total
+CleanData_2021$AvgSeedWt <- CleanData_2021$SeedColWt_mg / CleanData_2021$IJ_SeedCount
+explore_trans(CleanData_2021$AvgSeedWt)
+```
+
+```{r}
+#explore_trans(CleanData_2021$IJ_SeedCount)
+# did by hand becuase exp transformation is too big to show in r -> values become infinity
+
+plotNormalHistogram(CleanData_2021$IJ_SeedCount)
+plotNormalHistogram(log10(CleanData_2021$IJ_SeedCount))
+#plotNormalHistogram(exp(CleanData_2021$IJ_SeedCount))
+plotNormalHistogram(sqrt(CleanData_2021$IJ_SeedCount))
+  # want the one with the largest value
+print(shapiro.test(CleanData_2021$IJ_SeedCount))
+print(shapiro.test(log10(CleanData_2021$IJ_SeedCount)))
+#print(shapiro.test(exp(CleanData_2021$IJ_SeedCount)))
+print(shapiro.test(sqrt(CleanData_2021$IJ_SeedCount))) 
+
+# sqr is best but log10 still better than raw, all OK though
+CleanData_2021$l10_IJ_Seeds <- log10(CleanData_2021$IJ_SeedCount)
+CleanData_2021$SQR_IJ_Seeds <- sqrt(CleanData_2021$IJ_SeedCount)
+
+#  want to analyze it as the average collected in each fruit so take the total seed number divided by the number of fruits collected.
+CleanData_2021$AvgSeedNum <- CleanData_2021$IJ_SeedCount / CleanData_2021$FruitCollected
+explore_trans(CleanData_2021$AvgSeedNum)
+CleanData_2021$l10_AvgSeedNum <- log10(CleanData_2021$AvgSeedNum)
+```
+
+Fitness
+```{r}
+CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$IJ_FruitCount
+
+plotNormalHistogram(CleanData_2021$fitness)
+plotNormalHistogram(log10(CleanData_2021$fitness))
+#plotNormalHistogram(exp(CleanData_2021$fitness))
+plotNormalHistogram(sqrt(CleanData_2021$fitness))
+  # want the one with the largest value
+print(shapiro.test(CleanData_2021$fitness))
+print(shapiro.test(log10(CleanData_2021$fitness)))
+#print(shapiro.test(exp(CleanData_2021$fitness)))
+print(shapiro.test(sqrt(CleanData_2021$fitness))) 
+
+CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness)
+```
+
+Phenology
+```{r}
+explore_trans(CleanData_2021$Emergence)
+# happened pretty quickly. not normal but transformation doesn't help
+
+explore_trans(CleanData_2021$DayToBolt)
+
+explore_trans(CleanData_2021$DayToFlwr)
+# SQRT is better but leaving for consistency in treating phenology
+
+```
+## Save file
+Save this file to read in to analysis script
+```{r}
+write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
+```
+
+
+# 2022
+
+## Load in Data
+
+Raw data files not saved in github. All intermediate files are.
+
+```{r load}
+Dat1 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
+Dat2 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
+Dat3 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
+Dat4 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
+
+# this file already has averages calcuated. Tori did it in excel. To get a file without averages, read in KBS_Stomata_Count.csv
+Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
+```
+
+## Clean up data
+
+Now, organize data to rows with data.
+```{r}
+# remove test rows. note: total leaf number wasn't split into rosette and under until partway through harvesting
+Dat1 <- Dat1[1:129, ]
+
+# remove test rows and columns we don't need
+Dat2 <- Dat2[1:129, 1:8]
+
+# only keep columns with data
+Dat3 <- Dat3[ , 2:4]
+# create PotID column
+Dat3$PotID <- substr(Dat3$Label, 1, regexpr("_", Dat3$Label)-1)
+
+# remove test rows
+# note: dat 4 has everything including the pots that had no emergence or emergence but died before vernalization when I did transplanting. That is why there are more rows than the other dataframes.
+Dat4 <- Dat4[1:141, ]
+# fix incorrect emergence date for B13-3-F b/c it is the date for the rogue capsella that emerged.
+Dat4[Dat4$PotID == "B13-3-F", "Emergence.Date"] <- NA
+
+
+# split all data from average calculation that was done in excel
+Stomata_avg <- Stomata[1:129, 6:8]
+Stomata <- Stomata[1:258, 1:5]
+colnames(Stomata_avg) <- c("Treatment", "PotID", "Stom_avg")
+Stomata_avg[14, "Treatment"] <- "Current"
+
+```
+
+## Merge together 
+Merge all the data, then clean up the big dataframe to get ready for analysis.
+Change the type of data (character, numeric, factor) as needed for each column
+
+```{r}
+Alldata_2022 <- merge(Dat1, Dat2, by = c("PotID", "Treatment"), all = TRUE)
+Alldata_2022 <- merge(Alldata_2022, Dat3, by =c("PotID"), all = TRUE)
+Alldata_2022 <- merge(Alldata_2022, Dat4, by = c("PotID", "Treatment"), all = TRUE)
+
+# add in stomata averages. the just stomata data frame won't merge nicely because of the format.
+Alldata_2022 <- merge(Alldata_2022, Stomata_avg, by = c("PotID", "Treatment"), all = TRUE)
+
+# format dates as dates since stratification (ignores planting day + first week in cold room) - so day 1 is first day in chambers
+Alldata_2022$Emergence <- julian(as.Date(Alldata_2022$Emergence.Date, "%m/%d/%Y"), origin = as.Date("2022-04-11"))
+Alldata_2022$Bolting <- julian(as.Date(Alldata_2022$BoltingDate, "%m/%d/%Y"), origin = as.Date("2022-04-11"))
+Alldata_2022$Harvest <- julian(as.Date(Alldata_2022$HarvestDate, "%m/%d/%Y"), origin = as.Date("2022-04-11"))
+Alldata_2022$RootHarvest <- julian(as.Date(Alldata_2022$RootHarvestDate, "%m/%d/%Y"), origin = as.Date("2022-04-11"))
+
+# calculate days between dates
+Alldata_2022$EmergenceToBolting <- Alldata_2022$Bolting - Alldata_2022$Emergence
+# ideally, bolting to harvest is zero and harvest to root harvest is zero but hasn't always feasible. May want the difference in a model
+Alldata_2022$BoltingToRootWashing <- Alldata_2022$RootHarvest - Alldata_2022$Bolting
+Alldata_2022$BoltingToHarvest <- Alldata_2022$Harvest - Alldata_2022$Bolting 
+
+#Remove the extra plant that was growing in same pot as another plant
+Alldata_2022 <- Alldata_2022[!(Alldata_2022$PotID == "B15-1-C (E)"), ]
+
+# save this output file as a raw data file 
+write.csv(Alldata_2022, "data/AllData_2022.csv", row.names = FALSE)
+```
+
+Clean up environment
+
+```{r}
+rm("Dat1", "Dat2", "Dat3", "Dat4", "Stomata_avg")
+```
+
+Now clean up with AllData file to only keep things we will analyze.
+
+```{r clean2}
+CleanData_2022 <- Alldata_2022
+
+keepCols <- c("PotID", "Treatment", "Population", "Line.x", "Replicate", "Chamber", "Flat", "transplanted", "Emergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest", "Number.Emerged", "Leaf.Number.PreVern..post.transplant", "LeafNumber_6.6.2022", "LeafNumber_6.13.2022", "SingleLeaf_FreshWt.g.", "SingleLeafHydratedWt.g.", "SingleLeafDryWt.g.", "Area", "Perim.", "TotalLeafNumber", "RosetteLeafNumber", "UnderLeavesNumber", "AG_DryBiomass.g.", "BG_DryBiomass.g.", "Stom_avg")
+
+# Note: plants that died are still included at this point.
+
+# for the columns, I am reordering so all the general info is in the first few columns, then dates of things only keeping the "days to" calculations, leaf numbers through growth period, single leaf traits, then whole plant harvest traits
+
+CleanData_2022 <- CleanData_2022[ , keepCols ]
+
+# now Clean up those column names!
+# NoTe: The flat column is for after vernalization. Before vernalization the chamber column is equivalent to the different flats and all plants were in the same chamber.
+colnames(CleanData_2022) <- c("PotID", "Treatment", "Population", "Line", "Replicate", "Chamber", "Flat", "Transplanted", "DaysToEmergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest",  "NumEmerged", "LeafNumber_PreVern", "LeafNumber_Jun6", "LeafNumber_Jun13", "SL_FreshWt", "SL_HydWt", "SL_DryWt", "SL_Area", "SL_Perim", "LeafNumber_Total", "LeafNumber_Rosette", "LeafNumber_UnderLeaves", "AG_DryBiomass", "BG_DryBiomass", "Stomata_avg")
+
+# Change some things to factors
+CleanData_2022$Treatment <- as.factor(CleanData_2022$Treatment)
+CleanData_2022$Population <- as.factor(CleanData_2022$Population)
+CleanData_2022$Chamber <- as.factor(CleanData_2022$Chamber)
+CleanData_2022$Flat <- as.factor(CleanData_2022$Flat)
+CleanData_2022$Transplanted <- as.factor(CleanData_2022$Transplanted)
+```
+
+Calculate other traits
+```{r}
+# Calculate other traits
+# SLA = leaf area / leaf dry mass
+CleanData_2022$SLA <- CleanData_2022$SL_Area/CleanData_2022$SL_DryWt
+# LDMC = dry mass / saturated mass
+CleanData_2022$LDMC = CleanData_2022$SL_DryWt / CleanData_2022$SL_HydWt
+# RWC = (fresh mass - dry mass) / (saturated mass - dry mass)
+CleanData_2022$RWC = (CleanData_2022$SL_FreshWt - CleanData_2022$SL_DryWt) / (CleanData_2022$SL_HydWt - CleanData_2022$SL_DryWt)
+# Root_to_Shoot
+CleanData_2022$Root_to_Shoot <- CleanData_2022$BG_DryBiomass/(CleanData_2022$AG_DryBiomass)
+# stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2
+CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg/ 683.17 
+```
+
+## Transformations
+This code is determining which traits may need to be transformed when I run model analysis in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
+
+Start with big overview of everything
+```{r}
+# get a giant view of all the traits, not a super helpful figure honestly
+CleanData_2022 %>% select_if(is.numeric) %>% gather(cols, value) %>% 
+  ggplot(aes(x = value)) + 
+  geom_histogram() + 
+  facet_wrap(.~cols, scales = "free")
+```
+
+Dates
+```{r}
+explore_trans(CleanData_2022$DaysToEmergence)
+# add column of log transformed information to dataframe
+CleanData_2022$l10_DaysToEmergence <- log10(CleanData_2022$DaysToEmergence)
+
+explore_trans(CleanData_2022$EmergenceToBolting)
+
+# just check distributions
+plotNormalHistogram(CleanData_2022$BoltingToRootWashing)
+
+plotNormalHistogram(CleanData_2022$BoltingToHarvest)
+```
+
+Single Leaf Traits
+
+```{r}
+explore_trans(CleanData_2022$SL_FreshWt)
+CleanData_2022$l10_SL_FreshWt <- log10(CleanData_2022$SL_FreshWt)
+
+explore_trans(CleanData_2022$SL_HydWt)
+CleanData_2022$l10_SL_HydWt <- log10(CleanData_2022$SL_HydWt)
+CleanData_2022$SQR_SL_HydWt <- sqrt(CleanData_2022$SL_HydWt)
+
+explore_trans(CleanData_2022$SL_DryWt)
+CleanData_2022$SQR_SL_DryWt <- sqrt(CleanData_2022$SL_DryWt)
+
+explore_trans(CleanData_2022$SL_Area)
+CleanData_2022$SQR_SL_Area <- sqrt(CleanData_2022$SL_Area)
+
+explore_trans(CleanData_2022$SL_Perim)
+
+print(shapiro.test(CleanData_2022$SLA))
+print(shapiro.test(log10(CleanData_2022$SLA)))
+print(shapiro.test(exp(CleanData_2022$SLA)))
+print(shapiro.test(sqrt(CleanData_2022$SLA))) 
+CleanData_2022$l10_SLA <- log10(CleanData_2022$SLA)
+
+
+explore_trans(CleanData_2022$RWC)
+#exp best but rest really similar so not doing anything for consistency
+
+explore_trans(CleanData_2022$LDMC)
+CleanData_2022$l10_LDMC <- log10(CleanData_2022$LDMC)
+
+```
+
+Leaf Number + biomass
+
+```{r}
+explore_trans(CleanData_2022$LeafNumber_Total)
+CleanData_2022$l10_LeafNumber_Total <- log10(CleanData_2022$LeafNumber_Total)
+
+explore_trans(CleanData_2022$LeafNumber_Rosette)
+CleanData_2022$l10_LeafNumber_Rosette <- log10(CleanData_2022$LeafNumber_Rosette)
+
+explore_trans(CleanData_2022$LeafNumber_UnderLeaves)
+CleanData_2022$SQR_LeafNumber_UnderLeaves <- sqrt(CleanData_2022$LeafNumber_UnderLeaves)
+
+explore_trans(CleanData_2022$AG_DryBiomass)
+CleanData_2022$SQR_AG_DryBiomass <- sqrt(CleanData_2022$AG_DryBiomass)
+CleanData_2022$l10_AG_DryBiomass <- log10(CleanData_2022$AG_DryBiomass)
+
+explore_trans(CleanData_2022$BG_DryBiomass)
+CleanData_2022$SQR_BG_DryBiomass <- sqrt(CleanData_2022$BG_DryBiomass)
+
+explore_trans(CleanData_2022$Root_to_Shoot)
+CleanData_2022$l10_Root_to_Shoot <- log10(CleanData_2022$Root_to_Shoot)
+```
+
+Stomata
+
+```{r}
+explore_trans(CleanData_2022$Stomata_avg)
+CleanData_2022$l10_Stomata_avg <- log10(CleanData_2022$Stomata_avg)
+
+explore_trans(CleanData_2022$Stomata_density)
+CleanData_2022$l10_Stomata_density <- log10(CleanData_2022$Stomata_density)
+```
+## Save file
+Save this file to read in to analysis script
+```{r}
+write.csv(CleanData_2022, file = "data/CleanData_2022.csv", row.names = FALSE)
+```
