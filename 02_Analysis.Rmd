@@ -1389,3 +1389,51 @@ plot_seed <-  ggplot(df_seed) +
 ggplotly(plot_seed)
 ```
 
+make a plot with genotype on the x axis and seed count per fruit on the y axis. color by pop and treatment.
+
+```{r, echo = F}
+ps_plot <- ggplot(Dat_2021_TwoTrt)+
+  geom_point(aes(x = Line.ID.T, y = AvgSeedNum, col = Population, shape = Treatment, text = Pot.ID))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplotly(ps_plot)
+
+#ggplot(Dat_2021_TwoTrt)+
+#  geom_point(aes(x = Line.ID, y = AvgSeedNum, col = Population, shape = Treatment))+
+#  scale_color_manual(values = c("red", "blue"))+
+#  theme_classic()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#
+#ggplot(Dat_2021_TwoTrt)+
+#  geom_point(aes(x = Pot.ID, y = AvgSeedNum, col = Population, shape = Treatment))+
+#  scale_color_manual(values = c("red", "blue"))+
+#  theme_classic()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+Compare that to a plot of a trait that does have a genotype effect (just the first plot)
+```{r, echo = FALSE}
+ps_plot2 <- ggplot(Dat_2021_TwoTrt)+
+  geom_point(aes(x = Line.ID.T, y = IJ_FruitCount, col = Population, shape = Treatment, text = Pot.ID))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplotly(ps_plot2)
+
+ps_plot3 <- ggplot(Dat_2021_TwoTrt)+
+  geom_point(aes(x = Line.ID.T, y = DayToBolt, col = Population, shape = Treatment, text = Pot.ID))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplotly(ps_plot3)
+
+ps_plot4 <- ggplot(Dat_2021_TwoTrt)+
+  geom_point(aes(x = Line.ID.T, y = LeafPerimeter, col = Population, shape = Treatment, text = Pot.ID))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplotly(ps_plot4)
+
+```

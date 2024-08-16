@@ -187,12 +187,30 @@ forplot_2021 <- data.frame(t(Sum_2021))
 colnames(forplot_2021) <- forplot_2021[1, ]
 forplot_2021 <- forplot_2021[c(2:5), ]
 forplot_2021 <- forplot_2021 %>%
-  select(Population, Treatment, DayToFlwr_mean, DayToFlwr_ci_95, LeafNum_08262021_mean:RosetteLeafNum_10042021_ci_95, RosetteLeafNum_mean:DryReproG_ci_95, Repro_to_Ros_mean:IJ_FruitCount_ci_95, AG_biomass_mean:fitness_ci_95) %>%
+  select(Population, Treatment, DayToBolt_mean:DayToFlwr_ci_95, LeafNum_08262021_mean:RosetteLeafNum_10042021_ci_95, RosetteLeafNum_mean:DryReproG_ci_95, Repro_to_Ros_mean:IJ_FruitCount_ci_95, AG_biomass_mean:fitness_ci_95) %>%
   mutate(across(Population:Treatment, as.factor),
-         across(DayToFlwr_mean:fitness_ci_95, as.numeric))
+         across(DayToBolt_mean:fitness_ci_95, as.numeric))
 ```
 
 ## Phenology
+
+Days Emergence to bolting
+
+```{r, echo = FALSE, eval = FALSE}
+ggplot(data = forplot_2021, aes(x = Treatment, y = DayToBolt_mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=DayToBolt_mean-DayToBolt_ci_95, ymax = DayToBolt_mean + DayToBolt_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="Days Emergence to Bolting", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))+
+  expand_limits(y=0)
+```
+
+
 DaysBoltingToFlwr
 
 
@@ -797,7 +815,7 @@ forplot_both <- rbind(tmp_1, tmp_2)
 
 ## Phenology
 
-Emergence
+Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
 ```{r, echo = FALSE}
 ggplot(data = forplot_both, aes(x = Treatment, y = Emergence_mean)) +
@@ -817,9 +835,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Emergence_mean)) +
 ```
 
 
-EmergenceToBolting
+EmergenceToBolting. While this was measured in both experiments, it is not comparable becuase in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait for the manuscript.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = FALSE}
 ggplot(data = forplot_both, aes(x = Treatment, y = EmergeToBolt_mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Population:Exp, ymin=EmergeToBolt_mean-EmergeToBolt_ci, ymax = EmergeToBolt_mean + EmergeToBolt_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
