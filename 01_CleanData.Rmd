@@ -231,6 +231,9 @@ AllData_2021$DayToBolt = AllData_2021$Bolting - AllData_2021$Emergence
 # days to flower - days to bolt
 AllData_2021$DayToFlwr = AllData_2021$Flowering - AllData_2021$Bolting
 
+# days to flower - day to emergence
+AllData_2021$EmergeToFlwr <- AllData_2021$Flowering - AllData_2021$Emergence
+
 # make a separate notes dataframe
 Notes <- AllData_2021[, c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Notes.x", "notes.x", "Notes.y", "Notes.1", "Notes.x", "notes.y","notes.1", "notes.2", "Notes.y", "Notes", "Notes2")]
 
@@ -254,7 +257,7 @@ CleanData_2021$TotFruit[is.na(CleanData_2021$TotFruit)] <- 0
 CleanData_2021[CleanData_2021$Pot.ID %in% c('R47-4-C', 'R47-5-C', 'R47-3-CF', 'R47-4-CF', 'R47-3-F', 'R47-4-F'), "TotFruit"] <- NA
 
 # Also remove columns that won't be used in analysis. Here is a list of columns names to keep. Some of these leaf number counts might not be used later on, but keep at this point in time.
-myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "Emergence","DayToBolt", "DayToFlwr", "FreshWt_g", "SatWt_g", "DriedWt_g", "LeafArea", "LeafPerimeter", "SLA", "LDMC", "RWC", "LeafNum_.07222021", "LeafNum_08262021","NumRemoved_08262021", "RosetteLeafNum_10042021", "RosetteLeafNum_bolt", "RosetteLeafNum_Flower", "RosetteLeafNum", "DryRosetteG", "DryReproG", "DryRootG", "Root_to_Shoot", "Repro_to_Ros", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "IJ_FruitCount", "FruitCounter", "FruitCollected", "DoneFlwr","NumFlwrLeft","FruitColWt_mg","SeedColWt_mg", "IJ_SeedCount", "SeedCounter")
+myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "Emergence","DayToBolt", "DayToFlwr", "EmergeToFlwr", "FreshWt_g", "SatWt_g", "DriedWt_g", "LeafArea", "LeafPerimeter", "SLA", "LDMC", "RWC", "LeafNum_.07222021", "LeafNum_08262021","NumRemoved_08262021", "RosetteLeafNum_10042021", "RosetteLeafNum_bolt", "RosetteLeafNum_Flower", "RosetteLeafNum", "DryRosetteG", "DryReproG", "DryRootG", "Root_to_Shoot", "Repro_to_Ros", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "IJ_FruitCount", "FruitCounter", "FruitCollected", "DoneFlwr","NumFlwrLeft","FruitColWt_mg","SeedColWt_mg", "IJ_SeedCount", "SeedCounter")
 
 CleanData_2021 <- CleanData_2021[ ,myCols]
 
@@ -522,6 +525,7 @@ explore_trans(CleanData_2021$DayToBolt)
 explore_trans(CleanData_2021$DayToFlwr)
 # SQRT is better but leaving for consistency in treating phenology
 
+explore_trans(CleanData_2021$EmergeToFlwr)
 ```
 ## Save file
 Save this file to read in to analysis script

@@ -196,8 +196,16 @@ Days between bolting and flowering
 ```{r}
 # days bolting to flowering
 flowering_21 <- anov_lmer(Dat_2021_TwoTrt$DayToFlwr)
-flowering_21$trait <- "Flowering"
+flowering_21$trait <- "Bolting To Flowering"
 # no significant interaction
+```
+
+Days between Emergence and flowering
+
+```{r}
+eTof_21 <- anov_lmer(Dat_2021_TwoTrt$EmergeToFlwr)
+eTof_21$trait <- "Emergence To Flowering"
+
 ```
 
 ### Single Leaf Collected At Flowering
@@ -667,7 +675,7 @@ stargazer(RR_2021,RWC_2021, type = "text")
 I made a bunch of anova tables. Can I simply rbind them all together? Current plan is to r bind all these together, r bind all the 2022 models together, and then cbind the 2021 and 2022 models together.
 
 ```{r}
-AnovaResults_2021 <- rbind(emergence_21, bolting_21, flowering_21, fresh_21, sat_21, dry_21, area_21, per_21, SLA_2021, LDMC_2021, RWC_2021, LN_PreVern_2021, LN_Vern_2021, LN_PostVern_2021, LN_harv_2021, Ros_2021, Repro_2021, RR_2021, LatBranch_2021, PrimStalks_2021, height_2021, fruit_2021, AG_2021, AvSeedWt_2021, seeds_2021, fitness_2021)
+AnovaResults_2021 <- rbind(emergence_21, bolting_21, flowering_21, eTof_21, fresh_21, sat_21, dry_21, area_21, per_21, SLA_2021, LDMC_2021, RWC_2021, LN_PreVern_2021, LN_Vern_2021, LN_PostVern_2021, LN_harv_2021, Ros_2021, Repro_2021, RR_2021, LatBranch_2021, PrimStalks_2021, height_2021, fruit_2021, AG_2021, AvSeedWt_2021, seeds_2021, fitness_2021)
 
 write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TRUE)
 ```

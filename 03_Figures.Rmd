@@ -68,6 +68,9 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
     )
+
+# If I want to add back in that the y axis should always start at 0:
+#  expand_limits(y=0)
     
 ```
 
@@ -187,7 +190,7 @@ forplot_2021 <- data.frame(t(Sum_2021))
 colnames(forplot_2021) <- forplot_2021[1, ]
 forplot_2021 <- forplot_2021[c(2:5), ]
 forplot_2021 <- forplot_2021 %>%
-  select(Population, Treatment, DayToBolt_mean:DayToFlwr_ci_95, LeafNum_08262021_mean:RosetteLeafNum_10042021_ci_95, RosetteLeafNum_mean:DryReproG_ci_95, Repro_to_Ros_mean:IJ_FruitCount_ci_95, AG_biomass_mean:fitness_ci_95) %>%
+  select(Population, Treatment, DayToBolt_mean:EmergeToFlwr_ci_95, LeafNum_08262021_mean:RosetteLeafNum_10042021_ci_95, RosetteLeafNum_mean:DryReproG_ci_95, Repro_to_Ros_mean:IJ_FruitCount_ci_95, AG_biomass_mean:fitness_ci_95) %>%
   mutate(across(Population:Treatment, as.factor),
          across(DayToBolt_mean:fitness_ci_95, as.numeric))
 ```
@@ -196,7 +199,7 @@ forplot_2021 <- forplot_2021 %>%
 
 Days Emergence to bolting
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, echo = FALSE}
 ggplot(data = forplot_2021, aes(x = Treatment, y = DayToBolt_mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
   geom_errorbar(aes(ymin=DayToBolt_mean-DayToBolt_ci_95, ymax = DayToBolt_mean + DayToBolt_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
@@ -206,8 +209,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DayToBolt_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -224,10 +226,23 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DayToFlwr_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
+
+Days Emergence to Flower
+```{r, echo = FALSE}
+ggplot(data = forplot_2021, aes(x = Treatment, y = EmergeToFlwr_mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=EmergeToFlwr_mean-EmergeToFlwr_ci_95, ymax = EmergeToFlwr_mean + EmergeToFlwr_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="Days Emergence to Flowering", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+```
 
 ## Leaf Number
 LeafNum_duringvern (if included)
@@ -242,8 +257,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = LeafNum_08262021_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 LeafNum_Oct4 (if included)
@@ -258,8 +272,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = RosetteLeafNum_10042021_mean)
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 RosetteLeafNum_harvest
@@ -274,8 +287,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = RosetteLeafNum_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values with the y axis being leaf number.
@@ -311,8 +323,7 @@ ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.2,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.2,0))
 ```
 
 ## Plant Structure
@@ -328,8 +339,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DryRosetteG_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 DryReproG
@@ -344,8 +354,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DryReproG_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 AG_biomass (Ros+Repro)
@@ -360,8 +369,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AG_biomass_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 Repro_to_Ros
@@ -376,8 +384,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = Repro_to_Ros_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 LatBranches
@@ -392,8 +399,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = LatBranches_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 PrimaryStalks - how many stalks are coming out of the top of the rosette?
@@ -408,8 +414,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = PrimaryStalks_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 Height_cm (of main stalk)
@@ -424,8 +429,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = Height_cm_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 ## fitness + fitness related
@@ -443,8 +447,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = TotFruit_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 
 # IJ count
 ggplot(data = forplot_2021, aes(x = Treatment, y = IJ_FruitCount_mean)) +
@@ -456,8 +459,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = IJ_FruitCount_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 AvgSeedWt
@@ -472,8 +474,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedWt_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 AvgSeedNum
@@ -488,8 +489,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 fitness - avg seed num/fruit * fruit num
@@ -504,8 +504,7 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = fitness_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 
 ```
 
@@ -599,8 +598,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = NumEmerged_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 ## Leaf Number
@@ -616,8 +614,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun6_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 LeafNum_Jun13 (if included)
@@ -632,8 +629,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun13_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 LeafNum_bolt
@@ -648,8 +644,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Total_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
@@ -685,8 +680,7 @@ ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.2,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.2,0))
 ```
 
 
@@ -703,8 +697,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = AG_DryBiomass_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 BG_Dry_bolt
@@ -719,8 +712,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = BG_DryBiomass_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 Root_to_Shoot
@@ -735,8 +727,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = Root_to_Shoot_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 ## Stomata
@@ -752,8 +743,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = Stomata_density_mean)) +
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 # both
@@ -830,8 +820,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Emergence_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -850,8 +839,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = EmergeToBolt_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -871,8 +859,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Fresh_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -891,8 +878,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Sat_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -911,8 +897,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Dry_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -931,8 +916,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = area_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -951,8 +935,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = perim_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -973,8 +956,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = SLA_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -993,8 +975,7 @@ ggplot(data = forplot_both, aes(x = Treatment, y = LDMC_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
 
 
@@ -1014,7 +995,6 @@ ggplot(data = forplot_both, aes(x = Treatment, y = RWC_mean)) +
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
   scale_x_discrete(expand = c(0.6,0))
-  #expand_limits(y=0)
 ```
 
 ## Leaf Number
@@ -1033,6 +1013,5 @@ ggplot(data = forplot_both, aes(x = Treatment, y = LeafNum_4wk_mean)) +
   scale_linetype_manual(name = "Experiment",
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
-  scale_x_discrete(expand = c(0.6,0))+
-  expand_limits(y=0)
+  scale_x_discrete(expand = c(0.6,0))
 ```
