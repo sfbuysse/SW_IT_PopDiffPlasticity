@@ -34,6 +34,7 @@ library(tidyr)
 library(rcompanion)
 #library(stargazer)
 library(plotly)
+library(predictmeans)
 
 # prep for doing statistical analyses
 options(contrasts = c("contr.sum", "contr.poly"))
@@ -76,7 +77,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 
 ## Summarize some data
 ```{r}
-# for the things I can easily get a mean for (num or int)
+# for the things I can easily get a mean for (num or int). NOTE: These are raw means and confidence intervals, I might not actually want them later on because I will want model predicted means and standard errors.
 ByPop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
@@ -118,6 +119,8 @@ When removing the soil mix random effect, most p values and effect sizes were no
 
 In general these model changes were slight and soil mix explained very little variance - the exceptions are relative water content (soil mix explained half as much variance as genotype), number of fruits, and number of primary stalks (soil mix explained more variance than genotype but over half the variance is still residual). Thus, soil mix was removed as a random variable from the analysis.
 
+To make plotting easier, I want to have one function that runs the model and the model accuracy tests, then outputs the model object. I then want to create a data_table with predict means and run an anova with the model output object. The data tabel and the anova need to be saved to go into a summary table later or to be used for plotting.
+
 ```{r stats}
 # subset to only the Current and Future treatments
 Dat_2021_TwoTrt <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
@@ -129,7 +132,8 @@ Dat_2021_TwoTrt <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Trea
 # function to run models on 2021 data: 
 # the model itself is not saved to a global object. the anova table is saved.
 
-anov_lmer <- function(trait, data = Dat_2021_TwoTrt){
+# run the mixed model
+do_lmer <- function(trait, data = Dat_2021_TwoTrt){
   lm <- lmer(trait ~ Treatment * Population + (1|Population:Line) , data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
@@ -140,18 +144,36 @@ anov_lmer <- function(trait, data = Dat_2021_TwoTrt){
   #legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   # plotting sanity check
   print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
-  #title(trait)
   qqnorm(resid(lm))
   qqline(resid(lm))
   print(summary(lm))
   print(confint(lm))
-  anov <- anova(lm)
+  return(lm)
+}
+# do the anova
+do_anov <- function(model){
+  anov <- anova(model)
   print(anov)
   df <- as.data.frame(anov)
   df$exp <- "2021"
   return(df)
 }
-# things print out in the html slightly out of order
+
+# get the means table, no backtransforming - can add pairwise to do comparisons within treatment or within population, but not both at the same time
+get_table <- function(model){
+  tab <- predictmeans(model=model, modelterm = "Treatment:Population", plot = FALSE)
+  return(tab$mean_table)
+}
+# function to backtransform
+undo_log10 <- function(x){
+  10^x
+}
+
+#get the means table with backtransforming from log
+get_table_bt <- function(model){
+  tab <- predictmeans(model=model, modelterm = "Treatment:Population", trans=undo_log10, plot = FALSE)
+  return(tab$mean_table)
+}
 
 ```
 
@@ -165,8 +187,10 @@ Days to Emergence
 
 ```{r}
 # Emergence
-emergence_21 <- anov_lmer(Dat_2021_TwoTrt$Emergence)
-emergence_21$trait <- "Emergence"
+emergence_lm_21 <- do_lmer(Dat_2021_TwoTrt$Emergence)
+emergence_anov_21 <- do_anov(emergence_lm_21)
+emergence_anov_21$trait <- "Emergence"
+emergence_means_21 <- get_table(emergence_lm_21)
 ```
 
 There is an interaction, so do post-hoc analyses to identify where there are differences between means within treatments and between treatments within populations.
@@ -186,26 +210,30 @@ Days between emergence and bolting
 
 ```{r}
 # days emergence to bolting
-bolting_21 <- anov_lmer(Dat_2021_TwoTrt$DayToBolt)
-bolting_21$trait <- "Bolting"
-# no significant interaction
+bolting_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToBolt)
+bolting_anov_21 <- do_anov(bolting_lm_21)
+bolting_anov_21$trait <- "Bolting"
+bolting_means_21 <- get_table(bolting_lm_21)
 ```
 
 Days between bolting and flowering
 
 ```{r}
 # days bolting to flowering
-flowering_21 <- anov_lmer(Dat_2021_TwoTrt$DayToFlwr)
-flowering_21$trait <- "Bolting To Flowering"
-# no significant interaction
+flowering_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToFlwr)
+flowering_anov_21 <- do_anov(flowering_lm_21)
+flowering_anov_21$trait <- "Bolting To Flowering"
+flowering_means_21 <- get_table(flowering_lm_21)
 ```
 
 Days between Emergence and flowering
 
 ```{r}
-eTof_21 <- anov_lmer(Dat_2021_TwoTrt$EmergeToFlwr)
-eTof_21$trait <- "Emergence To Flowering"
-
+# Emergence to flowering
+eTof_lm_21 <- do_lmer(Dat_2021_TwoTrt$EmergeToFlwr)
+eTof_anov_21 <- do_anov(eTof_lm_21)
+eTof_anov_21$trait <- "Emergence To Flowering"
+eTof_means_21 <- get_table(eTof_lm_21)
 ```
 
 ### Single Leaf Collected At Flowering
@@ -213,8 +241,10 @@ eTof_21$trait <- "Emergence To Flowering"
 fresh weight
 ```{r}
 # Fresh weight
-fresh_21 <- anov_lmer(Dat_2021_TwoTrt$l10_FreshWt)
-fresh_21$trait <- "l10_FreshWt"
+fresh_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_FreshWt)
+fresh_anov_21 <- do_anov(fresh_lm_21)
+fresh_anov_21$trait <- "l10_FreshWt"
+fresh_means_21 <- get_table_bt(fresh_lm_21)
 ```
 
 There is an interaction, so do posthoc analyses.
@@ -235,8 +265,10 @@ saturated/hydrated weight
 
 ```{r}
 # Saturated weight
-sat_21 <- anov_lmer(Dat_2021_TwoTrt$l10_SatWt)
-sat_21$trait <- "l10_SatWt"
+sat_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_SatWt)
+sat_anov_21 <- do_anov(sat_lm_21)
+sat_anov_21$trait <- "l10_SatWt"
+sat_means_21 <- get_table_bt(sat_lm_21)
 ```
 
 
@@ -257,19 +289,26 @@ as.data.frame(summary(lmer(l10_SatWt ~ Population + (1|Population:Line), data = 
 dried weight
 ```{r}
 # Dried weight
-dry_21 <- anov_lmer(Dat_2021_TwoTrt$l10_DriedWt)
-dry_21$trait <- "l10_DriedWt"
+dry_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_DriedWt)
+dry_anov_21 <- do_anov(dry_lm_21)
+dry_anov_21$trait <- "l10_DriedWt"
+dry_means_21 <- get_table_bt(dry_lm_21)
 # no significant interaction term
-anov_lmer(Dat_2021_TwoTrt$DriedWt_g)
-anov_lmer(Dat_2021_TwoTrt$SQR_DriedWt)
+
+# testing, see below for more
+#anov_lmer(Dat_2021_TwoTrt$DriedWt_g)
+#anov_lmer(Dat_2021_TwoTrt$SQR_DriedWt)
+
 ```
 
 leaf area
 
 ```{r}
 # Leaf Area
-area_21 <- anov_lmer(Dat_2021_TwoTrt$l10_LeafArea)
-area_21$trait <- "l10_area"
+area_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_LeafArea)
+area_anov_21 <- do_anov(area_lm_21)
+area_anov_21$trait <- "l10_area"
+area_means_21 <- get_table_bt(area_lm_21)
 ```
 
 
@@ -289,9 +328,10 @@ as.data.frame(summary(lmer(l10_LeafArea ~ Population + (1|Population:Line), data
 leaf perimeter
 
 ```{r}
-# Leaf Perimeter
-per_21 <- anov_lmer(Dat_2021_TwoTrt$l10_LeafPer)
-per_21$trait <- "l10_Perimeter"
+per_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_LeafPer)
+per_anov_21 <- do_anov(per_lm_21)
+per_anov_21$trait <- "l10_Perimeter"
+per_means_21 <- get_table_bt(per_lm_21)
 ```
 
 
@@ -312,8 +352,10 @@ specific leaf area
 
 ```{r}
 # SLA
-SLA_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_SLA)
-SLA_2021$trait <- "l10_SLA"
+SLA_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_SLA)
+SLA_anov_21 <- do_anov(SLA_lm_21)
+SLA_anov_21$trait <- "l10_SLA"
+SLA_means_21 <- get_table_bt(SLA_lm_21)
 ```
 
 
@@ -333,8 +375,10 @@ as.data.frame(summary(lmer(l10_SLA ~ Population + (1|Population:Line), data = su
 leaf dry matter content
 ```{r}
 # LDMC
-LDMC_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_LDMC)
-LDMC_2021$trait <- "l10_LDMC"
+LDMC_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_LDMC)
+LDMC_anov_21 <- do_anov(LDMC_lm_21)
+LDMC_anov_21$trait <- "l10_LDMC"
+LDMC_means_21 <- get_table_bt(LDMC_lm_21)
 ```
 
 
@@ -355,9 +399,11 @@ as.data.frame(summary(lmer(l10_LDMC ~ Population + (1|Population:Line), data = s
 relative water content
 ```{r}
 # RWC
-RWC_2021 <- anov_lmer(Dat_2021_TwoTrt$RWC)
-RWC_2021$trait <- "RWC"
-# no interaction
+RWC_lm_21 <- do_lmer(Dat_2021_TwoTrt$RWC)
+RWC_anov_21 <- do_anov(RWC_lm_21)
+RWC_anov_21$trait <- "RWC"
+RWC_means_21 <- get_table(RWC_lm_21)
+#no interaction (well, weak)
 ```
 
 There is a weak interaction, so do posthoc analyses.
@@ -379,8 +425,10 @@ Note that Basia is potentially interested in looking at growth curves or leaf nu
 leaf num at 4 weeks
 ```{r}
 # Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
-LN_PreVern_2021 <- anov_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
-LN_PreVern_2021$trait <- "LeafNum_4wks"
+LN_PreVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
+LN_PreVern_anov_21 <- do_anov(LN_PreVern_lm_21)
+LN_PreVern_anov_21$trait <- "LeafNum_4wks"
+LN_PreVern_means_21 <- get_table(LN_PreVern_lm_21)
 # no interaction
 # diagonal lines in residual plot are artifact of discrete trait. none in left corner is indicative of zeros.
 # double check that residual lines all have same value
@@ -398,35 +446,37 @@ text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = D
 Leaf num 5 weeks into vernalization
 ```{r}
 # LeafNumber from 08262021 - 5 weeks into vernalization... why did I choose this date? I think I was thinning on this day?
-LN_Vern_2021 <- anov_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
-LN_Vern_2021$trait <- "LeafNum_9wks"
+LN_Vern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
+LN_Vern_anov_21 <- do_anov(LN_Vern_lm_21)
+LN_Vern_anov_21$trait <- "LeafNum_9wks"
+LN_Vern_means_21 <- get_table(LN_Vern_lm_21)
 # no interaction
 ```
+
 Leaf num about when bolting started
 ```{r}
 # Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
-LN_PostVern_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
-LN_PostVern_2021$trait <- "LeafNum_14wks"
+LN_PostVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
+LN_PostVern_anov_21 <- do_anov(LN_PostVern_lm_21)
+LN_PostVern_anov_21$trait <- "LeafNum_14wks"
+LN_PostVern_means_21 <- get_table(LN_PostVern_lm_21)
 # no interaction
 ```
 
-```{r}
-# LN bolting - only on some plants, actually only for SW plants so not running the model.
-#LN_bolt_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_bolt)
-```
 
-```{r}
-# only on 16 plants, not going to run the model b/c so small of a sample size
-#LN_flower_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum_Flower)
-```
+Leaf number at bolting and flower were only doneo n some plants, not all (bolting only for SW plants and flowering only for 16 plants), so there are no models or figures for these traits.
+
 
 Leaf num at harvest
 ```{r}
-# LN at harvest - from all plants - not sure totally accurate count
-LN_harv_2021 <- anov_lmer(Dat_2021_TwoTrt$RosetteLeafNum)
-LN_harv_2021$trait <- "LeafNum_harvest"
+# LN at harvest - from all plants - not sure totally accurate count because hard to count at this point in life cycle
+LN_harv_lm_21 <- do_lmer(Dat_2021_TwoTrt$RosetteLeafNum)
+LN_harv_anov_21 <- do_anov(LN_harv_lm_21)
+LN_harv_anov_21$trait <- "LeafNum_harvest"
+LN_harv_means_21 <- get_table(LN_harv_lm_21)
 # no interaction
 ```
+
 ### Biomass
 
 Any biomass traits and biomass allocation
@@ -434,23 +484,31 @@ Any biomass traits and biomass allocation
 Rosette biomass
 ```{r}
 # dry rosette biomass
-Ros_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_DryRosG)
-Ros_2021$trait <- "l10_DryRosG"
+Ros_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_DryRosG)
+Ros_anov_21 <- do_anov(Ros_lm_21)
+Ros_anov_21$trait <- "l10_DryRosG"
+Ros_means_21 <- get_table_bt(Ros_lm_21)
 #no interaction
 
 ```
+
 Reproductive biomass
 ```{r}
 # dry reproductive biomass
-Repro_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_DryReproG)
-Repro_2021$trait <- "l10_DryReproG"
+Repro_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_DryReproG)
+Repro_anov_21 <- do_anov(Repro_lm_21)
+Repro_anov_21$trait <- "l10_DryReproG"
+Repro_means_21 <- get_table_bt(Repro_lm_21)
 
 ```
+
 Above ground biomass (rosette + reproductive)
 ```{r}
 # dry above ground biomass (ros + repro)
-AG_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
-AG_2021$trait <- "l10_AG_biomass"
+AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
+AG_anov_21 <- do_anov(AG_lm_21)
+AG_anov_21$trait <- "l10_AG_biomass"
+AG_means_21 <- get_table_bt(AG_lm_21)
 ```
 
 Skipping dry root biomass because only have for a few plants. Also skipping root to shoot for the same reason.
@@ -458,8 +516,10 @@ Skipping dry root biomass because only have for a few plants. Also skipping root
 Above ground biomass allocation (repro/ros)
 ```{r}
 # reproductive biomass divided by rosette biomass - above ground biomass allocation
-RR_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_R_to_R)
-RR_2021$trait <- "l10_Repro_to_Ros"
+RR_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_R_to_R)
+RR_anov_21 <- do_anov(RR_lm_21)
+RR_anov_21$trait <- "l10_Repro_to_Ros"
+RR_means_21 <- get_table_bt(RR_lm_21)
 
 ```
 
@@ -467,16 +527,13 @@ RR_2021$trait <- "l10_Repro_to_Ros"
 ### Plant Structure
 branches and height. Branch structure is about damage so skip. but maybe should be a random effect in other models?
 
-```{r}
-# branch structure - damaged, bent, broken
-#BranchStruc_2021 <- anov_lmer(Dat_2021_TwoTrt$BranchStructure)
-```
-
 Num lateral branches
 ```{r}
 # number of lateral branches
-LatBranch_2021 <- anov_lmer(Dat_2021_TwoTrt$LatBranches)
-LatBranch_2021$trait <- "Lateral Branches"
+LatBranch_lm_21 <- do_lmer(Dat_2021_TwoTrt$LatBranches)
+LatBranch_anov_21 <- do_anov(LatBranch_lm_21)
+LatBranch_anov_21$trait <- "Lateral Branches"
+LatBranch_means_21 <- get_table(LatBranch_lm_21)
 ```
 
 There is an interaction, so do posthoc analyses.
@@ -495,8 +552,10 @@ as.data.frame(summary(lmer(LatBranches ~ Population + (1|Population:Line), data 
 Num primary stalks
 ```{r}
 # number of primary stalks
-PrimStalks_2021 <- anov_lmer(Dat_2021_TwoTrt$PrimaryStalks)
-PrimStalks_2021$trait <- "Primary Stalks"
+PrimStalks_lm_21 <- do_lmer(Dat_2021_TwoTrt$PrimaryStalks)
+PrimStalks_anov_21 <- do_anov(PrimStalks_lm_21)
+PrimStalks_anov_21$trait <- "Primary Stalks"
+PrimStalks_means_21 <- get_table(PrimStalks_lm_21)
 ```
 
 There is a weak interaction, so do posthoc analyses.
@@ -515,8 +574,10 @@ as.data.frame(summary(lmer(PrimaryStalks ~ Population + (1|Population:Line), dat
 Height main stalk
 ```{r}
 # height of main stalk (cm)
-height_2021 <- anov_lmer(Dat_2021_TwoTrt$Height_cm)
-height_2021$trait <- "Height (cm)"
+height_lm_21 <- do_lmer(Dat_2021_TwoTrt$Height_cm)
+height_anov_21 <- do_anov(height_lm_21)
+height_anov_21$trait <- "Height (cm)"
+height_means_21 <- get_table(height_lm_21)
 ```
 
 There is an interaction, so do posthoc analyses.
@@ -540,8 +601,11 @@ only using IJ fruit count becuase of issue with skipping counter for other fruit
 ```{r}
 # number fruits on plant
 # maybe would want to add done flower or not done flower as a random effect in this model?
-fruit_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
-fruit_2021$trait <- "FruitNum"
+fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
+fruit_anov_21 <- do_anov(fruit_lm_21)
+fruit_anov_21$trait <- "l10_FruitNum"
+fruit_means_21 <- get_table_bt(fruit_lm_21)
+
 ## test to see if adding fruit counter changes the model results
 #tmp_fruit <- lmer(l10_IJ_Fruits ~ Treatment * Population + (1|Population:Line) + (1|FruitCounter), data = Dat_2021_TwoTrt, #contrasts = list(Treatment=contr.sum, Population = contr.sum))
 #
@@ -571,23 +635,14 @@ as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), dat
 as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
 ```
 
-reproductive potential = number of fruits + number of flowers left on plant.
-
-Should this variable be included? One argument is that no, it should not because in the field all the plants might be killed at once and not allowed to flower until they make all fruits possible. 
-```{r, eval = FALSE}
-# repro potential
-Dat_2021_TwoTrt$ReproPotential <- (Dat_2021_TwoTrt$IJ_FruitCount + Dat_2021_TwoTrt$NumFlwrLeft)
-ReproPotential_2021 <- anov_lmer(Dat_2021_TwoTrt$ReproPotential)
-# some concern about the two groups of residuals at low and high values. are these the pops??
-```
-
 
 Average weight of a seed (collected seed weight / count of collected seeds)
 ```{r}
 # weight of collected seeds - take weight divided by number of seeds counted
-# skipping weight of collected fruits beccause weight of 10 fruits means less than the actual weight of the seeds
-AvSeedWt_2021 <- anov_lmer(Dat_2021_TwoTrt$AvgSeedWt)
-AvSeedWt_2021$trait <- "Average Seed Wt"
+AvSeedWt_lm_21 <- do_lmer(Dat_2021_TwoTrt$AvgSeedWt)
+AvSeedWt_anov_21 <- do_anov(AvSeedWt_lm_21)
+AvSeedWt_anov_21$trait <- "Average Seed Wt"
+AvSeedWt_means_21 <- get_table(AvSeedWt_lm_21)
 
 ```
 
@@ -596,8 +651,10 @@ average Seed number per fruit -
 # number seeds from collected fruits
 
 #seeds_2021 <- anov_lmer(Dat_2021_TwoTrt$AvgSeedNum)
-seeds_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_AvgSeedNum)
-seeds_2021$trait <- "l10_Average Seeds per Fruit"
+seeds_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AvgSeedNum)
+seeds_anov_21 <- do_anov(seeds_lm_21)
+seeds_anov_21$trait <- "l10_Average Seeds per Fruit"
+seeds_means_21 <- get_table_bt(seeds_lm_21)
 # why are residuals so odd? because population explains 0 variance.
 
 ## test if SeedCounter matters
@@ -640,8 +697,10 @@ Total Fitness
 
 ```{r}
 # total fitness 
-fitness_2021 <- anov_lmer(Dat_2021_TwoTrt$l10_fitness)
-fitness_2021$trait <- "Total Fitness"
+fitness_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_fitness)
+fitness_anov_21 <- do_anov(fitness_lm_21)
+fitness_anov_21$trait <- "l10_Total Fitness"
+fitness_means_21 <- get_table_bt(fitness_lm_21)
 
 ```
 
@@ -659,7 +718,9 @@ as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data 
 ```
 
 
-### Results Table
+###Outputs
+
+1) Results table
 
 Messing around with the stargazer package, but it ultimately works for model outputs but not for anova tables.
 ```{r, eval = FALSE}
@@ -675,9 +736,42 @@ stargazer(RR_2021,RWC_2021, type = "text")
 I made a bunch of anova tables. Can I simply rbind them all together? Current plan is to r bind all these together, r bind all the 2022 models together, and then cbind the 2021 and 2022 models together.
 
 ```{r}
-AnovaResults_2021 <- rbind(emergence_21, bolting_21, flowering_21, eTof_21, fresh_21, sat_21, dry_21, area_21, per_21, SLA_2021, LDMC_2021, RWC_2021, LN_PreVern_2021, LN_Vern_2021, LN_PostVern_2021, LN_harv_2021, Ros_2021, Repro_2021, RR_2021, LatBranch_2021, PrimStalks_2021, height_2021, fruit_2021, AG_2021, AvSeedWt_2021, seeds_2021, fitness_2021)
+AnovaResults_2021 <- rbind(emergence_anov_21, bolting_anov_21, flowering_anov_21, eTof_anov_21, fresh_anov_21, sat_anov_21, dry_anov_21, area_anov_21, per_anov_21, SLA_anov_21, LDMC_anov_21, RWC_anov_21, LN_PreVern_anov_21, LN_Vern_anov_21, LN_PostVern_anov_21, LN_harv_anov_21, Ros_anov_21, Repro_anov_21, RR_anov_21, LatBranch_anov_21, PrimStalks_anov_21, height_anov_21, fruit_anov_21, AG_anov_21, AvSeedWt_anov_21, seeds_anov_21, fitness_anov_21)
 
 write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TRUE)
+```
+
+2) All the tables to read in to the figures code
+
+```{r}
+# change column names
+# not transformed
+dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21")
+
+for (i in dfs) {
+  x=get(i)
+  colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95")
+  assign(i,x)
+}
+
+# transformed
+dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "fruit_means_21", "AG_means_21", "seeds_means_21", "fitness_means_21")
+
+for (i in dfs2) {
+  x=get(i)
+  colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95", "Bk_Mean", "Bk_LL_95", "Bk_UL_95")
+  assign(i,x)
+}
+
+# create list of data frames
+Means_2021 <- list(emergence_means_21, bolting_means_21, flowering_means_21, eTof_means_21, fresh_means_21, sat_means_21, dry_means_21, area_means_21, per_means_21, SLA_means_21, LDMC_means_21, RWC_means_21, LN_PreVern_means_21, LN_Vern_means_21, LN_PostVern_means_21, LN_harv_means_21, Ros_means_21, Repro_means_21, RR_means_21, LatBranch_means_21, PrimStalks_means_21, height_means_21, fruit_means_21, AG_means_21, AvSeedWt_means_21, seeds_means_21, fitness_means_21)
+
+# name that list
+names(Means_2021) <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "fruit_means_21", "AG_means_21", "AvSeedWt_means_21", "seeds_means_21", "fitness_means_21")
+
+# save named list
+save(Means_2021, file = "data/ModelMeans_2021.robj")
+
 ```
 
 
@@ -915,7 +1009,8 @@ contrasts(Dat_2022$Population) <- contr.sum
 contrasts(Dat_2022$Treatment) <- contr.sum
 
 # make a modelling function to streamline analyses. This function runs a mixed model, then plots the residuals, the model summary, and runs an ANOVA
-anov_lmer2 <- function(trait, data = Dat_2022){
+
+do_lmer2 <- function(trait, data = Dat_2022){
   lm<- lmer(trait ~ Treatment * Population + Treatment:Chamber + (1|Population:Line), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
@@ -932,12 +1027,18 @@ anov_lmer2 <- function(trait, data = Dat_2022){
   qqline(resid(lm))
   print(summary(lm))
   print(confint(lm))
-  anov <- anova(lm)
+  return(lm)
+}
+# do the anova
+do_anov2 <- function(model){
+  anov <- anova(model)
   print(anov)
   df <- as.data.frame(anov)
   df$exp <- "2022"
   return(df)
 }
+
+# get table functions are the same as from 2021
 
   
 ```
@@ -990,19 +1091,23 @@ anov_lmer4 <- function(trait, data = Dat_2022){
 Run the models
 ### Phenology
 
-Days to emergence
+Days to emergence - log10 transformed this time!
 ```{r}
 # days to emergence
-emerge_22 <- anov_lmer2(Dat_2022$l10_DaysToEmergence)
-emerge_22$trait <- "Emergence"
+emergence_lm_22 <- do_lmer2(Dat_2022$l10_DaysToEmergence)
+emergence_anov_22 <- do_anov2(emergence_lm_22)
+emergence_anov_22$trait <- "Emergence"
+emergence_means_22 <- get_table_bt(emergence_lm_22)
 # no interaction
 ```
 
 Days between emergence and bolting
 ```{r}
 # days emergence to bolting
-bolting_22 <- anov_lmer2(Dat_2022$EmergenceToBolting)
-bolting_22$trait <- "Bolting"
+bolting_lm_22 <- do_lmer2(Dat_2022$EmergenceToBolting)
+bolting_anov_22 <- do_anov2(bolting_lm_22)
+bolting_anov_22$trait <- "Bolting"
+bolting_means_22 <- get_table(bolting_lm_22)
 ```
 
 There is an interaction, so do posthoc analyses.No chamber effect in full model, so not included here.
@@ -1027,8 +1132,10 @@ Not looking an number emerged because doesn't have a 2021 comparison for emergen
 Fresh weight
 ```{r}
 # single leaf fresh weight
-fresh_22 <- anov_lmer2(Dat_2022$l10_SL_FreshWt)
-fresh_22$trait <- "l10_FreshWt"
+fresh_lm_22 <- do_lmer2(Dat_2022$l10_SL_FreshWt)
+fresh_anov_22 <- do_anov2(fresh_lm_22)
+fresh_anov_22$trait <- "l10_FreshWt"
+fresh_means_22 <- get_table_bt(fresh_lm_22)
 ```
 
 There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
@@ -1048,8 +1155,10 @@ as.data.frame(summary(lmer(l10_SL_FreshWt ~ Population + (1|Population:Line), da
 Saturated/Hydrated weight
 ```{r}
 # single leaf hydrated (also called saturated) weight
-hyd_22 <- anov_lmer2(Dat_2022$l10_SL_HydWt)
-hyd_22$trait <- "l10_SatWt"
+hyd_lm_22 <- do_lmer2(Dat_2022$l10_SL_HydWt)
+hyd_anov_22 <- do_anov2(hyd_lm_22)
+hyd_anov_22$trait <- "l10_SatWt"
+hyd_means_22 <- get_table_bt(hyd_lm_22)
 # also has SQR transformation
 ```
 
@@ -1070,8 +1179,10 @@ as.data.frame(summary(lmer(l10_SL_HydWt ~ Population + (1|Population:Line), data
 Dried weight
 ```{r}
 # single leaf dry weight
-dry_22 <- anov_lmer2(Dat_2022$SL_DryWt)
-dry_22$trait <- "DriedWt"
+dry_lm_22 <- do_lmer2(Dat_2022$SL_DryWt)
+dry_anov_22 <- do_anov2(dry_lm_22)
+dry_anov_22$trait <- "DriedWt"
+dry_means_22 <- get_table(dry_lm_22)
 # also has SQR transformation
 # no interaction
 
@@ -1085,8 +1196,10 @@ dry_22$trait <- "DriedWt"
 leaf area
 ```{r}
 # single leaf area
-area_22 <- anov_lmer2(Dat_2022$SL_Area)
-area_22$trait <- "Area"
+area_lm_22 <- do_lmer2(Dat_2022$SL_Area)
+area_anov_22 <- do_anov2(area_lm_22)
+area_anov_22$trait <- "Area"
+area_means_22 <- get_table(area_lm_22)
 # also has SQR
 ```
 
@@ -1107,8 +1220,10 @@ as.data.frame(summary(lmer(SL_Area ~ Population + (1|Population:Line), data = su
 leaf perimeter
 ```{r}
 # single leaf perimeter
-per_22 <- anov_lmer2(Dat_2022$SL_Perim)
-per_22$trait <- "Perimeter"
+per_lm_22 <- do_lmer2(Dat_2022$SL_Perim)
+per_anov_22 <- do_anov2(per_lm_22)
+per_anov_22$trait <- "Perimeter"
+per_means_22 <- get_table(per_lm_22)
 ```
 
 There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
@@ -1127,8 +1242,10 @@ as.data.frame(summary(lmer(SL_Perim ~ Population + (1|Population:Line), data = s
 specific leaf area
 ```{r}
 # SLA
-sla_22 <- anov_lmer2(Dat_2022$l10_SLA)
-sla_22$trait <- "l10_SLA"
+sla_lm_22 <- do_lmer2(Dat_2022$l10_SLA)
+sla_anov_22 <- do_anov2(sla_lm_22)
+sla_anov_22$trait <- "l10_SLA"
+sla_means_22 <- get_table_bt(sla_lm_22)
 ```
 
 There is an interaction, so do posthoc analyses. There is a chamber effect in full model, so included here.
@@ -1148,9 +1265,11 @@ as.data.frame(summary(lmer(l10_SLA ~ Population + Chamber + (1|Population:Line),
 leaf dry matter content
 ```{r}
 # leaf dry matter content
-ldmc_22 <- anov_lmer2(Dat_2022$l10_LDMC)
-ldmc_22$trait <- "l10_LDMC"
-# conf int gives many warnings
+ldmc_lm_22 <- do_lmer2(Dat_2022$l10_LDMC)
+ldmc_anov_22 <- do_anov2(ldmc_lm_22)
+ldmc_anov_22$trait <- "l10_LDMC"
+ldmc_means_22 <- get_table_bt(ldmc_lm_22)
+
 ```
 
 There is an interaction, so do posthoc analyses. There is a chamber effect in full model, so included here.
@@ -1169,8 +1288,10 @@ as.data.frame(summary(lmer(l10_LDMC ~ Population + Chamber + (1|Population:Line)
 relative water content
 ```{r}
 # relative water content
-rwc_22 <- anov_lmer2(Dat_2022$RWC)
-rwc_22$trait <- "RWC"
+rwc_lm_22 <- do_lmer2(Dat_2022$RWC)
+rwc_anov_22 <- do_anov2(rwc_lm_22)
+rwc_anov_22$trait <- "RWC"
+rwc_means_22 <- get_table(rwc_lm_22)
 # tori did log for RWC.
 ```
 
@@ -1193,29 +1314,40 @@ as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset
 leaf num at 4 weeks
 ```{r}
 # pre vern leaf number
-LN_PreVern_22 <- anov_lmer2(Dat_2022$LeafNumber_PreVern)
-LN_PreVern_22$trait <- "LeafNum_5wks"
+LN_PreVern_lm_22 <- do_lmer2(Dat_2022$LeafNumber_PreVern)
+LN_PreVern_anov_22 <- do_anov2(LN_PreVern_lm_22)
+LN_PreVern_anov_22$trait <- "LeafNum_5wks"
+LN_PreVern_means_22 <- get_table(LN_PreVern_lm_22)
 # no interaction
 ```
+
 leaf num first week post vern
 ```{r}
 # june 6 leaf number(first week post vern?)
-LN_Jun6_22 <- anov_lmer2(Dat_2022$LeafNumber_Jun6)
-LN_Jun6_22$trait <- "LeafNum_9wks"
+LN_Jun6_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun6)
+LN_Jun6_anov_22 <- do_anov2(LN_Jun6_lm_22)
+LN_Jun6_anov_22$trait <- "LeafNum_9wks"
+LN_Jun6_means_22 <- get_table(LN_Jun6_lm_22)
 # no interaction
 ```
+
 leaf num second week post vern
 ```{r}
 # june 14 leaf number (second week post vern?)
-LN_Jun13_22 <- anov_lmer2(Dat_2022$LeafNumber_Jun13)
-LN_Jun13_22$trait <- "LeafNum_10wks"
+LN_Jun13_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun13)
+LN_Jun13_anov_22 <- do_anov2(LN_Jun13_lm_22)
+LN_Jun13_anov_22$trait <- "LeafNum_10wks"
+LN_Jun13_means_22 <- get_table(LN_Jun13_lm_22)
 # no interaction
 ```
+
 leaf num at bolting
 ```{r}
 # total leaf number counted at bolting when plants were harvested
-LN_bolt_22 <- anov_lmer2(Dat_2022$l10_LeafNumber_Total)
-LN_bolt_22$trait <- "LeafNumb_bolting"
+LN_bolt_lm_22 <- do_lmer2(Dat_2022$l10_LeafNumber_Total)
+LN_bolt_anov_22 <- do_anov2(LN_bolt_lm_22)
+LN_bolt_anov_22$trait <- "l10_LeafNumb_bolting"
+LN_bolt_means_22 <- get_table_bt(LN_bolt_lm_22)
 # no interaction
 ```
 
@@ -1227,8 +1359,10 @@ Not analyzing rosette leaf number or under leaves because this split was started
 above ground biomass
 ```{r}
 # above ground biomass (same as rosette biomass)
-AG_22 <- anov_lmer2(Dat_2022$l10_AG_DryBiomass)
-AG_22$trait <- "l10_Above Ground Biomass"
+AG_lm_22 <- do_lmer2(Dat_2022$l10_AG_DryBiomass)
+AG_anov_22 <- do_anov2(AG_lm_22)
+AG_anov_22$trait <- "l10_Above Ground Biomass"
+AG_means_22 <- get_table_bt(AG_lm_22)
 # also has SQR transformation
 ```
 
@@ -1249,16 +1383,21 @@ as.data.frame(summary(lmer(l10_AG_DryBiomass ~ Population + (1|Population:Line),
 below ground biomass
 ```{r}
 # below ground biomass
-BG_22 <- anov_lmer2(Dat_2022$BG_DryBiomass)
-BG_22$trait <- "Below Ground Biomass"
+BG_lm_22 <- do_lmer2(Dat_2022$BG_DryBiomass)
+BG_anov_22 <- do_anov2(BG_lm_22)
+BG_anov_22$trait <- "Below Ground Biomass"
+BG_means_22 <- get_table(BG_lm_22)
 # also has SQR transformation
 # no interaction
 ```
+
 Root to shoot ration (below ground / above ground)
 ```{r}
 # Root to Shoot ratio
-RS_22 <- anov_lmer2(Dat_2022$l10_Root_to_Shoot)
-RS_22$trait <- "l10_Root to Shoot Ratio"
+RS_lm_22 <- do_lmer2(Dat_2022$l10_Root_to_Shoot)
+RS_anov_22 <- do_anov2(RS_lm_22)
+RS_anov_22$trait <- "l10_Root to Shoot Ratio"
+RS_means_22 <- get_table_bt(RS_lm_22)
 
 ```
 
@@ -1280,19 +1419,58 @@ as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Population + (1|Population:Line),
 Not analyzing stomata average becuase density is the average information with the viewing window area included in the calculation.
 ```{r}
 # stomatal density - imaged on harvest day
-sto_den_22 <- anov_lmer2(Dat_2022$l10_Stomata_density)
-sto_den_22$trait <- "Stomatal Density"
+sto_den_lm_22 <- do_lmer2(Dat_2022$l10_Stomata_density)
+sto_den_anov_22 <- do_anov2(sto_den_lm_22)
+sto_den_anov_22$trait <- "l10_Stomatal Density"
+sto_den_means_22 <- get_table_bt(sto_den_lm_22)
 # no interaction
 ```
 
-### Results Table
+### Outputs
+
+1) results table
 
 ```{r}
-AnovaResults_2022 <- rbind(emerge_22, bolting_22, fresh_22, hyd_22, dry_22, area_22, per_22, sla_22, ldmc_22, rwc_22, LN_PreVern_22, LN_Jun6_22, LN_Jun13_22, LN_bolt_22, AG_22, BG_22, RS_22, sto_den_22 )
+AnovaResults_2022 <- rbind(emergence_anov_22, bolting_anov_22, fresh_anov_22, hyd_anov_22, dry_anov_22, area_anov_22, per_anov_22, sla_anov_22, ldmc_anov_22, rwc_anov_22, LN_PreVern_anov_22, LN_Jun6_anov_22, LN_Jun13_anov_22, LN_bolt_anov_22, AG_anov_22, BG_anov_22, RS_anov_22, sto_den_anov_22 )
 
 write.csv(AnovaResults_2022, file = "data/AnovaResults_2022.csv", row.names = TRUE)
 ```
 
+2) All the tables to read in to the figures code
+
+```{r}
+# change column names
+# not transformed
+dfs3 <- c("bolting_means_22", "dry_means_22", "area_means_22", "per_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "BG_means_22")
+
+for (i in dfs3) {
+  x=get(i)
+  colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95")
+  assign(i,x)
+}
+
+# transformed
+dfs4 <- c("emergence_means_22", "fresh_means_22", "hyd_means_22", "sla_means_22", "ldmc_means_22", "LN_bolt_means_22", "AG_means_22", "RS_means_22", "sto_den_means_22")
+
+for (i in dfs4) {
+  x=get(i)
+  colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95", "Bk_Mean", "Bk_LL_95", "Bk_UL_95")
+  assign(i,x)
+}
+
+# create list of data frames
+Means_2022 <- list(emergence_means_22, bolting_means_22, fresh_means_22, hyd_means_22, dry_means_22, area_means_22, per_means_22, sla_means_22, ldmc_means_22, rwc_means_22, LN_PreVern_means_22, LN_Jun6_means_22, LN_Jun13_means_22, LN_bolt_means_22, AG_means_22, BG_means_22, RS_means_22, sto_den_means_22)
+
+# name that list
+names(Means_2022) <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "LN_bolt_means_22", "AG_means_22", "BG_means_22", "RS_means_22", "sto_den_means_22")
+
+# save named list
+save(Means_2022, file = "data/ModelMeans_2022.robj")
+
+```
+
+
+#Notes
 The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis.
 
 The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. Post hoc analyses if there was an interaction between population and treatment are only recorded here (as of 7/19/2024) and are only done for 2021 as of 8/2/2024.
@@ -1445,3 +1623,17 @@ ps_plot4 <- ggplot(Dat_2021_TwoTrt)+
 ggplotly(ps_plot4)
 
 ```
+
+
+##Test: Predicted means
+Test new plotting function with predictmeans package. Use emergence to flowering trait to test things out. This works and gives an output of values, including the mean_table which I think is what I want to plot with. I don't want their premade plots becuase I want more customization.
+
+```{r}
+# testing plotting functions
+# run lm
+lm <- lmer(EmergeToFlwr ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
+
+predictmeans(lm, modelterm="Treatment:Population",  plotord = c(1,2), lineplot = TRUE, plotxlab = "Treatment", plotylab = "Days between Emergence and Flowering", mplot = TRUE, pplot = FALSE, bkplot = FALSE, plot = TRUE, jitterv = 0.05, prtplt = TRUE, newwd= FALSE)
+
+```
+

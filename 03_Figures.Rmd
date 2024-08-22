@@ -37,7 +37,8 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 
-# make function
+# would like to phase these out but still used for the growth curves
+# let's make some functions
 std_mean <- function(x){
   sd(x, na.rm = TRUE)/sqrt(length(x))
 }
@@ -51,6 +52,7 @@ conf_int <- function(x, conf.interval = 0.95){
   ci <- std_mean(x) * ciMult
   return(ci)
 }
+
 ```
 
 Set theme for plots
@@ -78,7 +80,7 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
 
 # read in data
 
-Read in the data needed for all plotting
+Read in the data needed for all plotting.
 ```{r}
 # 2021
 Dat_2021 <- read.csv("data/CleanData_2021.csv")
@@ -94,9 +96,9 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 # subset to two treatments
 Dat_2021 <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
 
-Sum_2021 <- read.csv("data/PopMeansByTreatment_2021.csv")
-# subset to only two treatments
-Sum_2021 <- Sum_2021[ , c(1, 2, 4, 5, 7)]
+# for plotting - this file was made with only two treatments
+load("data/ModelMeans_2021.robj")
+
 
 # 2022
 Dat_2022 <- read.csv("data/CleanData_2022.csv")
@@ -108,7 +110,7 @@ Dat_2022$Flat <- as.factor(Dat_2022$Flat)
 Dat_2022$Chamber <- as.factor(Dat_2022$Chamber)
 Dat_2022$Transplanted <- as.factor(Dat_2022$Transplanted)
 
-Sum_2022 <- read.csv("data/PopMeansByTreatment_2022.csv")
+load("data/ModelMeans_2022.robj")
 ```
 
 # phenology
@@ -167,6 +169,7 @@ Takeaways: phenology is quicker for both populations in the 2022 experiment. In 
 # 2021 only
 
 Reaction norms to make here: \
+- DaysToBolting(b/c exp differences) \
 - DaysBoltingToFlwr \
 - LeafNum_duringvern (if included) \
 - LeafNum_Oct4 (if included) \
@@ -184,28 +187,18 @@ Reaction norms to make here: \
 - AvgSeedNum \
 - NumFlwrLeft (no model as of 7/31/2024, not included here, not measured for everything) \
 
-Subset to only that data from the summary table + format
-```{r}
-forplot_2021 <- data.frame(t(Sum_2021))
-colnames(forplot_2021) <- forplot_2021[1, ]
-forplot_2021 <- forplot_2021[c(2:5), ]
-forplot_2021 <- forplot_2021 %>%
-  select(Population, Treatment, DayToBolt_mean:EmergeToFlwr_ci_95, LeafNum_08262021_mean:RosetteLeafNum_10042021_ci_95, RosetteLeafNum_mean:DryReproG_ci_95, Repro_to_Ros_mean:IJ_FruitCount_ci_95, AG_biomass_mean:fitness_ci_95) %>%
-  mutate(across(Population:Treatment, as.factor),
-         across(DayToBolt_mean:fitness_ci_95, as.numeric))
-```
 
 ## Phenology
 
 Days Emergence to bolting
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = DayToBolt_mean)) +
+ggplot(data = Means_2021[["bolting_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=DayToBolt_mean-DayToBolt_ci_95, ymax = DayToBolt_mean + DayToBolt_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Days Emergence to Bolting", 
-      x="Treatment")+
+       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
@@ -217,9 +210,9 @@ DaysBoltingToFlwr
 
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = DayToFlwr_mean)) +
+ggplot(data = Means_2021[["flowering_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=DayToFlwr_mean-DayToFlwr_ci_95, ymax = DayToFlwr_mean + DayToFlwr_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Days Bolting to Flowering", 
       x="Treatment")+
@@ -232,9 +225,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DayToFlwr_mean)) +
 
 Days Emergence to Flower
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = EmergeToFlwr_mean)) +
+ggplot(data = Means_2021[["eTof_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=EmergeToFlwr_mean-EmergeToFlwr_ci_95, ymax = EmergeToFlwr_mean + EmergeToFlwr_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Days Emergence to Flowering", 
       x="Treatment")+
@@ -248,9 +241,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = EmergeToFlwr_mean)) +
 LeafNum_duringvern (if included)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = LeafNum_08262021_mean)) +
+ggplot(data = Means_2021[["LN_Vern_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LeafNum_08262021_mean-LeafNum_08262021_ci_95, ymax = LeafNum_08262021_mean + LeafNum_08262021_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Leaf Number: during vern", 
       x="Treatment")+
@@ -263,9 +256,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = LeafNum_08262021_mean)) +
 LeafNum_Oct4 (if included)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = RosetteLeafNum_10042021_mean)) +
+ggplot(data = Means_2021[["LN_PostVern_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=RosetteLeafNum_10042021_mean - RosetteLeafNum_10042021_ci_95, ymax = RosetteLeafNum_10042021_mean + RosetteLeafNum_10042021_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Leaf Number: 6 weeks post vern", 
       x="Treatment")+
@@ -278,9 +271,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = RosetteLeafNum_10042021_mean)
 RosetteLeafNum_harvest
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = RosetteLeafNum_mean)) +
+ggplot(data = Means_2021[["LN_harv_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=RosetteLeafNum_mean-RosetteLeafNum_ci_95, ymax = RosetteLeafNum_mean + RosetteLeafNum_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Leaf Number: at harvest", 
       x="Treatment")+
@@ -330,9 +323,21 @@ ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
 RosetteDry_harvest
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = DryRosetteG_mean)) +
+ggplot(data = Means_2021[["Ros_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=DryRosetteG_mean-DryRosetteG_ci_95, ymax = DryRosetteG_mean + DryRosetteG_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="Log10 Rosette Dry Biomass (g) at harvest", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+# backtransformed
+ggplot(data = Means_2021[["Ros_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Rosette Dry Biomass (g) at harvest", 
       x="Treatment")+
@@ -340,14 +345,26 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DryRosetteG_mean)) +
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.6,0))
+
 ```
 
 DryReproG
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = DryReproG_mean)) +
+ggplot(data = Means_2021[["Repro_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=DryReproG_mean-DryReproG_ci_95, ymax = DryReproG_mean + DryReproG_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="l10 Reproductive Dry Biomass (g)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+ggplot(data = Means_2021[["Repro_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Reproductive Dry Biomass (g)", 
       x="Treatment")+
@@ -360,9 +377,20 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = DryReproG_mean)) +
 AG_biomass (Ros+Repro)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = AG_biomass_mean)) +
+ggplot(data = Means_2021[["AG_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=AG_biomass_mean-AG_biomass_ci_95, ymax = AG_biomass_mean + AG_biomass_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="l10 Total Above Ground Biomass (g)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+ggplot(data = Means_2021[["AG_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Total Above Ground Biomass (g)", 
       x="Treatment")+
@@ -375,9 +403,21 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AG_biomass_mean)) +
 Repro_to_Ros
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = Repro_to_Ros_mean)) +
+ggplot(data = Means_2021[["RR_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Repro_to_Ros_mean-Repro_to_Ros_ci_95, ymax = Repro_to_Ros_mean + Repro_to_Ros_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="l10(Reproductive / Rosette Dry Biomass)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+
+ggplot(data = Means_2021[["RR_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Reproductive / Rosette Dry Biomass", 
       x="Treatment")+
@@ -390,9 +430,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = Repro_to_Ros_mean)) +
 LatBranches
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = LatBranches_mean)) +
+ggplot(data = Means_2021[["LatBranch_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LatBranches_mean-LatBranches_ci_95, ymax = LatBranches_mean + LatBranches_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Number of Lateral Branches", 
       x="Treatment")+
@@ -405,9 +445,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = LatBranches_mean)) +
 PrimaryStalks - how many stalks are coming out of the top of the rosette?
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = PrimaryStalks_mean)) +
+ggplot(data = Means_2021[["PrimStalks_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=PrimaryStalks_mean-PrimaryStalks_ci_95, ymax = PrimaryStalks_mean + PrimaryStalks_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Number of Primary Stalks", 
       x="Treatment")+
@@ -420,9 +460,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = PrimaryStalks_mean)) +
 Height_cm (of main stalk)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = Height_cm_mean)) +
+ggplot(data = Means_2021[["height_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Height_cm_mean-Height_cm_ci_95, ymax = Height_cm_mean + Height_cm_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Height (cm)", 
       x="Treatment")+
@@ -434,25 +474,24 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = Height_cm_mean)) +
 
 ## fitness + fitness related
 
-IJ_FruitCount (alsokept other fruit count in the forplot table just cause, is the first graph here)
+IJ_FruitCount
 
 ```{r, echo = FALSE}
-# hand count - think is wrong
-ggplot(data = forplot_2021, aes(x = Treatment, y = TotFruit_mean)) +
+# IJ count
+ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=TotFruit_mean-TotFruit_ci_95, ymax = TotFruit_mean + TotFruit_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
-  labs(y="Fruit Count (Machine Learning)", 
+  labs(y="l10 Fruit Count (ImageJ)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.6,0))
 
-# IJ count
-ggplot(data = forplot_2021, aes(x = Treatment, y = IJ_FruitCount_mean)) +
+ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=IJ_FruitCount_mean-IJ_FruitCount_ci_95, ymax = IJ_FruitCount_mean + IJ_FruitCount_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Fruit Count (ImageJ)", 
       x="Treatment")+
@@ -465,9 +504,9 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = IJ_FruitCount_mean)) +
 AvgSeedWt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedWt_mean)) +
+ggplot(data = Means_2021[["AvSeedWt_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=AvgSeedWt_mean-AvgSeedWt_ci_95, ymax = AvgSeedWt_mean + AvgSeedWt_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Average Seed Weight (mg)", 
       x="Treatment")+
@@ -480,9 +519,21 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedWt_mean)) +
 AvgSeedNum
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
+ggplot(data = Means_2021[["seeds_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=AvgSeedNum_mean-AvgSeedNum_ci_95, ymax = AvgSeedNum_mean + AvgSeedNum_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="l10(Average Number of Seeds per Fruit)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+# backtransformed
+ggplot(data = Means_2021[["seeds_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Average Number of Seeds per Fruit", 
       x="Treatment")+
@@ -495,9 +546,20 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
 fitness - avg seed num/fruit * fruit num
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2021, aes(x = Treatment, y = fitness_mean)) +
+ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=fitness_mean-fitness_ci_95, ymax = fitness_mean + fitness_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
+  labs(y="l10(Fitness)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Fitness", 
       x="Treatment")+
@@ -507,8 +569,6 @@ ggplot(data = forplot_2021, aes(x = Treatment, y = fitness_mean)) +
   scale_x_discrete(expand = c(0.6,0))
 
 ```
-
-
 
 
 ## graphs by line - include?
@@ -566,7 +626,6 @@ ggplot(dat = forplot2_2021)+
 # 2022 only
 
 Graphs to make here: \
-- NumEmerged \
 - LeafNum_Jun6 (if included) \
 - LeafNum_Jun13 (if included) \
 - LeafNum_bolt \
@@ -575,39 +634,15 @@ Graphs to make here: \
 - Root_to_Shoot \
 - Stomata_density \
 
-```{r}
-forplot_2022 <- data.frame(t(Sum_2022))
-colnames(forplot_2022) <- forplot_2022[1, ]
-forplot_2022 <- forplot_2022[c(2:5), ]
-forplot_2022 <- forplot_2022 %>%
-  select(Population, Treatment, NumEmerged_mean, NumEmerged_ci_95, LeafNumber_Jun6_mean:LeafNumber_Jun13_ci_95, LeafNumber_Total_mean, LeafNumber_Total_ci_95, AG_DryBiomass_mean:BG_DryBiomass_ci_95, Root_to_Shoot_mean:Stomata_density_ci_95) %>%
-  mutate(across(Population:Treatment, as.factor),
-         across(NumEmerged_mean:Stomata_density_ci_95, as.numeric))
-```
-
-## Num Emerged
-Number Emerged
-
-```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = NumEmerged_mean)) +
-  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=NumEmerged_mean-NumEmerged_ci_95, ymax = NumEmerged_mean + NumEmerged_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
-  geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
-  labs(y="Number Emerged Seeds", 
-      x="Treatment")+
-  scale_color_manual(name = "Population",
-                     labels = c("IT", "SW"),
-                     values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))
-```
+Note: skipping days from emergence to bolting because most of that time is the same treatment. Might want it later but no visualization of that for 2022 at all in this code as of 8/22/2024
 
 ## Leaf Number
 LeafNum_Jun6 (if included)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun6_mean)) +
+ggplot(data = Means_2022[["LN_Jun6_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LeafNumber_Jun6_mean-LeafNumber_Jun6_ci_95, ymax = LeafNumber_Jun6_mean + LeafNumber_Jun6_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Leaf Number 1 week post vern", 
       x="Treatment")+
@@ -620,9 +655,9 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun6_mean)) +
 LeafNum_Jun13 (if included)
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun13_mean)) +
+ggplot(data = Means_2022[["LN_Jun13_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LeafNumber_Jun13_mean-LeafNumber_Jun13_ci_95, ymax = LeafNumber_Jun13_mean + LeafNumber_Jun13_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Leaf Number 2 weeks post vern", 
       x="Treatment")+
@@ -635,9 +670,21 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Jun13_mean)) +
 LeafNum_bolt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = LeafNumber_Total_mean)) +
+ggplot(data = Means_2022[["LN_bolt_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LeafNumber_Total_mean-LeafNumber_Total_ci_95, ymax = LeafNumber_Total_mean + LeafNumber_Total_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
+  labs(y="l10 Leaf Number at Bolting", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+# back transform
+ggplot(data = Means_2022[["LN_bolt_means_22"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Leaf Number at Bolting", 
       x="Treatment")+
@@ -688,9 +735,20 @@ ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
 AG_Dry_bolt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = AG_DryBiomass_mean)) +
+ggplot(data = Means_2022[["AG_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=AG_DryBiomass_mean-AG_DryBiomass_ci_95, ymax = AG_DryBiomass_mean + AG_DryBiomass_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
+  labs(y="l10 Above Ground Biomass (g) at bolting", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+ggplot(data = Means_2022[["AG_means_22"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Above Ground Biomass (g) at bolting", 
       x="Treatment")+
@@ -703,9 +761,9 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = AG_DryBiomass_mean)) +
 BG_Dry_bolt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = BG_DryBiomass_mean)) +
+ggplot(data = Means_2022[["BG_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=BG_DryBiomass_mean-BG_DryBiomass_ci_95, ymax = BG_DryBiomass_mean + BG_DryBiomass_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Below Ground Biomass (g) at bolting", 
       x="Treatment")+
@@ -718,9 +776,21 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = BG_DryBiomass_mean)) +
 Root_to_Shoot
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = Root_to_Shoot_mean)) +
+ggplot(data = Means_2022[["RS_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Root_to_Shoot_mean-Root_to_Shoot_ci_95, ymax = Root_to_Shoot_mean + Root_to_Shoot_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
+  labs(y="l10(Root:Shoot Ratio)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+# back transformed
+ggplot(data = Means_2022[["RS_means_22"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Root:Shoot Ratio", 
       x="Treatment")+
@@ -734,9 +804,21 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = Root_to_Shoot_mean)) +
 Stomata Density
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_2022, aes(x = Treatment, y = Stomata_density_mean)) +
+ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Stomata_density_mean-Stomata_density_ci_95, ymax = Stomata_density_mean + Stomata_density_ci_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
+  labs(y="l10 Stomatal Density", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+# back transformed
+ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5, linetype = "dotted")+ 
   labs(y="Stomatal Density", 
       x="Treatment")+
@@ -746,6 +828,7 @@ ggplot(data = forplot_2022, aes(x = Treatment, y = Stomata_density_mean)) +
   scale_x_discrete(expand = c(0.6,0))
 ```
 
+#start here
 # both
 Steps to be completed here.
 Subset 2021 dataset. add 2021 column. Subset 2022 dataset. add 2022 column. make column names the same. merge. format. plot.
