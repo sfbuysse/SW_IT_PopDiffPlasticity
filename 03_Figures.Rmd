@@ -828,10 +828,9 @@ ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y = Bk_Mean))
   scale_x_discrete(expand = c(0.6,0))
 ```
 
-#start here
 # both
 Steps to be completed here.
-Subset 2021 dataset. add 2021 column. Subset 2022 dataset. add 2022 column. make column names the same. merge. format. plot.
+Subset 2021 dataset. add 2021 column. Subset 2022 dataset. add 2022 column. merge - rbind for each trait. format. plot.
 
 Reaction Norms to create here: \
 - Emergence \
@@ -848,42 +847,32 @@ Reaction Norms to create here: \
 
 ```{r}
 # subset 2021 dataset
-tmp_1 <- data.frame(t(Sum_2021))
-colnames(tmp_1) <- tmp_1[1, ]
-tmp_1 <- tmp_1[c(2:5), ]
-tmp_1 <- tmp_1 %>%
-  select(Population, Treatment, Emergence_mean:DayToBolt_ci_95, FreshWt_g_mean:LeafNum_.07222021_ci_95) %>%
-  mutate(across(Population:Treatment, as.factor),
-         across(Emergence_mean:LeafNum_.07222021_ci_95, as.numeric))
-tmp_1$Exp <- as.factor("2021")
+both_exp <- c("emergence_means_21", "bolting_means_21", "fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "RWC_means_21", "LN_PreVern_means_21")
+both_2021 <- Means_2021[both_exp]
+both_2021 <- lapply(both_2021, cbind, Exp = as.factor(c("2021")))
 
 # subset 2022 dataset
-tmp_2 <- data.frame(t(Sum_2022))
-colnames(tmp_2) <- tmp_2[1, ]
-tmp_2 <- tmp_2[c(2:5), ]
-tmp_2[tmp_2$Population == "B", "Population"] <- "BELM"
-tmp_2[tmp_2$Population == "R", "Population"] <- "RODA"
-tmp_2 <- tmp_2 %>%
-  select(Population, Treatment, DaysToEmergence_mean:EmergenceToBolting_ci_95, SL_FreshWt_mean:SL_Perim_ci_95, SLA_mean:RWC_ci_95, LeafNumber_PreVern_mean, LeafNumber_PreVern_ci_95) %>%
-  mutate(across(Population:Treatment, as.factor),
-         across(DaysToEmergence_mean:LeafNumber_PreVern_ci_95, as.numeric))
-tmp_2$Exp <- as.factor("2022")
+both_exp2 <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22")
+both_2022 <- Means_2022[both_exp2]
+# change B and R to Belm and Roda
+for (i in 1:length(both_2022)){
+  both_2022[[i]]$Population <- as.character(both_2022[[i]]$Population)
+  both_2022[[i]][both_2022[[i]]$Population == "B", "Population"] <- "BELM"
+  both_2022[[i]][both_2022[[i]]$Population == "R", "Population"] <- "RODA"
+  both_2022[[i]]$Population <- as.factor(both_2022[[i]]$Population)
+}
+both_2022 <- lapply(both_2022, cbind, Exp = as.factor(c("2022")))
 
 
-# test columns are in the same order in both 
-colnames(tmp_1)
-colnames(tmp_2)
+# merge - do this within a loop
+mylist.names <- c("emergence", "bolting", "fresh", "hyd", "dry", "area", "per", "sla", "ldmc", "rwc", "LN")
+both_dfs <-  vector("list", length(mylist.names))
+names(both_dfs) <- mylist.names
 
-# set colnames to be the same for both
-names <- c("Population", "Treatment", "Emergence_mean", "Emergence_ci", "EmergeToBolt_mean", "EmergeToBolt_ci", "Fresh_mean", "Fresh_ci", "Sat_mean", "Sat_ci", "Dry_mean", "Dry_ci", "area_mean", "area_ci", "perim_mean", "perim_ci", "SLA_mean", "SLA_ci", "LDMC_mean", "LDMC_ci", "RWC_mean", "RWC_ci","LeafNum_4wk_mean", "LeafNum_4wk_ci","Exp")
-
-colnames(tmp_1) <- names
-colnames(tmp_2) <- names
-
-# merge
-forplot_both <- rbind(tmp_1, tmp_2)
+for (i in 1:length(both_dfs)){
+  both_dfs[[i]] <- bind_rows(both_2021[[i]], both_2022[[i]])
+}
 ```
-
 
 
 ## Phenology
@@ -891,10 +880,13 @@ forplot_both <- rbind(tmp_1, tmp_2)
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = Emergence_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Emergence_mean-Emergence_ci, ymax = Emergence_mean + Emergence_ci, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+ggplot()+
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
   labs(y="Days to Emergence", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -904,15 +896,16 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Emergence_mean)) +
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
   scale_x_discrete(expand = c(0.6,0))
+  
 ```
 
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable becuase in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait for the manuscript.
 
 ```{r, echo = FALSE, eval = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = EmergeToBolt_mean)) +
+ggplot(data = both_dfs[["bolting"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=EmergeToBolt_mean-EmergeToBolt_ci, ymax = EmergeToBolt_mean + EmergeToBolt_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Days Emergence to Bolting", 
       x="Treatment")+
@@ -930,9 +923,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = EmergeToBolt_mean)) +
 FreshWt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = Fresh_mean)) +
+ggplot(data = both_dfs[["fresh"]], aes(x = Treatment, y = Bk_Mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Fresh_mean - Fresh_ci, ymax = Fresh_mean + Fresh_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Fresh Weight (g)", 
       x="Treatment")+
@@ -949,9 +942,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Fresh_mean)) +
 HydWt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = Sat_mean)) +
+ggplot(data = both_dfs[["hyd"]], aes(x = Treatment, y = Bk_Mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Sat_mean - Sat_ci, ymax = Sat_mean + Sat_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Saturated Weight (g)", 
       x="Treatment")+
@@ -968,10 +961,13 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Sat_mean)) +
 DryWt
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = Dry_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Dry_mean - Dry_ci, ymax = Dry_mean + Dry_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+ggplot() +
+  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
   labs(y="Dry Weight (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -987,10 +983,13 @@ ggplot(data = forplot_both, aes(x = Treatment, y = Dry_mean)) +
 LeafArea
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = area_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=area_mean - area_ci, ymax = area_mean + area_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+ggplot() +
+  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
   labs(y="Leaf Area (cm^2)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1006,10 +1005,13 @@ ggplot(data = forplot_both, aes(x = Treatment, y = area_mean)) +
 LeafPerimeter
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = perim_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=perim_mean - perim_ci, ymax = perim_mean + perim_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+ggplot() +
+  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
   labs(y="Leaf Perimeter (cm)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1027,9 +1029,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = perim_mean)) +
 Specific Leaf Area
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = SLA_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3),show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=SLA_mean - SLA_ci, ymax = SLA_mean + SLA_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Specific Leaf Area (cm^2 / g)", 
       x="Treatment")+
@@ -1046,9 +1048,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = SLA_mean)) +
 Leaf Dry Matter Content
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = LDMC_mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3),show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LDMC_mean - LDMC_ci, ymax = LDMC_mean + LDMC_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3),show.legend = FALSE)+
+ggplot(data = both_dfs[["ldmc"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Dry Matter Content (%)", 
       x="Treatment")+
@@ -1065,9 +1067,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = LDMC_mean)) +
 Relative Water Content
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = RWC_mean)) +
+ggplot(data = both_dfs[["rwc"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=RWC_mean - RWC_ci, ymax = RWC_mean + RWC_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Relative Water Content (%)", 
       x="Treatment")+
@@ -1084,9 +1086,9 @@ ggplot(data = forplot_both, aes(x = Treatment, y = RWC_mean)) +
 LeafNum_4weeks
 
 ```{r, echo = FALSE}
-ggplot(data = forplot_both, aes(x = Treatment, y = LeafNum_4wk_mean)) +
+ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LeafNum_4wk_mean - LeafNum_4wk_ci, ymax = LeafNum_4wk_mean + LeafNum_4wk_ci, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Number (4 weeks post planting)", 
       x="Treatment")+
