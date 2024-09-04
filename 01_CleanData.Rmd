@@ -2,10 +2,10 @@
 title: "01_CleanData"
 author: "Sophie Buysse"
 date: "`r Sys.Date()`"
-output: 
+output:
   html_document:
-  toc: true
-  toc_float: true
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -589,6 +589,8 @@ Alldata_2022 <- merge(Dat1, Dat2, by = c("PotID", "Treatment"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat3, by =c("PotID"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat4, by = c("PotID", "Treatment"), all = TRUE)
 
+# has one more row than Dat4 because of "B15-1-C (E)" - removed below
+
 # add in stomata averages. the just stomata data frame won't merge nicely because of the format.
 Alldata_2022 <- merge(Alldata_2022, Stomata_avg, by = c("PotID", "Treatment"), all = TRUE)
 
@@ -624,11 +626,12 @@ CleanData_2022 <- Alldata_2022
 
 keepCols <- c("PotID", "Treatment", "Population", "Line.x", "Replicate", "Chamber", "Flat", "transplanted", "Emergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest", "Number.Emerged", "Leaf.Number.PreVern..post.transplant", "LeafNumber_6.6.2022", "LeafNumber_6.13.2022", "SingleLeaf_FreshWt.g.", "SingleLeafHydratedWt.g.", "SingleLeafDryWt.g.", "Area", "Perim.", "TotalLeafNumber", "RosetteLeafNumber", "UnderLeavesNumber", "AG_DryBiomass.g.", "BG_DryBiomass.g.", "Stom_avg")
 
-# Note: plants that died are still included at this point.
+# Note: plants that died are still included at this point. by keeping Line.x, all the plants that were transplanted into with a genotype (so their line no longer exists in the dataframe) have an NA in the line column. I want to remove these because they are not helfpul, and I know from later on in the analysis that days to emergence and leaf number at 4 weeks are not important traits in the analysis (maybe not even being included in the supplemental) so I should exclude these plants that only have those 2 traits measured and died before bolting when the important traits were measured.
+
 
 # for the columns, I am reordering so all the general info is in the first few columns, then dates of things only keeping the "days to" calculations, leaf numbers through growth period, single leaf traits, then whole plant harvest traits
 
-CleanData_2022 <- CleanData_2022[ , keepCols ]
+CleanData_2022 <- CleanData_2022[!(is.na(CleanData_2022$Line.x)) , keepCols ]
 
 # now Clean up those column names!
 # NoTe: The flat column is for after vernalization. Before vernalization the chamber column is equivalent to the different flats and all plants were in the same chamber.

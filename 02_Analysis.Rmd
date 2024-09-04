@@ -75,6 +75,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 )
 ```
 
+
 ## Summarize some data
 ```{r}
 # for the things I can easily get a mean for (num or int). NOTE: These are raw means and confidence intervals, I might not actually want them later on because I will want model predicted means and standard errors.
@@ -939,6 +940,38 @@ ggplot(data = Cur_SLA, aes(x = mean_SLA, y = mean_fruits)) +
     )
 ```
 
+## Sample size information
+
+The goal here is to know how many lines and how many replicates per line for this experiment.
+
+What I want is a count of total plants, a mean, min, and max of plants per line, and the number of lines per population
+
+```{r}
+# sample size of 2021 total
+Dat_2021_TwoTrt %>% count(Treatment)
+# 50 plants per treatments
+Dat_2021_TwoTrt %>% count(Treatment, Population)
+# in each treatment, 20 are IT, 30 are SW
+
+# from models know that there are 21 unique lines. 8 IT, 13 SW.
+
+n_2021 <- Dat_2021_TwoTrt %>%
+  group_by(Treatment) %>%
+  group_by(Population, .add = TRUE) %>%
+  group_by(Line, .add = TRUE) %>%
+  count
+
+# so only line with 1 rep is Belm 1. Then everything has 2 but RIL parents. B12 has 7, R47 has 6.
+
+n_2021 %>% 
+  group_by(Treatment) %>%
+  group_by(Population, .add = TRUE) %>%
+  summarize(min = min(n), mean = mean(n), median = median(n), max = max(n))
+
+```
+
+
+
 # 2022
 
 ## Read in data
@@ -1469,6 +1502,38 @@ save(Means_2022, file = "data/ModelMeans_2022.robj")
 
 ```
 
+## Sample size information
+
+The goal here is to know how many lines and how many replicates per line for this experiment.
+
+What I want is a count of total plants, a mean, min, and max of plants per line, and the number of lines per population
+
+```{r}
+# sample size of 2022 total
+Dat_2022 %>% count(Treatment)
+# 72 plants in current, 69 plants in future
+Dat_2022 %>% count(Treatment, Population)
+# in each treatment, 20 are IT, 30 are SW
+
+# from models know that there are 16 unique lines. 8 IT, 8 SW. ( but 1 line fully died in IT cur)
+
+n_2022 <- Dat_2022 %>%
+  group_by(Treatment) %>%
+  group_by(Population, .add = TRUE) %>%
+  group_by(Line, .add = TRUE) %>%
+  count
+
+# so only line with 1 rep is Belm 1. Then everything has 2 but RIL parents. B12 has 7, R47 has 6.
+n_2022 %>% 
+  group_by(Treatment) %>%
+  summarize(min = min(n), mean = mean(n), median = median(n), max = max(n))
+
+n_2022 %>% 
+  group_by(Treatment) %>%
+  group_by(Population, .add = TRUE) %>%
+  summarize(min = min(n), mean = mean(n), median = median(n), max = max(n))
+
+```
 
 #Notes
 The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis.
@@ -1624,8 +1689,96 @@ ggplotly(ps_plot4)
 
 ```
 
+## Why are some confidence intervals so small?
 
-##Test: Predicted means
+SLA - focus on 2022 SW
+
+Plot the histograms for everything, then add the means and confidence intervals on top of the distributions
+```{r}
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = SLA, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 25)+
+  geom_vline(data = SLA_means_21, aes(xintercept = Bk_Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = SLA_means_21, aes(xintercept = Bk_LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = SLA_means_21, aes(xintercept = Bk_UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2021 SLA Back Transformed")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = SLA, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 25)+
+  geom_vline(data = sla_means_22, aes(xintercept = Bk_Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = sla_means_22, aes(xintercept = Bk_LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = sla_means_22, aes(xintercept = Bk_UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2022 SLA Back Transformed")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+
+# transformed
+
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = l10_SLA, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = .025)+
+  geom_vline(data = SLA_means_21, aes(xintercept = Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = SLA_means_21, aes(xintercept = LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = SLA_means_21, aes(xintercept = UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2021 SLA")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = l10_SLA, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = .025)+
+  geom_vline(data = sla_means_22, aes(xintercept = Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = sla_means_22, aes(xintercept = LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = sla_means_22, aes(xintercept = UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2022 SLA")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+```
+
+
+```{r}
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = LDMC, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 0.01)+
+  geom_vline(data = LDMC_means_21, aes(xintercept = Bk_Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = LDMC_means_21, aes(xintercept = Bk_LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = LDMC_means_21, aes(xintercept = Bk_UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2021 LDMC Back Transformed")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = LDMC, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 0.015)+
+  geom_vline(data = ldmc_means_22, aes(xintercept = Bk_Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = ldmc_means_22, aes(xintercept = Bk_LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = ldmc_means_22, aes(xintercept = Bk_UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2022 LDMC Back Transformed")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+# transformed scale
+ggplot(dat = Dat_2021_TwoTrt)+
+  geom_histogram(aes(x = l10_LDMC, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 0.05)+
+  geom_vline(data = LDMC_means_21, aes(xintercept = Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = LDMC_means_21, aes(xintercept = LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = LDMC_means_21, aes(xintercept = UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2021 l10 LDMC")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+
+
+ggplot(dat = Dat_2022)+
+  geom_histogram(aes(x = l10_LDMC, fill = Treatment:Population), alpha = 0.5, position = "identity", binwidth = 0.05)+
+  geom_vline(data = ldmc_means_22, aes(xintercept = Mean, color = Treatment:Population),  linetype = "solid")+
+  geom_vline(data = ldmc_means_22, aes(xintercept = LL_95, color = Treatment:Population),  linetype = "dashed")+
+  geom_vline(data = ldmc_means_22, aes(xintercept = UL_95, color = Treatment:Population),  linetype = "dashed")+
+  labs(title = "2022 l10 LDMC")+
+  facet_grid(Treatment ~ Population)+
+  theme_classic()
+```
+
+
+## Test: Predicted means
 Test new plotting function with predictmeans package. Use emergence to flowering trait to test things out. This works and gives an output of values, including the mean_table which I think is what I want to plot with. I don't want their premade plots becuase I want more customization.
 
 ```{r}
