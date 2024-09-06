@@ -6,6 +6,7 @@ output:
   html_document:
     toc: true
     toc_float: true
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -880,13 +881,33 @@ for (i in 1:length(both_dfs)){
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
 ```{r, echo = FALSE}
+#jitter by population
+#ggplot()+
+#  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, #col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+#  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, #ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+#  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = #Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+#  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, #col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+#  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, #ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+#  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col #= Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+#  labs(y="Days to Emergence", 
+#      x="Treatment")+
+#  scale_color_manual(name = "Population",
+#                     labels = c("IT", "SW"),
+#                     values = c("#CC79A7", "#009E73"))+
+#  scale_linetype_manual(name = "Experiment",
+#                        labels = c("2021", "2022"),
+#                        values = c("solid", "dotted"))+
+#  scale_x_discrete(expand = c(0.6,0))
+
+# jitter by experiment
+# still trying to figure out how to dodge within experiment and nudge between experiments...
 ggplot()+
-  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col=Population), size = 4, show.legend = FALSE, position = position_dodge(width=0.1)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Exp:Population, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, position = position_dodge(width=0.1),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width=0.1), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Exp:Population, col=Population), size = 4, show.legend = FALSE, position = position_nudge(x = 0.15)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Exp:Population, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, position = position_nudge(x = 0.15),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_nudge(x = 0.15), show.legend = TRUE)+ 
   labs(y="Days to Emergence", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -904,9 +925,9 @@ EmergenceToBolting. While this was measured in both experiments, it is not compa
 
 ```{r, echo = FALSE, eval = FALSE}
 ggplot(data = both_dfs[["bolting"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Days Emergence to Bolting", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -924,9 +945,9 @@ FreshWt
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["fresh"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Fresh Weight (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -943,9 +964,9 @@ HydWt
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["hyd"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Saturated Weight (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -962,12 +983,12 @@ DryWt
 
 ```{r, echo = FALSE}
 ggplot() +
-  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_nudge(x=0.15)) +
+  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, position = position_nudge(x=0.15),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_nudge(x=0.15), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_identity()) +
+  geom_errorbar(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, position = position_identity(),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["dry"]][both_dfs[["dry"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_identity(), show.legend = TRUE)+ 
   labs(y="Dry Weight (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -984,12 +1005,12 @@ LeafArea
 
 ```{r, echo = FALSE}
 ggplot() +
-  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_nudge(x=0.15)) +
+  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, position = position_nudge(x=0.15),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_nudge(x=0.15), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_identity()) +
+  geom_errorbar(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, position = position_identity(),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["area"]][both_dfs[["area"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_identity(), show.legend = TRUE)+ 
   labs(y="Leaf Area (cm^2)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1006,12 +1027,12 @@ LeafPerimeter
 
 ```{r, echo = FALSE}
 ggplot() +
-  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_nudge(x=0.15)) +
+  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, position = position_nudge(x=0.15),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2022", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_nudge(x=0.15), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_identity()) +
+  geom_errorbar(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, position = position_identity(),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["per"]][both_dfs[["per"]]$Exp=="2021", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_identity(), show.legend = TRUE)+ 
   labs(y="Leaf Perimeter (cm)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1030,9 +1051,9 @@ Specific Leaf Area
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Specific Leaf Area (cm^2 / g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1045,9 +1066,9 @@ ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Bk_Mean)) +
 
 # both not back transformed
 ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="l10 Specific Leaf Area (cm^2 / g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1064,9 +1085,9 @@ Leaf Dry Matter Content
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["ldmc"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Dry Matter Content (%)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1083,9 +1104,9 @@ Relative Water Content
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["rwc"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Relative Water Content (%)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1102,9 +1123,9 @@ LeafNum_4weeks
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Population:Exp, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Population:Exp, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Number (4 weeks post planting)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
