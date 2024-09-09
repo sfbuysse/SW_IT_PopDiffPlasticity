@@ -1439,9 +1439,11 @@ There is an interaction, so do posthoc analyses. No chamber effect in full model
 
 ```{r}
 # belm
-as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients)
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line)-1, data = subset(Dat_2022, Population == "B")))$coefficients) # not concerned about the warnings
+# the estimate in the intercept model is the distance between the global mean and the current treatment. switch sign to get to future treatment.
 #roda
-as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerned about the warnings
 #cur
 as.data.frame(summary(lmer(l10_Root_to_Shoot ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
 #fut
