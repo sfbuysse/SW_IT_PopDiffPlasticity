@@ -492,6 +492,13 @@ Ros_anov_21$trait <- "l10_DryRosG"
 Ros_means_21 <- get_table_bt(Ros_lm_21)
 #no interaction
 
+## check how it compares to the sqr transformed
+#Ros_lm_21SR <- do_lmer(Dat_2021_TwoTrt$SQR_DryRosG)
+#Ros_anov_21SR <- do_anov(Ros_lm_21SR)
+#Ros_anov_21SR$trait <- "SQR_DryRosG"
+#Ros_means_21SR <- get_table_bt(Ros_lm_21SR)
+## commented out b/c no difference in signficance levels.
+
 ```
 
 Reproductive biomass
@@ -622,6 +629,7 @@ fruit_means_21 <- get_table_bt(fruit_lm_21)
 #  anova(tmp_fruit)
 #  
 ## no meaningful changes, so FruitCounter will not be a random effect and this code is commented out.
+
 ```
 
 There is an interaction, so do posthoc analyses.
@@ -680,6 +688,7 @@ seeds_means_21 <- get_table_bt(seeds_lm_21)
 #anova(seeds_lm2)
 #
 ## no difference, as expected if the model was functioning as expected. All testing code is commented out and no changes were made to the model.
+
 ```
 
 There is an interaction, so do posthoc analyses.
@@ -1193,7 +1202,10 @@ hyd_lm_22 <- do_lmer2(Dat_2022$l10_SL_HydWt)
 hyd_anov_22 <- do_anov2(hyd_lm_22)
 hyd_anov_22$trait <- "l10_SatWt"
 hyd_means_22 <- get_table_bt(hyd_lm_22)
-# also has SQR transformation
+## also has SQR transformation. Pop becomes more significant but no other significance changes
+#hyd_lm_22SQR <- do_lmer2(Dat_2022$SQR_SL_HydWt)
+#hyd_anov_22SQR <- do_anov2(hyd_lm_22SQR)
+#hyd_anov_22SQR$trait <- "l10_SatWt"
 ```
 
 There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
@@ -1234,7 +1246,10 @@ area_lm_22 <- do_lmer2(Dat_2022$SL_Area)
 area_anov_22 <- do_anov2(area_lm_22)
 area_anov_22$trait <- "Area"
 area_means_22 <- get_table(area_lm_22)
-# also has SQR
+## also has SQR - no significance changes
+#area_lm_22SQR <- do_lmer2(Dat_2022$SQR_SL_Area)
+#area_anov_22SQR <- do_anov2(area_lm_22SQR)
+#area_anov_22SQR$trait <- "SQR_Area"
 ```
 
 
@@ -1397,7 +1412,10 @@ AG_lm_22 <- do_lmer2(Dat_2022$l10_AG_DryBiomass)
 AG_anov_22 <- do_anov2(AG_lm_22)
 AG_anov_22$trait <- "l10_Above Ground Biomass"
 AG_means_22 <- get_table_bt(AG_lm_22)
-# also has SQR transformation
+## also has SQR transformation -interaction gets a little weaker
+#AG_lm_22SQR <- do_lmer2(Dat_2022$SQR_AG_DryBiomass)
+#AG_anov_22SQR <- do_anov2(AG_lm_22SQR)
+#AG_anov_22SQR$trait <- "SQR_Above Ground Biomass"
 ```
 
 There is an interaction, so do posthoc analyses. No chamber effect in full model, so not included here.
@@ -1421,7 +1439,10 @@ BG_lm_22 <- do_lmer2(Dat_2022$BG_DryBiomass)
 BG_anov_22 <- do_anov2(BG_lm_22)
 BG_anov_22$trait <- "Below Ground Biomass"
 BG_means_22 <- get_table(BG_lm_22)
-# also has SQR transformation
+### also has SQR transformation; non significance changes
+#BG_lm_22SQR <- do_lmer2(Dat_2022$SQR_BG_DryBiomass)
+#BG_anov_22SQR <- do_anov2(BG_lm_22SQR)
+#BG_anov_22SQR$trait <- "SQR_Below Ground Biomass"
 # no interaction
 ```
 
