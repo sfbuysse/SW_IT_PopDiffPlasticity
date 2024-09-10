@@ -96,9 +96,9 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 )
 # subset to two treatments
 Dat_2021 <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
-
 # for plotting - this file was made with only two treatments
 load("data/ModelMeans_2021.robj")
+load("data/SampleSizes_2021.robj")
 
 
 # 2022
@@ -112,6 +112,7 @@ Dat_2022$Chamber <- as.factor(Dat_2022$Chamber)
 Dat_2022$Transplanted <- as.factor(Dat_2022$Transplanted)
 
 load("data/ModelMeans_2022.robj")
+load("data/SampleSizes_2022.robj")
 ```
 
 # phenology
@@ -882,29 +883,33 @@ Emergence. days to emergence is shown for both but should be interpreted with ca
 
 ```{r, echo = FALSE}
 #jitter by population
-#ggplot()+
-#  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, #col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-#  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, #ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-#  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = #Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-#  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, #col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
-#  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, #ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
-#  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col #= Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
-#  labs(y="Days to Emergence", 
-#      x="Treatment")+
-#  scale_color_manual(name = "Population",
-#                     labels = c("IT", "SW"),
-#                     values = c("#CC79A7", "#009E73"))+
-#  scale_linetype_manual(name = "Experiment",
-#                        labels = c("2021", "2022"),
-#                        values = c("solid", "dotted"))+
-#  scale_x_discrete(expand = c(0.6,0))
+ggplot()+
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Population:Exp, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col=Population), size = 4, show.legend = FALSE, position = position_dodge2(width = 0.3)) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Population:Exp, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3),  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Population:Exp, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+ 
+  labs(y="Days to Emergence", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_linetype_manual(name = "Experiment",
+                        labels = c("2021", "2022"),
+                        values = c("solid", "dotted"))+
+  scale_x_discrete(expand = c(0.6,0))
 
 # jitter by experiment
 # still trying to figure out how to dodge within experiment and nudge between experiments...
+#position = position_dodge(width=0.1) - can add this to the 2021 lines to get them to dodge, but the 2022 lines don't dodge
+
+# I think the actual solution might be to make a temp dataframe for each plot that has the columns that will be plotted intead of calling different geoms for each. then I could also just add dodge to the previous plots to get them to look like I want. Or I would split all the "together" things up so that they plot in the same say.not a focus for now but I will need to decide which figures I want in the end.
+
 ggplot()+
-  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col=Population), size = 4, show.legend = FALSE, position = position_dodge(width=0.1)) +
-  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Exp:Population, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, position = position_dodge(width=0.1),  show.legend = FALSE)+
-  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width=0.1), show.legend = TRUE)+ 
+  geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col=Population), size = 4, show.legend = FALSE ) +
+  geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(group = Exp:Population, x = Treatment, ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1,  show.legend = FALSE)+
+  geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2021", ], aes(x = Treatment, y = Mean, group = Exp:Population, col = Population, linetype = Exp), size = 1.5, show.legend = TRUE)+ 
   geom_point(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Exp:Population, col=Population), size = 4, show.legend = FALSE, position = position_nudge(x = 0.15)) +
   geom_errorbar(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(group = Exp:Population, x = Treatment, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, position = position_nudge(x = 0.15),  show.legend = FALSE)+
   geom_line(data = both_dfs[["emergence"]][both_dfs[["emergence"]]$Exp=="2022", ], aes(x = Treatment, y = Bk_Mean, group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_nudge(x = 0.15), show.legend = TRUE)+ 
@@ -925,9 +930,9 @@ EmergenceToBolting. While this was measured in both experiments, it is not compa
 
 ```{r, echo = FALSE, eval = FALSE}
 ggplot(data = both_dfs[["bolting"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge(width = 0.3), show.legend = FALSE) +
-  geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, position = position_dodge(width = 0.3), show.legend = FALSE)+
-  geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1.5, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(group = Exp:Population, col=Population), size = 4, position = position_dodge2(width = 0.3), show.legend = FALSE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95,group = Exp:Population, col = Population), width = 0.3, size = 1, position = position_dodge2(width = 0.3), show.legend = FALSE)+
+  geom_line(aes(group = Exp:Population,col = Population, linetype = Exp), size = 1.5, position = position_dodge2(width = 0.3), show.legend = TRUE)+
   labs(y="Days Emergence to Bolting", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -1078,6 +1083,34 @@ ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Mean)) +
                         labels = c("2021", "2022"),
                         values = c("solid", "dotted"))+
   scale_x_discrete(expand = c(0.6,0))
+
+
+# just 2021 SLA for Emily's tenure talk
+
+ggplot(data = both_2021[["SLA_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+  geom_point(aes(group = Population, col=Population), size = 4, show.legend = FALSE) +
+  geom_errorbar(aes(group = Population, ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.3, size = 1, show.legend = FALSE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, show.legend = TRUE)+
+  labs(y="Specific Leaf Area (cm^2 / g)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+ggsave(filename = "figures/SLA_2021.png", dpi=300)
+
+# not back transformed
+ggplot(data = both_2021[["SLA_means_21"]], aes(x = Treatment, y = Mean)) +
+  geom_point(aes(group = Population, col=Population), size = 4, show.legend = FALSE) +
+  geom_errorbar(aes(group = Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 1, show.legend = FALSE)+
+  geom_line(aes(group = Population, col = Population), size = 1.5, show.legend = TRUE)+
+  labs(y="log10 Specific Leaf Area (cm^2 / g)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+ggsave(filename = "figures/SLA_l10_2021.png", dpi=300)
 ```
 
 

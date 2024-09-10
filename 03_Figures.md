@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2024-09-06"
+date: "2024-09-10"
 output: 
   html_document:
     toc: true
@@ -29,12 +29,8 @@ Future: x axis, if needed #D55E00 - a dark orange or a dashed line \
 load packages
 
 
-```r
+``` r
 library(dplyr)
-```
-
-```
-## Warning: package 'dplyr' was built under R version 4.2.3
 ```
 
 ```
@@ -54,23 +50,10 @@ library(dplyr)
 ##     intersect, setdiff, setequal, union
 ```
 
-```r
+``` r
 library(ggplot2)
-```
-
-```
-## Warning: package 'ggplot2' was built under R version 4.2.3
-```
-
-```r
 library(tidyr)
-```
 
-```
-## Warning: package 'tidyr' was built under R version 4.2.3
-```
-
-```r
 # would like to phase these out but still used for the growth curves
 # let's make some functions
 std_mean <- function(x){
@@ -90,7 +73,7 @@ conf_int <- function(x, conf.interval = 0.95){
 
 Set theme for plots
 
-```r
+``` r
 theme_set(theme_classic())
 theme_update(legend.title = element_text(family = "serif", color = "black", size = 20),
     legend.text = element_text(family = "serif", color = "black", size = 20),
@@ -115,7 +98,7 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
 
 Read in the data needed for all plotting.
 
-```r
+``` r
 # 2021
 Dat_2021 <- read.csv("data/CleanData_2021.csv")
 # set factors
@@ -129,9 +112,9 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 )
 # subset to two treatments
 Dat_2021 <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
-
 # for plotting - this file was made with only two treatments
 load("data/ModelMeans_2021.robj")
+load("data/SampleSizes_2021.robj")
 
 
 # 2022
@@ -145,6 +128,7 @@ Dat_2022$Chamber <- as.factor(Dat_2022$Chamber)
 Dat_2022$Transplanted <- as.factor(Dat_2022$Transplanted)
 
 load("data/ModelMeans_2022.robj")
+load("data/SampleSizes_2022.robj")
 ```
 
 # phenology
@@ -161,15 +145,18 @@ Graphs showing general phenology trends. The goal of these is a quick comparison
 ```
 
 ```
-## Warning: Removed 6 rows containing non-finite values (`stat_density()`).
+## Warning: Removed 6 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ```
-## Warning: Removed 14 rows containing non-finite values (`stat_density()`).
+## Warning: Removed 14 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ```
-## Warning: Removed 15 rows containing non-finite values (`stat_density()`).
+## Warning: Removed 15 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
@@ -177,11 +164,13 @@ Graphs showing general phenology trends. The goal of these is a quick comparison
 2022 - note: plants that died or were transplanted are not shown here because they may have an emergence date and no bolting date (if died) or a bolting date and no emergence date (if transplanted)
 
 ```
-## Warning: Removed 14 rows containing non-finite values (`stat_density()`).
+## Warning: Removed 14 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ```
-## Warning: Removed 15 rows containing non-finite values (`stat_density()`).
+## Warning: Removed 15 rows containing non-finite outside the scale range
+## (`stat_density()`).
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
@@ -243,7 +232,7 @@ RosetteLeafNum_harvest
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values with the y axis being leaf number.
 
 
-```r
+``` r
 # format a dataframe
 tmp_mean_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
@@ -256,7 +245,7 @@ tmp_mean_21 <- Dat_2021 %>%
 ## `.groups` argument.
 ```
 
-```r
+``` r
 # pivot
 tmp_mean_21 <- pivot_longer(tmp_mean_21, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "mean")
 tmp_mean_21$Time <- factor(rep(c("Week5", "Week10", "Week14", "Harvest"), times = 4), levels = c("Week5", "Week10", "Week14", "Harvest"))
@@ -272,7 +261,7 @@ tmp_ci_21 <- Dat_2021 %>%
 ## `.groups` argument.
 ```
 
-```r
+``` r
 # pivot
 tmp_ci_21 <- pivot_longer(tmp_ci_21, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "ci")
 tmp_ci_21$Time <- factor(rep(c("Week5", "Week10", "Week14", "Harvest"), times = 4), levels = c("Week5", "Week10", "Week14", "Harvest"))
@@ -349,7 +338,7 @@ Let's look at some things by line instead of Population.
 For now, only making a graph by line for seeds per fruit because I want to see if there truly is little variation between lines within a population.The confidence intervals are decently small guess. 
 
 
-```r
+``` r
 Dat_2021$Line.ID <- as.factor(paste0(Dat_2021$Population, Dat_2021$Line))
 
 forplot2_2021 <- Dat_2021 %>%
@@ -362,7 +351,7 @@ forplot2_2021 <- Dat_2021 %>%
 ## Warning: There were 56 warnings in `summarize()`.
 ## The first warning was:
 ## ℹ In argument: `across(...)`.
-## ℹ In group 1: `Treatment = Current`, `Line.ID = BELM1`.
+## ℹ In group 1: `Treatment = Current` and `Line.ID = BELM1`.
 ## Caused by warning in `qt()`:
 ## ! NaNs produced
 ## ℹ Run `dplyr::last_dplyr_warnings()` to see the 55 remaining warnings.
@@ -373,7 +362,7 @@ forplot2_2021 <- Dat_2021 %>%
 ## `.groups` argument.
 ```
 
-```r
+``` r
 # some lines only have 1 pot per treatment
 # some lines only have pots in one treatment (3)
 forplot2_2021$Population <- substr(forplot2_2021$Line.ID, start = 1, stop = 4)
@@ -394,11 +383,13 @@ ggplot(data = forplot2_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
 ```
 
 ```
-## Warning: Removed 4 rows containing missing values (`geom_point()`).
+## Warning: Removed 4 rows containing missing values or values outside the scale range
+## (`geom_point()`).
 ```
 
 ```
-## Warning: Removed 4 rows containing missing values (`geom_line()`).
+## Warning: Removed 4 rows containing missing values or values outside the scale range
+## (`geom_line()`).
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
@@ -406,7 +397,7 @@ ggplot(data = forplot2_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
 This truly shows little variation in line means within each population and treatment. huh. The error bars are very large and maybe skewing the scale so now plotting without error bars and looking at a histogram of means just to see it a different way.
 
 
-```r
+``` r
 ggplot(dat = forplot2_2021)+
   geom_histogram(aes(x = AvgSeedNum_mean, fill = Population), binwidth = 3, alpha = 0.5, position = "identity")+
   scale_fill_manual(name = "Population",
@@ -415,12 +406,13 @@ ggplot(dat = forplot2_2021)+
 ```
 
 ```
-## Warning: Removed 4 rows containing non-finite values (`stat_bin()`).
+## Warning: Removed 4 rows containing non-finite outside the scale range
+## (`stat_bin()`).
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
-```r
+``` r
 ggplot(dat = forplot2_2021)+
   geom_histogram(aes(x = AvgSeedNum_mean, fill = Treatment), binwidth = 3, alpha = 0.5, position = "identity")+
   scale_fill_manual(name = "Treatment",
@@ -429,7 +421,8 @@ ggplot(dat = forplot2_2021)+
 ```
 
 ```
-## Warning: Removed 4 rows containing non-finite values (`stat_bin()`).
+## Warning: Removed 4 rows containing non-finite outside the scale range
+## (`stat_bin()`).
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
@@ -464,7 +457,7 @@ LeafNum_bolt
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
 
 
-```r
+``` r
 # format a dataframe
 tmp_mean <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
@@ -477,7 +470,7 @@ tmp_mean <- Dat_2022 %>%
 ## `.groups` argument.
 ```
 
-```r
+``` r
 # pivot
 tmp_mean <- pivot_longer(tmp_mean, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "mean")
 tmp_mean$Time <- factor(rep(c("Week5", "Week9", "Week10", "Bolting"), times = 4), levels = c("Week5", "Week9", "Week10", "Bolting"))
@@ -493,7 +486,7 @@ tmp_ci <- Dat_2022 %>%
 ## `.groups` argument.
 ```
 
-```r
+``` r
 # pivot
 tmp_ci <- pivot_longer(tmp_ci, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "ci")
 tmp_ci$Time <- factor(rep(c("Week5", "Week9", "Week10", "Bolting"), times = 4), levels = c("Week5", "Week9", "Week10", "Bolting"))
@@ -552,7 +545,7 @@ Reaction Norms to create here: \
 - LeafNum_4weeks \
 
 
-```r
+``` r
 # subset 2021 dataset
 both_exp <- c("emergence_means_21", "bolting_means_21", "fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "RWC_means_21", "LN_PreVern_means_21")
 both_2021 <- Means_2021[both_exp]
@@ -586,7 +579,7 @@ for (i in 1:length(both_dfs)){
 
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
-![](03_Figures_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
 
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable becuase in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait for the manuscript.
@@ -624,7 +617,17 @@ LeafPerimeter
 ## Single Leaf Calculated Traits
 Specific Leaf Area
 
-![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-43-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-43-3.png)<!-- -->
+
+```
+## Saving 7 x 5 in image
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-43-4.png)<!-- -->
+
+```
+## Saving 7 x 5 in image
+```
 
 
 Leaf Dry Matter Content

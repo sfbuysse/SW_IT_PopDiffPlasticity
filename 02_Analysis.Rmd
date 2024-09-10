@@ -82,7 +82,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 # for the things I can easily get a mean for (num or int). NOTE: These are raw means and confidence intervals, I might not actually want them later on because I will want model predicted means and standard errors.
 ByPop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 
 # transpose for easier viewing
 ByPop_21 <- data.frame(t(ByPop_21))
@@ -90,14 +90,18 @@ ByPop_21 <- data.frame(t(ByPop_21))
 # now do by treatment
 ByTrt_21 <- Dat_2021 %>%
   dplyr::group_by(Treatment) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 ByTrt_21 <- data.frame(t(ByTrt_21))
 
 # Now I want population  means within each treatment
 ByTrt_Pop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+
+# get just the sample sizes
+SampleSizes_2021 <- dplyr::select(ByTrt_Pop_21, "Treatment", "Population", ends_with("_n"))
+save(SampleSizes_2021, file = "data/SampleSizes_2021.robj")
 
 # for some ease of viewing
 ByTrt_Pop_21 <- data.frame(t(ByTrt_Pop_21))
@@ -105,6 +109,8 @@ colnames(ByTrt_Pop_21) <- c("Belm_C", "Belm_CF", "Belm_F", "Roda_C", "Roda_CF", 
 
 # save this to keep means
 write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
+
+# get just the 
 ```
 ## Two Treatment Anovas
 
@@ -150,6 +156,7 @@ do_lmer <- function(trait, data = Dat_2021_TwoTrt){
   qqline(resid(lm))
   print(summary(lm))
   print(confint(lm))
+  #sample.size <- data %>% group_by(Treatment) %>% group_by(Treatment, .add = TRUE) %>% summarize(across(.cols = trait, .fns= ~sum(!is.na(.x))))
   return(lm)
 }
 # do the anova
@@ -956,6 +963,8 @@ The goal here is to know how many lines and how many replicates per line for thi
 
 What I want is a count of total plants, a mean, min, and max of plants per line, and the number of lines per population
 
+I got the number of observations that were not NA from earlier in the summarize section
+
 ```{r}
 # sample size of 2021 total
 Dat_2021_TwoTrt %>% count(Treatment)
@@ -1004,7 +1013,7 @@ Dat_2022$Transplanted <- as.factor(Dat_2022$Transplanted)
 # by population only
 ByPop_22 <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
-  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 
 # transpose for easier viewing
 ByPop_22 <- data.frame(t(ByPop_22))
@@ -1012,14 +1021,18 @@ ByPop_22 <- data.frame(t(ByPop_22))
 # now do by treatment
 ByTrt_22 <- Dat_2022 %>%
   dplyr::group_by(Treatment) %>%
-  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 ByTrt_22 <- data.frame(t(ByTrt_22))
 
 # Now I want population  means within each treatment
 ByTrt_Pop_22 <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
-  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x))))
+  summarize(across(.col = c(DaysToEmergence:l10_Stomata_density), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+
+# get just the sample sizes
+SampleSizes_2022 <- dplyr::select(ByTrt_Pop_22, "Treatment", "Population", ends_with("_n"))
+save(SampleSizes_2022, file = "data/SampleSizes_2022.robj")
 
 # for some ease of viewing
 ByTrt_Pop_22 <- data.frame(t(ByTrt_Pop_22))
