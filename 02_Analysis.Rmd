@@ -245,6 +245,19 @@ eTof_anov_21$trait <- "Emergence To Flowering"
 eTof_means_21 <- get_table(eTof_lm_21)
 ```
 
+Run single models to test for difference only in future environment
+
+```{r}
+# belm
+as.data.frame(summary(lmer(EmergeToFlwr ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) # no, difference between treatments for belm
+#roda
+as.data.frame(summary(lmer(EmergeToFlwr ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients) # weak, difference between treatments for roda
+#cur
+as.data.frame(summary(lmer(EmergeToFlwr ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) # yes difference between pops in cur
+#fut
+as.data.frame(summary(lmer(EmergeToFlwr ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients) # yes difference between pops in fut
+```
+
 ### Single Leaf Collected At Flowering
 
 fresh weight
@@ -308,6 +321,18 @@ dry_means_21 <- get_table_bt(dry_lm_21)
 #anov_lmer(Dat_2021_TwoTrt$DriedWt_g)
 #anov_lmer(Dat_2021_TwoTrt$SQR_DriedWt)
 
+```
+
+No interaction but run single models to test for difference in the future environment
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_DriedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) # yes, difference between treatments for belm
+#roda
+as.data.frame(summary(lmer(l10_DriedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients) # yes, difference between treatments for roda
+#cur
+as.data.frame(summary(lmer(l10_DriedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) # weak difference between pops in cur
+#fut
+as.data.frame(summary(lmer(l10_DriedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients) # yes difference between pops in fut
 ```
 
 leaf area
@@ -486,6 +511,18 @@ LN_harv_means_21 <- get_table(LN_harv_lm_21)
 # no interaction
 ```
 
+No interaction but run individual models to check for difference in future environment
+```{r}
+# belm
+as.data.frame(summary(lmer(RosetteLeafNum ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(RosetteLeafNum ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(RosetteLeafNum ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(RosetteLeafNum ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
 ### Biomass
 
 Any biomass traits and biomass allocation
@@ -507,6 +544,19 @@ Ros_means_21 <- get_table_bt(Ros_lm_21)
 ## commented out b/c no difference in signficance levels.
 
 ```
+
+No interaction but run individual models to test for a difference in the future environment
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_DryRosG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_DryRosG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_DryRosG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_DryRosG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
 
 Reproductive biomass
 ```{r}
@@ -537,6 +587,18 @@ RR_anov_21 <- do_anov(RR_lm_21)
 RR_anov_21$trait <- "l10_Repro_to_Ros"
 RR_means_21 <- get_table_bt(RR_lm_21)
 
+```
+
+No interaction but run individual models to test for a difference in the future environment
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_R_to_R ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_R_to_R ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_R_to_R ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_R_to_R ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
 ```
 
 
@@ -1252,6 +1314,19 @@ dry_means_22 <- get_table(dry_lm_22)
 #anov_lmer2(log10(Dat_2022$SL_DryWt))
 ```
 
+No interaction but do individual models to see difference in future environment. no chamber effect in full model so not included here
+
+```{r}
+# belm
+as.data.frame(summary(lmer(SL_DryWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(SL_DryWt ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(SL_DryWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(SL_DryWt ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
 leaf area
 ```{r}
 # single leaf area
@@ -1413,6 +1488,21 @@ LN_bolt_means_22 <- get_table_bt(LN_bolt_lm_22)
 # no interaction
 ```
 
+No interaction but do individual models to see difference in future environment. no chamber effect in full model so not included here
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_LeafNumber_Total ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_LeafNumber_Total ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_LeafNumber_Total ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_LeafNumber_Total ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
+
 Not analyzing rosette leaf number or under leaves because this split was started partway through the experiment.
 
 
@@ -1459,6 +1549,20 @@ BG_means_22 <- get_table(BG_lm_22)
 # no interaction
 ```
 
+No interaction but do individual models to see difference in future environment. no chamber effect in full model so not included here
+
+```{r}
+# belm
+as.data.frame(summary(lmer(BG_DryBiomass ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(BG_DryBiomass ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(BG_DryBiomass ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(BG_DryBiomass ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
+```
+
+
 Root to shoot ration (below ground / above ground)
 ```{r}
 # Root to Shoot ratio
@@ -1494,6 +1598,19 @@ sto_den_anov_22 <- do_anov2(sto_den_lm_22)
 sto_den_anov_22$trait <- "l10_Stomatal Density"
 sto_den_means_22 <- get_table_bt(sto_den_lm_22)
 # no interaction
+```
+
+No interaction but do individual models to see difference in future environment. no chamber effect in full model so not included here
+
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_Stomata_density ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "B")))$coefficients) # not concerened about the warnings
+#roda
+as.data.frame(summary(lmer(l10_Stomata_density ~ Treatment + (1|Population:Line), data = subset(Dat_2022, Population == "R")))$coefficients) # not concerened about the warnings
+#cur
+as.data.frame(summary(lmer(l10_Stomata_density ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_Stomata_density ~ Population + (1|Population:Line), data = subset(Dat_2022, Treatment == "Future")))$coefficients)
 ```
 
 ### Outputs
