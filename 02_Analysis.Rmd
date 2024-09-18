@@ -216,6 +216,7 @@ as.data.frame(summary(lmer(Emergence ~ Population + (1|Population:Line), data = 
 ```
 
 Days between emergence and bolting
+no post hoc models because not in paper
 
 ```{r}
 # days emergence to bolting
@@ -226,6 +227,7 @@ bolting_means_21 <- get_table(bolting_lm_21)
 ```
 
 Days between bolting and flowering
+no post hoc models because not in paper
 
 ```{r}
 # days bolting to flowering
@@ -457,6 +459,7 @@ as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset
 Note that Basia is potentially interested in looking at growth curves or leaf number changes over time wth a shade or photoperiod response but would also probably be interested in a temperature response but I should do a bit more literature searching on that if we go that route. but that is all to say that all these leaf number traits could be the basis of why she does that, and I could go back and see what Tori did too.
  
 leaf num at 4 weeks
+no post hoc analyses because not in paper
 ```{r}
 # Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
 LN_PreVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
@@ -478,6 +481,7 @@ text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = D
 ```
 
 Leaf num 5 weeks into vernalization
+no post hoc analyses because not in paper
 ```{r}
 # LeafNumber from 08262021 - 5 weeks into vernalization... why did I choose this date? I think I was thinning on this day?
 LN_Vern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
@@ -488,6 +492,7 @@ LN_Vern_means_21 <- get_table(LN_Vern_lm_21)
 ```
 
 Leaf num about when bolting started
+no post hoc analyses becuase not in paper - not at a constant developmental stage
 ```{r}
 # Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
 LN_PostVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
@@ -565,10 +570,24 @@ Repro_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_DryReproG)
 Repro_anov_21 <- do_anov(Repro_lm_21)
 Repro_anov_21$trait <- "l10_DryReproG"
 Repro_means_21 <- get_table_bt(Repro_lm_21)
-
 ```
 
+No interaction but run individual models to test for a difference in the future environment
+```{r}
+# belm
+as.data.frame(summary(lmer(l10_DryReproG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(l10_DryReproG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(l10_DryReproG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(l10_DryReproG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
+
 Above ground biomass (rosette + reproductive)
+no post hoc analyses because not in paper
 ```{r}
 # dry above ground biomass (ros + repro)
 AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
@@ -724,6 +743,21 @@ AvSeedWt_anov_21$trait <- "Average Seed Wt"
 AvSeedWt_means_21 <- get_table(AvSeedWt_lm_21)
 
 ```
+
+No interaction, but want to do post hoc to be able to discuss differences
+
+```{r}
+# belm
+as.data.frame(summary(lmer(AvgSeedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+#roda
+as.data.frame(summary(lmer(AvgSeedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+#cur
+as.data.frame(summary(lmer(AvgSeedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+#fut
+as.data.frame(summary(lmer(AvgSeedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+
 
 average Seed number per fruit -
 ```{r}
@@ -1210,6 +1244,7 @@ Run the models
 ### Phenology
 
 Days to emergence - log10 transformed this time!
+no post hoc because not in manuscript
 ```{r}
 # days to emergence
 emergence_lm_22 <- do_lmer2(Dat_2022$l10_DaysToEmergence)
@@ -1449,6 +1484,7 @@ as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset
 ### Leaf Number
 
 leaf num at 4 weeks
+no post hoc because not in manuscript
 ```{r}
 # pre vern leaf number
 LN_PreVern_lm_22 <- do_lmer2(Dat_2022$LeafNumber_PreVern)
@@ -1459,6 +1495,7 @@ LN_PreVern_means_22 <- get_table(LN_PreVern_lm_22)
 ```
 
 leaf num first week post vern
+no post hoc because not in manuscript
 ```{r}
 # june 6 leaf number(first week post vern?)
 LN_Jun6_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun6)
@@ -1469,6 +1506,7 @@ LN_Jun6_means_22 <- get_table(LN_Jun6_lm_22)
 ```
 
 leaf num second week post vern
+no post hoc because not in manuscript
 ```{r}
 # june 14 leaf number (second week post vern?)
 LN_Jun13_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun13)
