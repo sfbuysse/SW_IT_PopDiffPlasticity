@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2024-09-06"
+date: "2024-09-20"
 output:
   html_document:
     toc: true
@@ -22,7 +22,7 @@ This chunk sets things that will be constant for the whole document.
 Load packages: \
 
 
-```r
+``` r
 #setup code here
 
 # read in packages
@@ -35,7 +35,7 @@ library(rcompanion)
 Make functions: \
 
 
-```r
+``` r
 # prep for doing statistical analyses
 options(contrasts = c("contr.sum", "contr.poly"))
 
@@ -74,7 +74,7 @@ conf_int <- function(x, conf.interval = 0.95){
 Raw Data files not on github.
 
 
-```r
+``` r
 SingleLeaf <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
 Harv_blue <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
 Harv_pink <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
@@ -90,7 +90,7 @@ The goal of this code is to identify any entering errors and fix them, go throug
 Note: There was a labelling error that is fixed later on. IT RIL Parent seeds ordered from the stock center were labelled as B1 instead of the correct B12. This is fixed below. Fixed labels were given unique IDs so they did not overlap with already existing labels and could be identified later.
 
 
-```r
+``` r
 # there were steps to put things in notes columns and make sure NAs were missing values and zeros were zeros prior to this step that were done in excel.
 
 Harv_blue <- Harv_blue[!(is.na(Harv_blue$Line)), c(1:14)]
@@ -103,14 +103,14 @@ Harv_blue$Root_to_Shoot <- Harv_blue$DryRootG/(Harv_blue$DryRosetteG + Harv_blue
 # reproductive tissue relative to the rosette weight it has
 Harv_blue$Repro_to_Ros <- Harv_blue$DryReproG / Harv_blue$DryRosetteG
 
-# fix envelope labelling mistake and fill in with accurate values; while there was a mistake here, my lab notebook says " I put some of the R47-1-C reproductive in the R21-1-C reproductive envelope. I could kig of fix it, but R47-1 might be low and R21-1 might be high so I should discard both of these reproductive weights. Thus, commenting out these lines.
+# fix envelope labelling mistake and fill in with accurate values; while there was a mistake here, my lab notebook says " I put some of the R47-1-C reproductive in the R21-1-C reproductive envelope. I could kind of fix it, but R47-1 might be low and R21-1 might be high so I should discard both of these reproductive weights. Thus, commenting out these lines.
 #Harv_blue[Harv_blue$Pot.ID == "R21-1-C", "DryReproG"] <- 2.0414
 #Harv_blue[Harv_blue$Pot.ID == "R47-1-C", "DryReproG"] <- 1.2501
 
 #R35-2-C was dropped before flowering (on 10/14) so I am dropping the value on anything collected post the drop.
 Harv_blue <- Harv_blue[!(Harv_blue$Pot.ID == "R35-2-C"), ]
 
-colnames(Harv_pink) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "IJ_FruitCount", "FruitCounter", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "FruitCollected", "FruitColLocation", "DoneFlwr", "NumFlwrLeft", "Notes", "FruitColWt_mg", "SeedColWt_mg", "ScanPosition", "ScanPhotoName", "IJ_SeedCount", "SeedCounter", "Notes2")
+colnames(Harv_pink) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "IJ_FruitCount", "FruitCounter", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "FruitCollected", "FruitColLocation", "DoneFlwr", "NumFlwrLeft", "Notes", "FruitColWt_mg", "SeedColWt_mg", "ScanPosition", "ScanPhotoName", "IJ_SeedCount", "SeedCounter", "FruitCount_BL", "Notes2")
 
 # remove extra rows in .csv + R35-2-C
 Harv_pink <- Harv_pink[!(is.na(Harv_pink$Line)), ]
@@ -156,7 +156,7 @@ B4-1-CF has a new emergent on 8/31/2024 but it was dead by bolting so don't need
 Now, merge data frames together
 
 
-```r
+``` r
 AllData_2021 <- merge(PlantingDay, Phenology, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
 AllData_2021 <- merge(AllData_2021, SingleLeaf, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
 AllData_2021 <- merge(AllData_2021, LeafNum, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
@@ -168,7 +168,7 @@ AllData_2021 <- merge(AllData_2021, Harv_blue, by = c("Pot.ID", "Population", "L
 ## "Population", : column names 'Notes.x', 'Notes.y' are duplicated in the result
 ```
 
-```r
+``` r
 AllData_2021 <- merge(AllData_2021, Harv_pink, by = c("Pot.ID", "Population", "Line", "Replicate", "Treatment"), all = TRUE)
 ```
 
@@ -177,7 +177,7 @@ AllData_2021 <- merge(AllData_2021, Harv_pink, by = c("Pot.ID", "Population", "L
 ## "Population", : column names 'Notes.x', 'Notes.y' are duplicated in the result
 ```
 
-```r
+``` r
 # there's lots of notes columns at this point but that is okay.
 # notes column names are repeated
 
@@ -203,7 +203,7 @@ str(AllData_2021)
 ```
 
 ```
-## 'data.frame':	150 obs. of  78 variables:
+## 'data.frame':	150 obs. of  79 variables:
 ##  $ Pot.ID                          : chr  "B12-11-C" "B12-11-CF" "B12-11-F" "B12-12-C" ...
 ##  $ Population                      : chr  "BELM" "BELM" "BELM" "BELM" ...
 ##  $ Line                            : chr  "12" "12" "12" "12" ...
@@ -281,10 +281,11 @@ str(AllData_2021)
 ##  $ ScanPhotoName                   : chr  "4" "6" "10" "4" ...
 ##  $ IJ_SeedCount                    : int  504 266 538 523 364 420 378 510 432 531 ...
 ##  $ SeedCounter                     : chr  "" "CH" "SB" "" ...
+##  $ FruitCount_BL                   : int  833 NA 150 567 NA 210 887 NA 144 969 ...
 ##  $ Notes2                          : chr  "KB assumed" "" "552 was old count (no initials) - weird that this and 10-11 are identical but I double checked it" "KB assumed" ...
 ```
 
-```r
+``` r
 # and write this out
 write.csv(AllData_2021,"data/AllData_2021.csv", row.names = FALSE)
 
@@ -295,13 +296,13 @@ write.csv(AllData_2021,"data/AllData_2021.csv", row.names = FALSE)
 
 Now clean up environment
 
-```r
+``` r
 rm("Harv_blue", "Harv_pink", "LeafNum", "Phenology", "PlantingDay", "SingleLeaf", "change.these", "rm_these")
 ```
 
 Now clean up AllData dataframe
 
-```r
+``` r
 # first make some factors
 AllData_2021$Population <- as.factor(AllData_2021$Population)
 AllData_2021$Treatment <- as.factor(AllData_2021$Treatment)
@@ -319,7 +320,7 @@ AllData_2021$TotFruit <- as.numeric(AllData_2021$TotFruit) # forces columns with
 ## Warning: NAs introduced by coercion
 ```
 
-```r
+``` r
 sum(is.na(AllData_2021$NumFlwrLeft))
 ```
 
@@ -327,7 +328,7 @@ sum(is.na(AllData_2021$NumFlwrLeft))
 ## [1] 22
 ```
 
-```r
+``` r
 # expect 10 more
 AllData_2021$NumFlwrLeft <- as.numeric(AllData_2021$NumFlwrLeft)
 ```
@@ -336,7 +337,7 @@ AllData_2021$NumFlwrLeft <- as.numeric(AllData_2021$NumFlwrLeft)
 ## Warning: NAs introduced by coercion
 ```
 
-```r
+``` r
 sum(is.na(AllData_2021$NumFlwrLeft))
 ```
 
@@ -344,7 +345,7 @@ sum(is.na(AllData_2021$NumFlwrLeft))
 ## [1] 32
 ```
 
-```r
+``` r
 # format as dates, calculated from planting day
 AllData_2021$Emergence <- julian(as.Date(AllData_2021$Emergence, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
 AllData_2021$Bolting <- julian(as.Date(AllData_2021$Bolting, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
@@ -380,13 +381,13 @@ CleanData_2021$Notes.y <- NULL
 CleanData_2021$Notes <- NULL
 CleanData_2021$Notes2 <- NULL
 
-# add zeros to TotFruit so it is a better measure of fitness and includes the plants that died.
-CleanData_2021$TotFruit[is.na(CleanData_2021$TotFruit)] <- 0
-# but not the ones where they were harvested, so would have made fruits if not harvested
-CleanData_2021[CleanData_2021$Pot.ID %in% c('R47-4-C', 'R47-5-C', 'R47-3-CF', 'R47-4-CF', 'R47-3-F', 'R47-4-F'), "TotFruit"] <- NA
+# add zeros to TotFruit so it is a better measure of fitness and includes the plants that died.Keep NA if is a missing value only (plants root harvested or missed). Way of doing this is that if it is an NA in harvest date, make a 0 for fruit columns
+CleanData_2021$TotFruit[is.na(CleanData_2021$Harvest.Date)] <- 0
+CleanData_2021$IJ_FruitCount[is.na(CleanData_2021$Harvest.Date)] <- 0
+CleanData_2021$FruitCount_BL[is.na(CleanData_2021$Harvest.Date)] <- 0
 
 # Also remove columns that won't be used in analysis. Here is a list of columns names to keep. Some of these leaf number counts might not be used later on, but keep at this point in time.
-myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "Emergence","DayToBolt", "DayToFlwr", "EmergeToFlwr", "FreshWt_g", "SatWt_g", "DriedWt_g", "LeafArea", "LeafPerimeter", "SLA", "LDMC", "RWC", "LeafNum_.07222021", "LeafNum_08262021","NumRemoved_08262021", "RosetteLeafNum_10042021", "RosetteLeafNum_bolt", "RosetteLeafNum_Flower", "RosetteLeafNum", "DryRosetteG", "DryReproG", "DryRootG", "Root_to_Shoot", "Repro_to_Ros", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "IJ_FruitCount", "FruitCounter", "FruitCollected", "DoneFlwr","NumFlwrLeft","FruitColWt_mg","SeedColWt_mg", "IJ_SeedCount", "SeedCounter")
+myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "Emergence","DayToBolt", "DayToFlwr", "EmergeToFlwr", "FreshWt_g", "SatWt_g", "DriedWt_g", "LeafArea", "LeafPerimeter", "SLA", "LDMC", "RWC", "LeafNum_.07222021", "LeafNum_08262021","NumRemoved_08262021", "RosetteLeafNum_10042021", "RosetteLeafNum_bolt", "RosetteLeafNum_Flower", "RosetteLeafNum", "DryRosetteG", "DryReproG", "DryRootG", "Root_to_Shoot", "Repro_to_Ros", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "IJ_FruitCount", "FruitCounter", "FruitCollected", "DoneFlwr","NumFlwrLeft","FruitColWt_mg","SeedColWt_mg", "IJ_SeedCount", "SeedCounter", "FruitCount_BL")
 
 CleanData_2021 <- CleanData_2021[ ,myCols]
 
@@ -401,7 +402,7 @@ This code is determining which traits may need to be transformed when I run mode
 Start with big overview of everything
 
 
-```r
+``` r
 # get a giant view of all the traits, not a super helpful figure honestly
 CleanData_2021 %>% select_if(is.numeric) %>% gather(cols, value) %>% 
   ggplot(aes(x = value)) + 
@@ -419,7 +420,8 @@ CleanData_2021 %>% select_if(is.numeric) %>% gather(cols, value) %>%
 ```
 
 ```
-## Warning: Removed 1145 rows containing non-finite values (`stat_bin()`).
+## Warning: Removed 1171 rows containing non-finite outside the scale range
+## (`stat_bin()`).
 ```
 
 ![](01_CleanData_files/figure-html/histograms-1.png)<!-- -->
@@ -428,7 +430,7 @@ Start to go through traits one at a time. Make each one its own code chunk for e
 
 Fresh weight of Single Leaf
 
-```r
+``` r
 explore_trans(CleanData_2021$FreshWt_g)
 ```
 
@@ -460,7 +462,7 @@ explore_trans(CleanData_2021$FreshWt_g)
 ## W = 0.94348, p-value = 4.245e-05
 ```
 
-```r
+``` r
 # add column of log transformed information to dataframe
 CleanData_2021$l10_FreshWt <- log10(CleanData_2021$FreshWt_g)
 ```
@@ -468,7 +470,7 @@ CleanData_2021$l10_FreshWt <- log10(CleanData_2021$FreshWt_g)
 Saturated Weight of Single Leaf
 
 
-```r
+``` r
 explore_trans(CleanData_2021$SatWt_g)
 ```
 
@@ -500,13 +502,13 @@ explore_trans(CleanData_2021$SatWt_g)
 ## W = 0.94732, p-value = 8.099e-05
 ```
 
-```r
+``` r
 CleanData_2021$l10_SatWt <- log10(CleanData_2021$SatWt_g)
 ```
 
 Dried Weight of Single Leaf
 
-```r
+``` r
 explore_trans(CleanData_2021$DriedWt_g)
 ```
 
@@ -538,7 +540,7 @@ explore_trans(CleanData_2021$DriedWt_g)
 ## W = 0.98365, p-value = 0.1267
 ```
 
-```r
+``` r
 # sqrt is the best here, also do log for consistency
 CleanData_2021$l10_DriedWt <- log10(CleanData_2021$DriedWt_g)
 CleanData_2021$SQR_DriedWt <- sqrt(CleanData_2021$DriedWt_g)
@@ -546,7 +548,7 @@ CleanData_2021$SQR_DriedWt <- sqrt(CleanData_2021$DriedWt_g)
 
 Leaf Area of Single Leaf
 
-```r
+``` r
 explore_trans(CleanData_2021$LeafArea)
 ```
 
@@ -578,14 +580,14 @@ explore_trans(CleanData_2021$LeafArea)
 ## W = 0.93074, p-value = 6.701e-06
 ```
 
-```r
+``` r
 # log ten is the best
 CleanData_2021$l10_LeafArea <- log10(CleanData_2021$LeafArea)
 ```
 
 Leaf Perimeter of Single Leaf
 
-```r
+``` r
 explore_trans(CleanData_2021$LeafPerimeter)
 ```
 
@@ -617,13 +619,13 @@ explore_trans(CleanData_2021$LeafPerimeter)
 ## W = 0.95414, p-value = 0.0003048
 ```
 
-```r
+``` r
 CleanData_2021$l10_LeafPer <- log10(CleanData_2021$LeafPerimeter)
 ```
 
 Specific Leaf Area
 
-```r
+``` r
 #explore_trans(CleanData_2021$SLA)
 #function throws an error so did it by hand (probably because of NAs, issue with exponential transformation)
 plotNormalHistogram(CleanData_2021$SLA)
@@ -631,25 +633,25 @@ plotNormalHistogram(CleanData_2021$SLA)
 
 ![](01_CleanData_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
-```r
+``` r
   plotNormalHistogram(log10(CleanData_2021$SLA))
 ```
 
 ![](01_CleanData_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
 
-```r
+``` r
   hist(exp(CleanData_2021$SLA))
 ```
 
 ![](01_CleanData_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
 
-```r
+``` r
   plotNormalHistogram(sqrt(CleanData_2021$SLA))
 ```
 
 ![](01_CleanData_files/figure-html/unnamed-chunk-10-4.png)<!-- -->
 
-```r
+``` r
   # want the one with the largest value
   print(shapiro.test(CleanData_2021$SLA))
 ```
@@ -662,7 +664,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## W = 0.85913, p-value = 1.354e-09
 ```
 
-```r
+``` r
   print(shapiro.test(log10(CleanData_2021$SLA)))
 ```
 
@@ -674,7 +676,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## W = 0.95206, p-value = 0.0002101
 ```
 
-```r
+``` r
   print(shapiro.test(exp(CleanData_2021$SLA)))
 ```
 
@@ -686,7 +688,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
   print(shapiro.test(sqrt(CleanData_2021$SLA))) 
 ```
 
@@ -698,14 +700,14 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## W = 0.92148, p-value = 1.781e-06
 ```
 
-```r
+``` r
 # log10 is the best
 CleanData_2021$l10_SLA <- log10(CleanData_2021$SLA)
 ```
 
 Leaf Dry Matter Content
 
-```r
+``` r
 explore_trans(CleanData_2021$LDMC)
 ```
 
@@ -737,13 +739,13 @@ explore_trans(CleanData_2021$LDMC)
 ## W = 0.95537, p-value = 0.000338
 ```
 
-```r
+``` r
 CleanData_2021$l10_LDMC <- log10(CleanData_2021$LDMC)
 ```
 
 Relative Water Content
 
-```r
+``` r
 explore_trans(CleanData_2021$RWC)
 ```
 
@@ -775,13 +777,13 @@ explore_trans(CleanData_2021$RWC)
 ## W = 0.82197, p-value = 3.765e-11
 ```
 
-```r
+``` r
 # none of these are really good. leave alone.
 ```
 
 Leaf Number, early stages
 
-```r
+``` r
 print(shapiro.test(CleanData_2021$LeafNum_.07222021))
 ```
 
@@ -793,7 +795,7 @@ print(shapiro.test(CleanData_2021$LeafNum_.07222021))
 ## W = 0.91613, p-value = 1.204e-07
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2021$LeafNum_.07222021)))
 ```
 
@@ -805,7 +807,7 @@ print(shapiro.test(log10(CleanData_2021$LeafNum_.07222021)))
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
 print(shapiro.test(exp(CleanData_2021$LeafNum_.07222021)))
 ```
 
@@ -817,7 +819,7 @@ print(shapiro.test(exp(CleanData_2021$LeafNum_.07222021)))
 ## W = 0.31683, p-value < 2.2e-16
 ```
 
-```r
+``` r
 print(shapiro.test(sqrt(CleanData_2021$LeafNum_.07222021))) 
 ```
 
@@ -831,7 +833,7 @@ print(shapiro.test(sqrt(CleanData_2021$LeafNum_.07222021)))
 
 Leaf number, during winter
 
-```r
+``` r
 print(shapiro.test(CleanData_2021$LeafNum_08262021))
 ```
 
@@ -843,7 +845,7 @@ print(shapiro.test(CleanData_2021$LeafNum_08262021))
 ## W = 0.90527, p-value = 2.652e-08
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2021$LeafNum_08262021)))
 ```
 
@@ -855,7 +857,7 @@ print(shapiro.test(log10(CleanData_2021$LeafNum_08262021)))
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
 print(shapiro.test(exp(CleanData_2021$LeafNum_08262021)))
 ```
 
@@ -867,7 +869,7 @@ print(shapiro.test(exp(CleanData_2021$LeafNum_08262021)))
 ## W = 0.2265, p-value < 2.2e-16
 ```
 
-```r
+``` r
 print(shapiro.test(sqrt(CleanData_2021$LeafNum_08262021))) 
 ```
 
@@ -881,7 +883,7 @@ print(shapiro.test(sqrt(CleanData_2021$LeafNum_08262021)))
 
 leaf number about bolting time
 
-```r
+``` r
 explore_trans(CleanData_2021$RosetteLeafNum_10042021)
 ```
 
@@ -915,7 +917,7 @@ explore_trans(CleanData_2021$RosetteLeafNum_10042021)
 
 leaf number at bolting
 
-```r
+``` r
 explore_trans(CleanData_2021$RosetteLeafNum_bolt)
 ```
 
@@ -949,7 +951,7 @@ explore_trans(CleanData_2021$RosetteLeafNum_bolt)
 
 Leaf number at flowering
 
-```r
+``` r
 explore_trans(CleanData_2021$RosetteLeafNum_Flower)
 ```
 
@@ -983,7 +985,7 @@ explore_trans(CleanData_2021$RosetteLeafNum_Flower)
 
 Rosette Leaf Num at Harvest
 
-```r
+``` r
 explore_trans(CleanData_2021$RosetteLeafNum)
 ```
 
@@ -1018,7 +1020,7 @@ explore_trans(CleanData_2021$RosetteLeafNum)
 Dry Rosette Biomass
 
 
-```r
+``` r
 explore_trans(CleanData_2021$DryRosetteG)
 ```
 
@@ -1050,7 +1052,7 @@ explore_trans(CleanData_2021$DryRosetteG)
 ## W = 0.97926, p-value = 0.04997
 ```
 
-```r
+``` r
 #sqrt is the best but not quite normal but l10 okay so do both
 CleanData_2021$SQR_DryRosG <- sqrt(CleanData_2021$DryRosetteG)
 CleanData_2021$l10_DryRosG <- log10(CleanData_2021$DryRosetteG)
@@ -1058,7 +1060,7 @@ CleanData_2021$l10_DryRosG <- log10(CleanData_2021$DryRosetteG)
 
 Dry Reproductive Biomass
 
-```r
+``` r
 explore_trans(CleanData_2021$DryReproG)
 ```
 
@@ -1090,7 +1092,7 @@ explore_trans(CleanData_2021$DryReproG)
 ## W = 0.81035, p-value = 1.842e-11
 ```
 
-```r
+``` r
 # log10 does the best job but not fantastic. 
 
 CleanData_2021$l10_DryReproG <- log10(CleanData_2021$DryReproG)
@@ -1127,13 +1129,13 @@ explore_trans(CleanData_2021$AG_biomass)
 ## W = 0.80973, p-value = 2.236e-11
 ```
 
-```r
+``` r
 CleanData_2021$l10_AG_biomass <- log10(CleanData_2021$AG_biomass)
 ```
 
 Dry Root Biomass - few samples
 
-```r
+``` r
 explore_trans(CleanData_2021$DryRootG)
 ```
 
@@ -1165,13 +1167,13 @@ explore_trans(CleanData_2021$DryRootG)
 ## W = 0.93365, p-value = 0.3091
 ```
 
-```r
+``` r
 # leave as it
 ```
 
 Dry Root_to_Shoot ratio - few samples
 
-```r
+``` r
 explore_trans(CleanData_2021$Root_to_Shoot)
 ```
 
@@ -1203,13 +1205,13 @@ explore_trans(CleanData_2021$Root_to_Shoot)
 ## W = 0.92796, p-value = 0.2543
 ```
 
-```r
+``` r
 # leave as is
 ```
 
 Reproductive to Rosette biomass ratio
 
-```r
+``` r
 explore_trans(CleanData_2021$Repro_to_Ros)
 ```
 
@@ -1241,14 +1243,14 @@ explore_trans(CleanData_2021$Repro_to_Ros)
 ## W = 0.94898, p-value = 0.0001399
 ```
 
-```r
+``` r
 # log is the best
 CleanData_2021$l10_R_to_R <- log10(CleanData_2021$Repro_to_Ros)
 ```
 
 Number of Lateral Branches
 
-```r
+``` r
 explore_trans(CleanData_2021$LatBranches)
 ```
 
@@ -1280,13 +1282,13 @@ explore_trans(CleanData_2021$LatBranches)
 ## W = 0.96293, p-value = 0.00197
 ```
 
-```r
+``` r
 # leave it alone
 ```
 
 Number of Primary Stalks
 
-```r
+``` r
 explore_trans(CleanData_2021$PrimaryStalks)
 ```
 
@@ -1318,12 +1320,12 @@ explore_trans(CleanData_2021$PrimaryStalks)
 ## W = 0.90351, p-value = 2.473e-07
 ```
 
-```r
+``` r
 # leave it alone
 ```
 
 
-```r
+``` r
 explore_trans(CleanData_2021$Height_cm)
 ```
 
@@ -1355,12 +1357,59 @@ explore_trans(CleanData_2021$Height_cm)
 ## W = 0.89653, p-value = 1.31e-07
 ```
 
-```r
+``` r
 # none are great, so I'm going to leave it alone for now.
 ```
 Fruit Number
 
-```r
+I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, so looking only at Currents and Futures)
+
+``` r
+fruit_comp<- CleanData_2021[CleanData_2021$Treatment %in% c("Current", "Future"), c("TotFruit", "IJ_FruitCount", "FruitCount_BL")]
+
+# want to remove rows that are fully NAs - these only happen when Basia's count is NA
+fruit_comp <- fruit_comp[!(is.na(fruit_comp$FruitCount_BL)), ]
+
+pairs(fruit_comp)
+```
+
+![](01_CleanData_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+``` r
+# Basia's counts almost seem better correlated with total fruit than from the initial imageJ counts
+cor(fruit_comp$TotFruit, fruit_comp$IJ_FruitCount, use = "pairwise.complete.obs")
+```
+
+```
+## [1] 0.9653283
+```
+
+``` r
+#0.948158
+cor(fruit_comp$TotFruit, fruit_comp$FruitCount_BL, use = "pairwise.complete.obs")
+```
+
+```
+## [1] 0.9872239
+```
+
+``` r
+#0.9771513
+cor(fruit_comp$IJ_FruitCount, fruit_comp$FruitCount_BL, use = "pairwise.complete.obs")
+```
+
+```
+## [1] 0.9693973
+```
+
+``` r
+#0.9605816
+```
+
+This tells me that everything is still rather highly correlated. Basia's counts are more highly correlated with the total fruit count than with the other imageJ count or than the other count is with the total count. I do want to use Basia's info going forward because they had the most consistent counting technique since they were all counted by the same person.
+
+
+``` r
 # Counts at Harvest
   print(shapiro.test(CleanData_2021$TotFruit))
 ```
@@ -1370,10 +1419,10 @@ Fruit Number
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$TotFruit
-## W = 0.81034, p-value = 2.249e-12
+## W = 0.81145, p-value = 2.766e-12
 ```
 
-```r
+``` r
   print(shapiro.test(log10(CleanData_2021$TotFruit)))
 ```
 
@@ -1385,7 +1434,7 @@ Fruit Number
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
   print(shapiro.test(exp(CleanData_2021$TotFruit)))
 ```
 
@@ -1397,7 +1446,7 @@ Fruit Number
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
   print(shapiro.test(sqrt(CleanData_2021$TotFruit))) 
 ```
 
@@ -1406,10 +1455,10 @@ Fruit Number
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$TotFruit)
-## W = 0.92449, p-value = 6.586e-07
+## W = 0.92504, p-value = 7.724e-07
 ```
 
-```r
+``` r
 # counts from ImageJ
 print(shapiro.test(CleanData_2021$IJ_FruitCount))
 ```
@@ -1419,10 +1468,10 @@ print(shapiro.test(CleanData_2021$IJ_FruitCount))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$IJ_FruitCount
-## W = 0.81977, p-value = 9.229e-11
+## W = 0.81124, p-value = 3.409e-12
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2021$IJ_FruitCount)))
 ```
 
@@ -1431,10 +1480,10 @@ print(shapiro.test(log10(CleanData_2021$IJ_FruitCount)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(CleanData_2021$IJ_FruitCount)
-## W = 0.95043, p-value = 0.0002478
+## W = NaN, p-value = NA
 ```
 
-```r
+``` r
 print(shapiro.test(exp(CleanData_2021$IJ_FruitCount)))
 ```
 
@@ -1446,7 +1495,7 @@ print(shapiro.test(exp(CleanData_2021$IJ_FruitCount)))
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
 print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
 ```
 
@@ -1455,15 +1504,66 @@ print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$IJ_FruitCount)
-## W = 0.89796, p-value = 1.701e-07
+## W = 0.94273, p-value = 1.547e-05
 ```
 
-```r
+``` r
 CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
+
+# Basia recounts
+print(shapiro.test(CleanData_2021$FruitCount_BL))
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  CleanData_2021$FruitCount_BL
+## W = 0.87073, p-value = 5.308e-08
+```
+
+``` r
+print(shapiro.test(log10(CleanData_2021$FruitCount_BL)))
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  log10(CleanData_2021$FruitCount_BL)
+## W = NaN, p-value = NA
+```
+
+``` r
+print(shapiro.test(exp(CleanData_2021$FruitCount_BL)))
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  exp(CleanData_2021$FruitCount_BL)
+## W = NaN, p-value = NA
+```
+
+``` r
+print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  sqrt(CleanData_2021$FruitCount_BL)
+## W = 0.92064, p-value = 1.159e-05
+```
+
+``` r
+# none of the transformations do better than the raw counts.But honestly it is not normally distributed.
 ```
 
 
-```r
+``` r
   print(shapiro.test(CleanData_2021$NumFlwrLeft))
 ```
 
@@ -1475,7 +1575,7 @@ CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 ## W = 0.71143, p-value = 6.393e-14
 ```
 
-```r
+``` r
   print(shapiro.test(log10(CleanData_2021$NumFlwrLeft)))
 ```
 
@@ -1487,7 +1587,7 @@ CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
   print(shapiro.test(exp(CleanData_2021$NumFlwrLeft)))
 ```
 
@@ -1499,7 +1599,7 @@ CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 ## W = 0.066304, p-value < 2.2e-16
 ```
 
-```r
+``` r
   print(shapiro.test(sqrt(CleanData_2021$NumFlwrLeft))) 
 ```
 
@@ -1512,11 +1612,11 @@ CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 ```
 
 
-```r
+``` r
 explore_trans(CleanData_2021$FruitColWt_mg)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-29-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-29-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-29-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-29-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-4.png)<!-- -->
 
 ```
 ## 
@@ -1545,11 +1645,11 @@ explore_trans(CleanData_2021$FruitColWt_mg)
 ```
 
 
-```r
+``` r
 explore_trans(CleanData_2021$SeedColWt_mg)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-31-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-4.png)<!-- -->
 
 ```
 ## 
@@ -1577,13 +1677,13 @@ explore_trans(CleanData_2021$SeedColWt_mg)
 ## W = 0.94847, p-value = 0.0001787
 ```
 
-```r
+``` r
 # what actually matters is the average seed weight, not the total
 CleanData_2021$AvgSeedWt <- CleanData_2021$SeedColWt_mg / CleanData_2021$IJ_SeedCount
 explore_trans(CleanData_2021$AvgSeedWt)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-30-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-30-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-31-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-8.png)<!-- -->
 
 ```
 ## 
@@ -1612,29 +1712,29 @@ explore_trans(CleanData_2021$AvgSeedWt)
 ```
 
 
-```r
+``` r
 #explore_trans(CleanData_2021$IJ_SeedCount)
 # did by hand becuase exp transformation is too big to show in r -> values become infinity
 
 plotNormalHistogram(CleanData_2021$IJ_SeedCount)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
-```r
+``` r
 plotNormalHistogram(log10(CleanData_2021$IJ_SeedCount))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
 
-```r
+``` r
 #plotNormalHistogram(exp(CleanData_2021$IJ_SeedCount))
 plotNormalHistogram(sqrt(CleanData_2021$IJ_SeedCount))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-31-3.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-32-3.png)<!-- -->
 
-```r
+``` r
   # want the one with the largest value
 print(shapiro.test(CleanData_2021$IJ_SeedCount))
 ```
@@ -1647,7 +1747,7 @@ print(shapiro.test(CleanData_2021$IJ_SeedCount))
 ## W = 0.96627, p-value = 0.004388
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2021$IJ_SeedCount)))
 ```
 
@@ -1659,7 +1759,7 @@ print(shapiro.test(log10(CleanData_2021$IJ_SeedCount)))
 ## W = 0.97123, p-value = 0.01177
 ```
 
-```r
+``` r
 #print(shapiro.test(exp(CleanData_2021$IJ_SeedCount)))
 print(shapiro.test(sqrt(CleanData_2021$IJ_SeedCount))) 
 ```
@@ -1672,7 +1772,7 @@ print(shapiro.test(sqrt(CleanData_2021$IJ_SeedCount)))
 ## W = 0.97556, p-value = 0.02876
 ```
 
-```r
+``` r
 # sqr is best but log10 still better than raw, all OK though
 CleanData_2021$l10_IJ_Seeds <- log10(CleanData_2021$IJ_SeedCount)
 CleanData_2021$SQR_IJ_Seeds <- sqrt(CleanData_2021$IJ_SeedCount)
@@ -1682,7 +1782,7 @@ CleanData_2021$AvgSeedNum <- CleanData_2021$IJ_SeedCount / CleanData_2021$FruitC
 explore_trans(CleanData_2021$AvgSeedNum)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-31-4.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-31-7.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-32-4.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-32-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-32-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-32-7.png)<!-- -->
 
 ```
 ## 
@@ -1710,34 +1810,34 @@ explore_trans(CleanData_2021$AvgSeedNum)
 ## W = 0.9749, p-value = 0.02505
 ```
 
-```r
+``` r
 CleanData_2021$l10_AvgSeedNum <- log10(CleanData_2021$AvgSeedNum)
 ```
 
-Fitness
+Fitness - calculated with Basia's fruit counts
 
-```r
-CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$IJ_FruitCount
+``` r
+CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
 
 plotNormalHistogram(CleanData_2021$fitness)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
-```r
+``` r
 plotNormalHistogram(log10(CleanData_2021$fitness))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
 
-```r
+``` r
 #plotNormalHistogram(exp(CleanData_2021$fitness))
 plotNormalHistogram(sqrt(CleanData_2021$fitness))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-32-3.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
 
-```r
+``` r
   # want the one with the largest value
 print(shapiro.test(CleanData_2021$fitness))
 ```
@@ -1747,10 +1847,10 @@ print(shapiro.test(CleanData_2021$fitness))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$fitness
-## W = 0.78737, p-value = 8.788e-12
+## W = 0.88275, p-value = 3.13e-06
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2021$fitness)))
 ```
 
@@ -1759,10 +1859,10 @@ print(shapiro.test(log10(CleanData_2021$fitness)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(CleanData_2021$fitness)
-## W = 0.93055, p-value = 1.22e-05
+## W = 0.90295, p-value = 2.033e-05
 ```
 
-```r
+``` r
 #print(shapiro.test(exp(CleanData_2021$fitness)))
 print(shapiro.test(sqrt(CleanData_2021$fitness))) 
 ```
@@ -1772,20 +1872,21 @@ print(shapiro.test(sqrt(CleanData_2021$fitness)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$fitness)
-## W = 0.86249, p-value = 4.482e-09
+## W = 0.90074, p-value = 1.64e-05
 ```
 
-```r
+``` r
 CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness)
+CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
 ```
 
 Phenology
 
-```r
+``` r
 explore_trans(CleanData_2021$Emergence)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
 
 ```
 ## 
@@ -1813,13 +1914,13 @@ explore_trans(CleanData_2021$Emergence)
 ## W = 0.62719, p-value < 2.2e-16
 ```
 
-```r
+``` r
 # happened pretty quickly. not normal but transformation doesn't help
 
 explore_trans(CleanData_2021$DayToBolt)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-34-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-8.png)<!-- -->
 
 ```
 ## 
@@ -1847,11 +1948,11 @@ explore_trans(CleanData_2021$DayToBolt)
 ## W = 0.89316, p-value = 3.749e-08
 ```
 
-```r
+``` r
 explore_trans(CleanData_2021$DayToFlwr)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-12.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-34-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-12.png)<!-- -->
 
 ```
 ## 
@@ -1879,13 +1980,13 @@ explore_trans(CleanData_2021$DayToFlwr)
 ## W = 0.97271, p-value = 0.01092
 ```
 
-```r
+``` r
 # SQRT is better but leaving for consistency in treating phenology
 
 explore_trans(CleanData_2021$EmergeToFlwr)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-33-16.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-34-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-34-16.png)<!-- -->
 
 ```
 ## 
@@ -1915,7 +2016,7 @@ explore_trans(CleanData_2021$EmergeToFlwr)
 ## Save file
 Save this file to read in to analysis script
 
-```r
+``` r
 write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
 ```
 
@@ -1927,7 +2028,7 @@ write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
 Raw data files not saved in github. All intermediate files are.
 
 
-```r
+``` r
 Dat1 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
 Dat2 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
 Dat3 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
@@ -1941,7 +2042,7 @@ Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabid
 
 Now, organize data to rows with data.
 
-```r
+``` r
 # remove test rows. note: total leaf number wasn't split into rosette and under until partway through harvesting
 Dat1 <- Dat1[1:129, ]
 
@@ -1972,7 +2073,7 @@ Merge all the data, then clean up the big dataframe to get ready for analysis.
 Change the type of data (character, numeric, factor) as needed for each column
 
 
-```r
+``` r
 Alldata_2022 <- merge(Dat1, Dat2, by = c("PotID", "Treatment"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat3, by =c("PotID"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat4, by = c("PotID", "Treatment"), all = TRUE)
@@ -2004,14 +2105,14 @@ write.csv(Alldata_2022, "data/AllData_2022.csv", row.names = FALSE)
 Clean up environment
 
 
-```r
+``` r
 rm("Dat1", "Dat2", "Dat3", "Dat4", "Stomata_avg")
 ```
 
 Now clean up with AllData file to only keep things we will analyze.
 
 
-```r
+``` r
 CleanData_2022 <- Alldata_2022
 
 keepCols <- c("PotID", "Treatment", "Population", "Line.x", "Replicate", "Chamber", "Flat", "transplanted", "Emergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest", "Number.Emerged", "Leaf.Number.PreVern..post.transplant", "LeafNumber_6.6.2022", "LeafNumber_6.13.2022", "SingleLeaf_FreshWt.g.", "SingleLeafHydratedWt.g.", "SingleLeafDryWt.g.", "Area", "Perim.", "TotalLeafNumber", "RosetteLeafNumber", "UnderLeavesNumber", "AG_DryBiomass.g.", "BG_DryBiomass.g.", "Stom_avg")
@@ -2037,7 +2138,7 @@ CleanData_2022$Transplanted <- as.factor(CleanData_2022$Transplanted)
 
 Calculate other traits
 
-```r
+``` r
 # Calculate other traits
 # SLA = leaf area / leaf dry mass
 CleanData_2022$SLA <- CleanData_2022$SL_Area/CleanData_2022$SL_DryWt
@@ -2056,7 +2157,7 @@ This code is determining which traits may need to be transformed when I run mode
 
 Start with big overview of everything
 
-```r
+``` r
 # get a giant view of all the traits, not a super helpful figure honestly
 CleanData_2022 %>% select_if(is.numeric) %>% gather(cols, value) %>% 
   ggplot(aes(x = value)) + 
@@ -2069,18 +2170,19 @@ CleanData_2022 %>% select_if(is.numeric) %>% gather(cols, value) %>%
 ```
 
 ```
-## Warning: Removed 206 rows containing non-finite values (`stat_bin()`).
+## Warning: Removed 206 rows containing non-finite outside the scale range
+## (`stat_bin()`).
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
 Dates
 
-```r
+``` r
 explore_trans(CleanData_2022$DaysToEmergence)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-40-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-4.png)<!-- -->
 
 ```
 ## 
@@ -2108,14 +2210,14 @@ explore_trans(CleanData_2022$DaysToEmergence)
 ## W = 0.77513, p-value = 6.333e-12
 ```
 
-```r
+``` r
 # add column of log transformed information to dataframe
 CleanData_2022$l10_DaysToEmergence <- log10(CleanData_2022$DaysToEmergence)
 
 explore_trans(CleanData_2022$EmergenceToBolting)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-40-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-40-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-41-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-8.png)<!-- -->
 
 ```
 ## 
@@ -2143,27 +2245,27 @@ explore_trans(CleanData_2022$EmergenceToBolting)
 ## W = 0.89953, p-value = 3.646e-07
 ```
 
-```r
+``` r
 # just check distributions
 plotNormalHistogram(CleanData_2022$BoltingToRootWashing)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-40-9.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-41-9.png)<!-- -->
 
-```r
+``` r
 plotNormalHistogram(CleanData_2022$BoltingToHarvest)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-40-10.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-41-10.png)<!-- -->
 
 Single Leaf Traits
 
 
-```r
+``` r
 explore_trans(CleanData_2022$SL_FreshWt)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-4.png)<!-- -->
 
 ```
 ## 
@@ -2191,13 +2293,13 @@ explore_trans(CleanData_2022$SL_FreshWt)
 ## W = 0.97546, p-value = 0.02076
 ```
 
-```r
+``` r
 CleanData_2022$l10_SL_FreshWt <- log10(CleanData_2022$SL_FreshWt)
 
 explore_trans(CleanData_2022$SL_HydWt)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-8.png)<!-- -->
 
 ```
 ## 
@@ -2225,14 +2327,14 @@ explore_trans(CleanData_2022$SL_HydWt)
 ## W = 0.97284, p-value = 0.01221
 ```
 
-```r
+``` r
 CleanData_2022$l10_SL_HydWt <- log10(CleanData_2022$SL_HydWt)
 CleanData_2022$SQR_SL_HydWt <- sqrt(CleanData_2022$SL_HydWt)
 
 explore_trans(CleanData_2022$SL_DryWt)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-12.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-12.png)<!-- -->
 
 ```
 ## 
@@ -2260,13 +2362,13 @@ explore_trans(CleanData_2022$SL_DryWt)
 ## W = 0.99477, p-value = 0.9246
 ```
 
-```r
+``` r
 CleanData_2022$SQR_SL_DryWt <- sqrt(CleanData_2022$SL_DryWt)
 
 explore_trans(CleanData_2022$SL_Area)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-16.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-16.png)<!-- -->
 
 ```
 ## 
@@ -2294,13 +2396,13 @@ explore_trans(CleanData_2022$SL_Area)
 ## W = 0.98923, p-value = 0.4255
 ```
 
-```r
+``` r
 CleanData_2022$SQR_SL_Area <- sqrt(CleanData_2022$SL_Area)
 
 explore_trans(CleanData_2022$SL_Perim)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-17.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-18.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-19.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-20.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-17.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-18.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-19.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-20.png)<!-- -->
 
 ```
 ## 
@@ -2328,7 +2430,7 @@ explore_trans(CleanData_2022$SL_Perim)
 ## W = 0.97947, p-value = 0.05076
 ```
 
-```r
+``` r
 print(shapiro.test(CleanData_2022$SLA))
 ```
 
@@ -2340,7 +2442,7 @@ print(shapiro.test(CleanData_2022$SLA))
 ## W = 0.92166, p-value = 1.681e-06
 ```
 
-```r
+``` r
 print(shapiro.test(log10(CleanData_2022$SLA)))
 ```
 
@@ -2352,7 +2454,7 @@ print(shapiro.test(log10(CleanData_2022$SLA)))
 ## W = 0.98251, p-value = 0.1007
 ```
 
-```r
+``` r
 print(shapiro.test(exp(CleanData_2022$SLA)))
 ```
 
@@ -2364,7 +2466,7 @@ print(shapiro.test(exp(CleanData_2022$SLA)))
 ## W = NaN, p-value = NA
 ```
 
-```r
+``` r
 print(shapiro.test(sqrt(CleanData_2022$SLA))) 
 ```
 
@@ -2376,14 +2478,14 @@ print(shapiro.test(sqrt(CleanData_2022$SLA)))
 ## W = 0.96724, p-value = 0.003596
 ```
 
-```r
+``` r
 CleanData_2022$l10_SLA <- log10(CleanData_2022$SLA)
 
 
 explore_trans(CleanData_2022$RWC)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-21.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-22.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-23.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-24.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-21.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-22.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-23.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-24.png)<!-- -->
 
 ```
 ## 
@@ -2411,13 +2513,13 @@ explore_trans(CleanData_2022$RWC)
 ## W = 0.95585, p-value = 0.0004155
 ```
 
-```r
+``` r
 #exp best but rest really similar so not doing anything for consistency
 
 explore_trans(CleanData_2022$LDMC)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-41-25.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-26.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-27.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-41-28.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-42-25.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-26.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-27.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-28.png)<!-- -->
 
 ```
 ## 
@@ -2445,18 +2547,18 @@ explore_trans(CleanData_2022$LDMC)
 ## W = 0.88769, p-value = 2.672e-08
 ```
 
-```r
+``` r
 CleanData_2022$l10_LDMC <- log10(CleanData_2022$LDMC)
 ```
 
 Leaf Number + biomass
 
 
-```r
+``` r
 explore_trans(CleanData_2022$LeafNumber_Total)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-4.png)<!-- -->
 
 ```
 ## 
@@ -2484,13 +2586,13 @@ explore_trans(CleanData_2022$LeafNumber_Total)
 ## W = 0.97422, p-value = 0.01581
 ```
 
-```r
+``` r
 CleanData_2022$l10_LeafNumber_Total <- log10(CleanData_2022$LeafNumber_Total)
 
 explore_trans(CleanData_2022$LeafNumber_Rosette)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-8.png)<!-- -->
 
 ```
 ## 
@@ -2518,13 +2620,13 @@ explore_trans(CleanData_2022$LeafNumber_Rosette)
 ## W = 0.9608, p-value = 0.06208
 ```
 
-```r
+``` r
 CleanData_2022$l10_LeafNumber_Rosette <- log10(CleanData_2022$LeafNumber_Rosette)
 
 explore_trans(CleanData_2022$LeafNumber_UnderLeaves)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-12.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-9.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-10.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-11.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-12.png)<!-- -->
 
 ```
 ## 
@@ -2552,13 +2654,13 @@ explore_trans(CleanData_2022$LeafNumber_UnderLeaves)
 ## W = 0.9659, p-value = 0.1079
 ```
 
-```r
+``` r
 CleanData_2022$SQR_LeafNumber_UnderLeaves <- sqrt(CleanData_2022$LeafNumber_UnderLeaves)
 
 explore_trans(CleanData_2022$AG_DryBiomass)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-16.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-13.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-14.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-15.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-16.png)<!-- -->
 
 ```
 ## 
@@ -2586,14 +2688,14 @@ explore_trans(CleanData_2022$AG_DryBiomass)
 ## W = 0.98608, p-value = 0.2222
 ```
 
-```r
+``` r
 CleanData_2022$SQR_AG_DryBiomass <- sqrt(CleanData_2022$AG_DryBiomass)
 CleanData_2022$l10_AG_DryBiomass <- log10(CleanData_2022$AG_DryBiomass)
 
 explore_trans(CleanData_2022$BG_DryBiomass)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-17.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-18.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-19.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-20.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-17.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-18.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-19.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-20.png)<!-- -->
 
 ```
 ## 
@@ -2621,13 +2723,13 @@ explore_trans(CleanData_2022$BG_DryBiomass)
 ## W = 0.99152, p-value = 0.6363
 ```
 
-```r
+``` r
 CleanData_2022$SQR_BG_DryBiomass <- sqrt(CleanData_2022$BG_DryBiomass)
 
 explore_trans(CleanData_2022$Root_to_Shoot)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-42-21.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-22.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-23.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-42-24.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-43-21.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-22.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-23.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-24.png)<!-- -->
 
 ```
 ## 
@@ -2655,18 +2757,18 @@ explore_trans(CleanData_2022$Root_to_Shoot)
 ## W = 0.97068, p-value = 0.007369
 ```
 
-```r
+``` r
 CleanData_2022$l10_Root_to_Shoot <- log10(CleanData_2022$Root_to_Shoot)
 ```
 
 Stomata
 
 
-```r
+``` r
 explore_trans(CleanData_2022$Stomata_avg)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-4.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-3.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-4.png)<!-- -->
 
 ```
 ## 
@@ -2694,13 +2796,13 @@ explore_trans(CleanData_2022$Stomata_avg)
 ## W = 0.9889, p-value = 0.399
 ```
 
-```r
+``` r
 CleanData_2022$l10_Stomata_avg <- log10(CleanData_2022$Stomata_avg)
 
 explore_trans(CleanData_2022$Stomata_density)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-43-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-44-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-8.png)<!-- -->
 
 ```
 ## 
@@ -2728,12 +2830,12 @@ explore_trans(CleanData_2022$Stomata_density)
 ## W = 0.9889, p-value = 0.399
 ```
 
-```r
+``` r
 CleanData_2022$l10_Stomata_density <- log10(CleanData_2022$Stomata_density)
 ```
 ## Save file
 Save this file to read in to analysis script
 
-```r
+``` r
 write.csv(CleanData_2022, file = "data/CleanData_2022.csv", row.names = FALSE)
 ```

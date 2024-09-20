@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2024-09-10"
+date: "2024-09-20"
 output: 
   html_document:
     toc: true
@@ -314,9 +314,9 @@ Height_cm (of main stalk)
 
 ## fitness + fitness related
 
-IJ_FruitCount
+FruitCount - Basia
 
-![](03_Figures_files/figure-html/unnamed-chunk-21-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
 AvgSeedWt
 

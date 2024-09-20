@@ -1,7 +1,7 @@
 ---
 title: "02_Analysis"
 author: "Sophie Buysse"
-date: "2024-09-13"
+date: "2024-09-20"
 output: 
   html_document:
     toc: true
@@ -82,7 +82,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 # for the things I can easily get a mean for (num or int). NOTE: These are raw means and confidence intervals, I might not actually want them later on because I will want model predicted means and standard errors.
 ByPop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 
 # transpose for easier viewing
 ByPop_21 <- data.frame(t(ByPop_21))
@@ -90,14 +90,14 @@ ByPop_21 <- data.frame(t(ByPop_21))
 # now do by treatment
 ByTrt_21 <- Dat_2021 %>%
   dplyr::group_by(Treatment) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 ByTrt_21 <- data.frame(t(ByTrt_21))
 
 # Now I want population  means within each treatment
 ByTrt_Pop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 ```
 
 ```
@@ -116,8 +116,6 @@ colnames(ByTrt_Pop_21) <- c("Belm_C", "Belm_CF", "Belm_F", "Roda_C", "Roda_CF", 
 
 # save this to keep means
 write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
-
-# get just the 
 ```
 ## Two Treatment Anovas
 
@@ -330,6 +328,7 @@ as.data.frame(summary(lmer(Emergence ~ Population + (1|Population:Line), data = 
 ```
 
 Days between emergence and bolting
+no post hoc models because not in paper
 
 
 ``` r
@@ -413,6 +412,7 @@ bolting_means_21 <- get_table(bolting_lm_21)
 ```
 
 Days between bolting and flowering
+no post hoc models because not in paper
 
 
 ``` r
@@ -1683,6 +1683,7 @@ as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset
 Note that Basia is potentially interested in looking at growth curves or leaf number changes over time wth a shade or photoperiod response but would also probably be interested in a temperature response but I should do a bit more literature searching on that if we go that route. but that is all to say that all these leaf number traits could be the basis of why she does that, and I could go back and see what Tori did too.
  
 leaf num at 4 weeks
+no post hoc analyses because not in paper
 
 ``` r
 # Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
@@ -1778,6 +1779,7 @@ text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = D
 ![](02_Analysis_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
 
 Leaf num 5 weeks into vernalization
+no post hoc analyses because not in paper
 
 ``` r
 # LeafNumber from 08262021 - 5 weeks into vernalization... why did I choose this date? I think I was thinning on this day?
@@ -1861,6 +1863,7 @@ LN_Vern_means_21 <- get_table(LN_Vern_lm_21)
 ```
 
 Leaf num about when bolting started
+no post hoc analyses becuase not in paper - not at a constant developmental stage
 
 ``` r
 # Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
@@ -2299,14 +2302,63 @@ Repro_anov_21$trait <- "l10_DryReproG"
 Repro_means_21 <- get_table_bt(Repro_lm_21)
 ```
 
+No interaction but run individual models to test for a difference in the future environment
+
+``` r
+# belm
+as.data.frame(summary(lmer(l10_DryReproG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+```
+
+```
+##               Estimate Std. Error        df   t value     Pr(>|t|)
+## (Intercept) -0.2538158 0.09644543  5.515782 -2.631703 4.221342e-02
+## Treatment1   0.3732317 0.02314503 22.935904 16.125781 5.242662e-14
+```
+
+``` r
+#roda
+as.data.frame(summary(lmer(l10_DryReproG ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+```
+
+```
+##               Estimate Std. Error       df   t value     Pr(>|t|)
+## (Intercept) -0.1943989 0.04917490 17.98688 -3.953213 9.332138e-04
+## Treatment1   0.3971901 0.03568424 42.63098 11.130687 3.404316e-14
+```
+
+``` r
+#cur
+as.data.frame(summary(lmer(l10_DryReproG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+```
+
+```
+##               Estimate Std. Error       df    t value    Pr(>|t|)
+## (Intercept)  0.1733283 0.05526152 21.33609  3.1365101 0.004919434
+## Population1 -0.0258151 0.05526152 21.33609 -0.4671442 0.645132201
+```
+
+``` r
+#fut
+as.data.frame(summary(lmer(l10_DryReproG ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+```
+##                Estimate Std. Error       df    t value     Pr(>|t|)
+## (Intercept) -0.57527688 0.03063599 18.61136 -18.777815 1.497231e-13
+## Population1  0.02835364 0.03063599 18.61136   0.925501 3.665513e-01
+```
+
+
+
 Above ground biomass (rosette + reproductive)
+no post hoc analyses because not in paper
 
 ``` r
 # dry above ground biomass (ros + repro)
 AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-33-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-34-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
@@ -2350,7 +2402,7 @@ AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-33-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -2390,7 +2442,7 @@ Above ground biomass allocation (repro/ros)
 RR_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_R_to_R)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-34-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-34-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-35-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-35-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
@@ -2434,7 +2486,7 @@ RR_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_R_to_R)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-34-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-35-4.png)<!-- -->
 
 ```
 ##                              2.5 %     97.5 %
@@ -2522,7 +2574,7 @@ Num lateral branches
 LatBranch_lm_21 <- do_lmer(Dat_2021_TwoTrt$LatBranches)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-36-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-36-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-37-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-37-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-37-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
@@ -2566,7 +2618,7 @@ LatBranch_lm_21 <- do_lmer(Dat_2021_TwoTrt$LatBranches)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-36-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-37-4.png)<!-- -->
 
 ```
 ##                             2.5 %     97.5 %
@@ -2651,7 +2703,7 @@ Num primary stalks
 PrimStalks_lm_21 <- do_lmer(Dat_2021_TwoTrt$PrimaryStalks)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-38-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-38-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-39-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-39-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-39-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
@@ -2695,7 +2747,7 @@ PrimStalks_lm_21 <- do_lmer(Dat_2021_TwoTrt$PrimaryStalks)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-38-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-39-4.png)<!-- -->
 
 ```
 ##                             2.5 %      97.5 %
@@ -2780,7 +2832,7 @@ Height main stalk
 height_lm_21 <- do_lmer(Dat_2021_TwoTrt$Height_cm)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-40-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-40-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-40-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-41-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-41-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 80"
@@ -2824,7 +2876,7 @@ height_lm_21 <- do_lmer(Dat_2021_TwoTrt$Height_cm)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-40-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-41-4.png)<!-- -->
 
 ```
 ##                            2.5 %     97.5 %
@@ -2906,125 +2958,16 @@ as.data.frame(summary(lmer(Height_cm ~ Population + (1|Population:Line), data = 
 ### Fitness
 
 Fruit Count
-only using IJ fruit count becuase of issue with skipping counter for other fruit count.
+at first, only using IJ fruit count because of issue with skipping counter for other fruit count.
+
+Now (9/20/2024) only using Basia's fruit counts
+
 
 ``` r
 # number fruits on plant
 # maybe would want to add done flower or not done flower as a random effect in this model?
 fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
-```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-42-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-42-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-42-3.png)<!-- -->
-
-```
-## [1] "the number of complete cases is 78"
-```
-
-```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
-## Formula: trait ~ Treatment * Population + (1 | Population:Line)
-##    Data: data
-## 
-## REML criterion at convergence: -40.2
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.5269 -0.4649 -0.0208  0.6039  2.8068 
-## 
-## Random effects:
-##  Groups          Name        Variance Std.Dev.
-##  Population:Line (Intercept) 0.001229 0.03505 
-##  Residual                    0.025872 0.16085 
-## Number of obs: 78, groups:  Population:Line, 21
-## 
-## Fixed effects:
-##                        Estimate Std. Error       df t value      Pr(>|t|)    
-## (Intercept)             2.44500    0.02071  4.53869 118.083 0.00000000432 ***
-## Treatment1              0.34255    0.01856 48.31983  18.455       < 2e-16 ***
-## Population1             0.09548    0.02071  4.53869   4.611      0.007339 ** 
-## Treatment1:Population1 -0.06869    0.01856 48.31983  -3.700      0.000551 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) Trtmn1 Ppltn1
-## Treatment1  -0.078              
-## Population1  0.199 -0.025       
-## Trtmnt1:Pp1 -0.025  0.157 -0.078
-```
-
-```
-## Computing profile confidence intervals ...
-```
-
-```
-## Warning in zeta(shiftpar, start = opt[seqpar1][-w]): slightly lower deviances
-## (diff=-1.42109e-14) detected
-```
-
-```
-## Warning in nextpar(mat, cc, i, delta, lowcut, upcut): Last two rows have
-## identical or NA .zeta values: using minstep
-## Warning in nextpar(mat, cc, i, delta, lowcut, upcut): Last two rows have
-## identical or NA .zeta values: using minstep
-```
-
-```
-## Warning in FUN(X[[i]], ...): non-monotonic profile for .sig01
-```
-
-```
-## Warning in nextpar(mat, cc, i, delta, lowcut, upcut): unexpected decrease in
-## profile: using minstep
-```
-
-```
-## Warning in FUN(X[[i]], ...): non-monotonic profile for .sigma
-```
-
-```
-## Warning in confint.thpr(pp, level = level, zeta = zeta): bad spline fit for
-## .sig01: falling back to linear interpolation
-```
-
-```
-## Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-## collapsing to unique 'x' values
-```
-
-```
-## Warning in confint.thpr(pp, level = level, zeta = zeta): bad spline fit for
-## .sigma: falling back to linear interpolation
-```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-42-4.png)<!-- -->
-
-```
-##                              2.5 %      97.5 %
-## .sig01                  0.00000000  0.11173835
-## .sigma                  0.13771828  0.18863573
-## (Intercept)             2.40950940  2.48243256
-## Treatment1              0.30480443  0.37772759
-## Population1             0.05984012  0.13276327
-## Treatment1:Population1 -0.10580158 -0.03287842
-```
-
-``` r
 fruit_anov_21 <- do_anov(fruit_lm_21)
-```
-
-```
-## Type III Analysis of Variance Table with Satterthwaite's method
-##                      Sum Sq Mean Sq NumDF  DenDF F value    Pr(>F)    
-## Treatment            8.8113  8.8113     1 48.320 340.572 < 2.2e-16 ***
-## Population           0.5501  0.5501     1  4.539  21.262 0.0073392 ** 
-## Treatment:Population 0.3543  0.3543     1 48.320  13.693 0.0005512 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-``` r
 fruit_anov_21$trait <- "l10_FruitNum"
 fruit_means_21 <- get_table_bt(fruit_lm_21)
 
@@ -3044,61 +2987,135 @@ fruit_means_21 <- get_table_bt(fruit_lm_21)
 ## no meaningful changes, so FruitCounter will not be a random effect and this code is commented out.
 ```
 
-There is an interaction, so do posthoc analyses.
+
+``` r
+# number fruits on plant
+# maybe would want to add done flower or not done flower as a random effect in this model?
+fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$FruitCount_BL)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
+
+```
+## [1] "the number of complete cases is 96"
+```
+
+```
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: trait ~ Treatment * Population + (1 | Population:Line)
+##    Data: data
+## 
+## REML criterion at convergence: 1263.3
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -2.95586 -0.32149  0.04401  0.46782  2.63198 
+## 
+## Random effects:
+##  Groups          Name        Variance Std.Dev.
+##  Population:Line (Intercept) 11931    109.2   
+##  Residual                    36911    192.1   
+## Number of obs: 96, groups:  Population:Line, 21
+## 
+## Fixed effects:
+##                        Estimate Std. Error      df t value     Pr(>|t|)    
+## (Intercept)             376.023     32.365  17.041  11.618 0.0000000016 ***
+## Treatment1              257.257     19.887  71.888  12.936      < 2e-16 ***
+## Population1              37.728     32.365  17.041   1.166        0.260    
+## Treatment1:Population1    7.543     19.887  71.888   0.379        0.706    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Trtmn1 Ppltn1
+## Treatment1  0.000               
+## Population1 0.239  0.000        
+## Trtmnt1:Pp1 0.000  0.167  0.000
+```
+
+```
+## Computing profile confidence intervals ...
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-44-4.png)<!-- -->
+
+```
+##                            2.5 %    97.5 %
+## .sig01                  29.98821 169.56497
+## .sigma                 162.77760 225.24820
+## (Intercept)            312.86468 439.33735
+## Treatment1             218.25449 296.25980
+## Population1            -25.49054 100.97883
+## Treatment1:Population1 -31.45980  46.54551
+```
+
+``` r
+fruit_anov_21 <- do_anov(fruit_lm_21)
+```
+
+```
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                       Sum Sq Mean Sq NumDF  DenDF  F value Pr(>F)    
+## Treatment            6176916 6176916     1 71.888 167.3450 <2e-16 ***
+## Population             50158   50158     1 17.041   1.3589 0.2598    
+## Treatment:Population    5310    5310     1 71.888   0.1439 0.7056    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+``` r
+fruit_anov_21$trait <- "FruitNum"
+fruit_means_21 <- get_table(fruit_lm_21)
+```
+
+
+There is not an interaction, but do post-hoc analyses (there was an interaction with IJ_FruitCount)
 
 
 ``` r
 # belm
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+as.data.frame(summary(lmer(FruitCount_BL ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
 ```
 
 ```
-##              Estimate Std. Error        df  t value          Pr(>|t|)
-## (Intercept) 2.5051348 0.07015259  3.593525 35.70980 0.000010248996058
-## Treatment1  0.2910532 0.02901995 21.177559 10.02942 0.000000001689272
+##             Estimate Std. Error        df  t value          Pr(>|t|)
+## (Intercept)  414.365   70.26781  6.630847 5.896939 0.000734805495624
+## Treatment1   264.800   32.23411 30.811264 8.214901 0.000000002938428
 ```
 
 ``` r
 #roda
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+as.data.frame(summary(lmer(FruitCount_BL ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
 ```
 
 ```
-## boundary (singular) fit: see help('isSingular')
-```
-
-```
-##             Estimate Std. Error df   t value     Pr(>|t|)
-## (Intercept) 2.349669 0.02035375 43 115.44161 3.099274e-55
-## Treatment1  0.410606 0.02035375 43  20.17349 1.512214e-23
+##             Estimate Std. Error       df  t value     Pr(>|t|)
+## (Intercept) 337.7082   27.95124 10.10679 12.08205 2.476333e-07
+## Treatment1  249.7143   24.47692 40.62676 10.20203 9.036968e-13
 ```
 
 ``` r
 #cur
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+as.data.frame(summary(lmer(FruitCount_BL ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
 ```
 
 ```
-##               Estimate Std. Error       df    t value          Pr(>|t|)
-## (Intercept) 2.78358977 0.03214497 6.870055 86.5948871 0.000000000010735
-## Population1 0.02370226 0.03214497 6.870055  0.7373552 0.485321232059939
+##              Estimate Std. Error       df    t value          Pr(>|t|)
+## (Intercept) 630.98523    56.5375 16.96773 11.1604726 0.000000003090344
+## Population1  43.20968    56.5375 16.96773  0.7642658 0.455206645233996
 ```
 
 ``` r
 #fut
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+as.data.frame(summary(lmer(FruitCount_BL ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
 ```
 
 ```
-## boundary (singular) fit: see help('isSingular')
+##              Estimate Std. Error       df  t value        Pr(>|t|)
+## (Intercept) 121.11227   15.41546 17.28622 7.856544 0.0000004168146
+## Population1  32.25978   15.41546 17.28622 2.092690 0.0514251187538
 ```
-
-```
-##              Estimate Std. Error df   t value     Pr(>|t|)
-## (Intercept) 2.1047050 0.02514138 34 83.714759 5.729817e-41
-## Population1 0.1656417 0.02514138 34  6.588408 1.497875e-07
-```
-
 
 Average weight of a seed (collected seed weight / count of collected seeds)
 
@@ -3107,7 +3124,7 @@ Average weight of a seed (collected seed weight / count of collected seeds)
 AvSeedWt_lm_21 <- do_lmer(Dat_2021_TwoTrt$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-46-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-46-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-46-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 78"
@@ -3151,7 +3168,7 @@ AvSeedWt_lm_21 <- do_lmer(Dat_2021_TwoTrt$AvgSeedWt)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-44-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-46-4.png)<!-- -->
 
 ```
 ##                                2.5 %        97.5 %
@@ -3182,6 +3199,63 @@ AvSeedWt_anov_21$trait <- "Average Seed Wt"
 AvSeedWt_means_21 <- get_table(AvSeedWt_lm_21)
 ```
 
+No interaction, but want to do post hoc to be able to discuss differences
+
+
+``` r
+# belm
+as.data.frame(summary(lmer(AvgSeedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+```
+
+```
+##                  Estimate   Std. Error       df     t value       Pr(>|t|)
+## (Intercept) 0.02274526082 0.0009413707  6.46036 24.16185337 0.000000140673
+## Treatment1  0.00002012891 0.0004082549 25.33674  0.04930476 0.961063049499
+```
+
+``` r
+#roda
+as.data.frame(summary(lmer(AvgSeedWt ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+```
+
+```
+## boundary (singular) fit: see help('isSingular')
+```
+
+```
+##                Estimate   Std. Error df   t value     Pr(>|t|)
+## (Intercept) 0.027137237 0.0007173583 43 37.829402 1.217006e-34
+## Treatment1  0.000872003 0.0007173583 43  1.215575 2.307786e-01
+```
+
+``` r
+#cur
+as.data.frame(summary(lmer(AvgSeedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+```
+
+```
+## boundary (singular) fit: see help('isSingular')
+```
+
+```
+##                 Estimate   Std. Error df   t value     Pr(>|t|)
+## (Intercept)  0.025972502 0.0006513087 40 39.877409 7.937281e-34
+## Population1 -0.002036739 0.0006513087 40 -3.127148 3.285150e-03
+```
+
+``` r
+#fut
+as.data.frame(summary(lmer(AvgSeedWt ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+```
+
+```
+##                 Estimate   Std. Error       df   t value     Pr(>|t|)
+## (Intercept)  0.024871467 0.0008643317 11.87432 28.775372 2.380522e-12
+## Population1 -0.001576327 0.0008643317 11.87432 -1.823752 9.344280e-02
+```
+
+
+
 average Seed number per fruit -
 
 ``` r
@@ -3195,7 +3269,7 @@ seeds_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AvgSeedNum)
 ## boundary (singular) fit: see help('isSingular')
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-45-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-45-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-45-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-48-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-48-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-48-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 78"
@@ -3241,7 +3315,7 @@ seeds_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AvgSeedNum)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-45-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-48-4.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -3362,10 +3436,10 @@ Total Fitness
 fitness_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_fitness)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-47-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-47-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-47-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-50-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-50-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-50-3.png)<!-- -->
 
 ```
-## [1] "the number of complete cases is 77"
+## [1] "the number of complete cases is 78"
 ```
 
 ```
@@ -3374,48 +3448,48 @@ fitness_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_fitness)
 ## Formula: trait ~ Treatment * Population + (1 | Population:Line)
 ##    Data: data
 ## 
-## REML criterion at convergence: -33.2
+## REML criterion at convergence: -45.3
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.9785 -0.4333  0.0258  0.6579  2.0456 
+## -3.6812 -0.5137  0.1031  0.5573  1.7267 
 ## 
 ## Random effects:
 ##  Groups          Name        Variance Std.Dev.
-##  Population:Line (Intercept) 0.005457 0.07387 
-##  Residual                    0.025559 0.15987 
-## Number of obs: 77, groups:  Population:Line, 21
+##  Population:Line (Intercept) 0.001688 0.04109 
+##  Residual                    0.023736 0.15406 
+## Number of obs: 78, groups:  Population:Line, 21
 ## 
 ## Fixed effects:
 ##                        Estimate Std. Error       df t value Pr(>|t|)    
-## (Intercept)             4.15015    0.02613  7.24185 158.856 4.27e-14 ***
-## Treatment1              0.39145    0.01873 47.50943  20.900  < 2e-16 ***
-## Population1             0.05403    0.02613  7.24185   2.068   0.0761 .  
-## Treatment1:Population1 -0.09782    0.01873 47.50943  -5.223 3.85e-06 ***
+## (Intercept)             4.19233    0.02073  6.22460 202.267 4.03e-13 ***
+## Treatment1              0.38684    0.01781 51.66779  21.723  < 2e-16 ***
+## Population1             0.04814    0.02073  6.22460   2.322   0.0577 .  
+## Treatment1:Population1 -0.09727    0.01781 51.66779  -5.462 1.36e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) Trtmn1 Ppltn1
-## Treatment1  -0.084              
-## Population1  0.227 -0.017       
-## Trtmnt1:Pp1 -0.017  0.145 -0.084
+## Treatment1  -0.078              
+## Population1  0.210 -0.025       
+## Trtmnt1:Pp1 -0.025  0.157 -0.078
 ```
 
 ```
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-47-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-50-4.png)<!-- -->
 
 ```
-##                                2.5 %     97.5 %
-## .sig01                  0.0000000000  0.1450011
-## .sigma                  0.1304662676  0.1968704
-## (Intercept)             4.0934266846  4.1997645
-## Treatment1              0.3493816938  0.4269470
-## Population1            -0.0003731675  0.1035708
-## Treatment1:Population1 -0.1376422668 -0.0619379
+##                               2.5 %      97.5 %
+## .sig01                  0.000000000  0.11437162
+## .sigma                  0.126023487  0.18234725
+## (Intercept)             4.148261794  4.23161810
+## Treatment1              0.350125895  0.42073291
+## Population1             0.004930722  0.08737592
+## Treatment1:Population1 -0.132927510 -0.06242098
 ```
 
 ``` r
@@ -3425,9 +3499,9 @@ fitness_anov_21 <- do_anov(fitness_lm_21)
 ```
 ## Type III Analysis of Variance Table with Satterthwaite's method
 ##                       Sum Sq Mean Sq NumDF  DenDF  F value      Pr(>F)    
-## Treatment            11.1643 11.1643     1 47.509 436.7967   < 2.2e-16 ***
-## Population            0.1093  0.1093     1  7.242   4.2765     0.07611 .  
-## Treatment:Population  0.6972  0.6972     1 47.509  27.2786 0.000003848 ***
+## Treatment            11.2008 11.2008     1 51.668 471.8937   < 2.2e-16 ***
+## Population            0.1280  0.1280     1  6.225   5.3938     0.05771 .  
+## Treatment:Population  0.7082  0.7082     1 51.668  29.8348 0.000001363 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -3446,9 +3520,9 @@ as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data =
 ```
 
 ```
-##              Estimate Std. Error        df   t value          Pr(>|t|)
-## (Intercept) 4.1861776 0.06585125  2.781163 63.570204 0.000017530419786
-## Treatment1  0.3027711 0.03245629 20.161213  9.328578 0.000000009343399
+##              Estimate Std. Error        df   t value        Pr(>|t|)
+## (Intercept) 4.2244705 0.05438519  1.017925 77.676850 0.0076073007407
+## Treatment1  0.2965311 0.03008192 12.984576  9.857454 0.0000002146581
 ```
 
 ``` r
@@ -3458,8 +3532,8 @@ as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data =
 
 ```
 ##              Estimate Std. Error        df   t value     Pr(>|t|)
-## (Intercept) 4.0966119 0.02491789  9.348267 164.40446 1.685451e-17
-## Treatment1  0.4888615 0.01978095 31.944267  24.71376 2.163109e-22
+## (Intercept) 4.1442422 0.02253622  9.360755 183.89255 5.652827e-18
+## Treatment1  0.4844341 0.01925058 33.275271  25.16465 3.096425e-23
 ```
 
 ``` r
@@ -3469,8 +3543,8 @@ as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data 
 
 ```
 ##                Estimate Std. Error       df    t value     Pr(>|t|)
-## (Intercept)  4.54101889 0.03548217 9.779698 127.980296 4.264350e-17
-## Population1 -0.04194248 0.03548217 9.779698  -1.182072 2.651208e-01
+## (Intercept)  4.57666086  0.0321822 6.754302 142.210955 5.379684e-13
+## Population1 -0.04917677  0.0321822 6.754302  -1.528074 1.718765e-01
 ```
 
 ``` r
@@ -3479,9 +3553,9 @@ as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data 
 ```
 
 ```
-##              Estimate Std. Error       df    t value      Pr(>|t|)
-## (Intercept) 3.7692706 0.02392704 2.280962 157.531869 0.00001182613
-## Population1 0.1585448 0.02392704 2.280962   6.626179 0.01557614379
+##             Estimate Std. Error       df    t value     Pr(>|t|)
+## (Intercept) 3.808282 0.02425088 6.789045 157.036857 2.424260e-13
+## Population1 0.146826 0.02425088 6.789045   6.054459 5.777614e-04
 ```
 
 
@@ -3516,7 +3590,7 @@ write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TR
 ``` r
 # change column names
 # not transformed
-dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21")
+dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21", "fruit_means_21")
 
 for (i in dfs) {
   x=get(i)
@@ -3525,7 +3599,7 @@ for (i in dfs) {
 }
 
 # transformed
-dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "fruit_means_21", "AG_means_21", "seeds_means_21", "fitness_means_21")
+dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "AG_means_21", "seeds_means_21", "fitness_means_21")
 
 for (i in dfs2) {
   x=get(i)
@@ -3900,13 +3974,14 @@ Run the models
 ### Phenology
 
 Days to emergence - log10 transformed this time!
+no post hoc because not in manuscript
 
 ``` r
 # days to emergence
 emergence_lm_22 <- do_lmer2(Dat_2022$l10_DaysToEmergence)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-57-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-57-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-57-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-60-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-60-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-60-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 114"
@@ -3955,7 +4030,7 @@ emergence_lm_22 <- do_lmer2(Dat_2022$l10_DaysToEmergence)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-57-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-60-4.png)<!-- -->
 
 ```
 ##                                  2.5 %      97.5 %
@@ -3997,7 +4072,7 @@ Days between emergence and bolting
 bolting_lm_22 <- do_lmer2(Dat_2022$EmergenceToBolting)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-58-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-58-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-58-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-61-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-61-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-61-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 113"
@@ -4053,7 +4128,7 @@ bolting_lm_22 <- do_lmer2(Dat_2022$EmergenceToBolting)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-58-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-61-4.png)<!-- -->
 
 ```
 ##                                 2.5 %     97.5 %
@@ -4161,7 +4236,7 @@ Fresh weight
 fresh_lm_22 <- do_lmer2(Dat_2022$l10_SL_FreshWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-60-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-60-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-60-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-63-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-63-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-63-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -4217,7 +4292,7 @@ fresh_lm_22 <- do_lmer2(Dat_2022$l10_SL_FreshWt)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-60-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-63-4.png)<!-- -->
 
 ```
 ##                                 2.5 %        97.5 %
@@ -4320,7 +4395,7 @@ Saturated/Hydrated weight
 hyd_lm_22 <- do_lmer2(Dat_2022$l10_SL_HydWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-62-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-62-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-62-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-65-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-65-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-65-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
@@ -4369,7 +4444,7 @@ hyd_lm_22 <- do_lmer2(Dat_2022$l10_SL_HydWt)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-62-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-65-4.png)<!-- -->
 
 ```
 ##                                 2.5 %       97.5 %
@@ -4476,7 +4551,7 @@ Dried weight
 dry_lm_22 <- do_lmer2(Dat_2022$SL_DryWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-64-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-64-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-64-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-67-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-67-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-67-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -4532,7 +4607,7 @@ dry_lm_22 <- do_lmer2(Dat_2022$SL_DryWt)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-64-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-67-4.png)<!-- -->
 
 ```
 ##                                   2.5 %        97.5 %
@@ -4647,7 +4722,7 @@ leaf area
 area_lm_22 <- do_lmer2(Dat_2022$SL_Area)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-66-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-66-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-66-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-69-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-69-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-69-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -4696,7 +4771,7 @@ area_lm_22 <- do_lmer2(Dat_2022$SL_Area)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-66-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-69-4.png)<!-- -->
 
 ```
 ##                                 2.5 %      97.5 %
@@ -4803,7 +4878,7 @@ leaf perimeter
 per_lm_22 <- do_lmer2(Dat_2022$SL_Perim)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-68-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-68-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-68-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-71-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-71-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-71-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -4852,7 +4927,7 @@ per_lm_22 <- do_lmer2(Dat_2022$SL_Perim)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-68-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-71-4.png)<!-- -->
 
 ```
 ##                                2.5 %      97.5 %
@@ -4954,7 +5029,7 @@ specific leaf area
 sla_lm_22 <- do_lmer2(Dat_2022$l10_SLA)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-70-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-70-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-70-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-73-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-73-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-73-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -5010,7 +5085,7 @@ sla_lm_22 <- do_lmer2(Dat_2022$l10_SLA)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-70-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-73-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -5133,7 +5208,7 @@ ldmc_lm_22 <- do_lmer2(Dat_2022$l10_LDMC)
 ## boundary (singular) fit: see help('isSingular')
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-72-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-72-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-72-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-75-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-75-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-75-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
@@ -5191,7 +5266,7 @@ ldmc_lm_22 <- do_lmer2(Dat_2022$l10_LDMC)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-72-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-75-4.png)<!-- -->
 
 ```
 ##                                   2.5 %       97.5 %
@@ -5315,7 +5390,7 @@ relative water content
 rwc_lm_22 <- do_lmer2(Dat_2022$RWC)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-74-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-74-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-74-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-77-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-77-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-77-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
@@ -5364,7 +5439,7 @@ rwc_lm_22 <- do_lmer2(Dat_2022$RWC)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-74-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-77-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -5464,13 +5539,14 @@ as.data.frame(summary(lmer(RWC ~ Population + (1|Population:Line), data = subset
 ### Leaf Number
 
 leaf num at 4 weeks
+no post hoc because not in manuscript
 
 ``` r
 # pre vern leaf number
 LN_PreVern_lm_22 <- do_lmer2(Dat_2022$LeafNumber_PreVern)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-76-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-76-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-76-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-79-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-79-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-79-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 128"
@@ -5526,7 +5602,7 @@ LN_PreVern_lm_22 <- do_lmer2(Dat_2022$LeafNumber_PreVern)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-76-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-79-4.png)<!-- -->
 
 ```
 ##                                2.5 %     97.5 %
@@ -5562,13 +5638,14 @@ LN_PreVern_means_22 <- get_table(LN_PreVern_lm_22)
 ```
 
 leaf num first week post vern
+no post hoc because not in manuscript
 
 ``` r
 # june 6 leaf number(first week post vern?)
 LN_Jun6_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun6)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-77-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-77-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-77-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-80-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-80-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-80-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 128"
@@ -5617,7 +5694,7 @@ LN_Jun6_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun6)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-77-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-80-4.png)<!-- -->
 
 ```
 ##                                2.5 %     97.5 %
@@ -5653,13 +5730,14 @@ LN_Jun6_means_22 <- get_table(LN_Jun6_lm_22)
 ```
 
 leaf num second week post vern
+no post hoc because not in manuscript
 
 ``` r
 # june 14 leaf number (second week post vern?)
 LN_Jun13_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun13)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-78-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-78-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-78-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-81-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-81-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-81-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 128"
@@ -5708,7 +5786,7 @@ LN_Jun13_lm_22 <- do_lmer2(Dat_2022$LeafNumber_Jun13)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-78-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-81-4.png)<!-- -->
 
 ```
 ##                                2.5 %     97.5 %
@@ -5750,7 +5828,7 @@ leaf num at bolting
 LN_bolt_lm_22 <- do_lmer2(Dat_2022$l10_LeafNumber_Total)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-79-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-79-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-79-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-82-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-82-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-82-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -5806,7 +5884,7 @@ LN_bolt_lm_22 <- do_lmer2(Dat_2022$l10_LeafNumber_Total)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-79-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-82-4.png)<!-- -->
 
 ```
 ##                                 2.5 %       97.5 %
@@ -5916,7 +5994,7 @@ above ground biomass
 AG_lm_22 <- do_lmer2(Dat_2022$l10_AG_DryBiomass)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-81-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-81-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-81-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-84-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-84-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-84-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -5972,7 +6050,7 @@ AG_lm_22 <- do_lmer2(Dat_2022$l10_AG_DryBiomass)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-81-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-84-4.png)<!-- -->
 
 ```
 ##                                  2.5 %      97.5 %
@@ -6079,7 +6157,7 @@ below ground biomass
 BG_lm_22 <- do_lmer2(Dat_2022$BG_DryBiomass)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-83-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-83-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-83-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-86-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-86-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-86-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -6135,7 +6213,7 @@ BG_lm_22 <- do_lmer2(Dat_2022$BG_DryBiomass)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-83-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-86-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -6243,7 +6321,7 @@ Root to shoot ration (below ground / above ground)
 RS_lm_22 <- do_lmer2(Dat_2022$l10_Root_to_Shoot)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-85-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-85-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-85-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-88-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-88-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-88-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -6292,7 +6370,7 @@ RS_lm_22 <- do_lmer2(Dat_2022$l10_Root_to_Shoot)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-85-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-88-4.png)<!-- -->
 
 ```
 ##                                 2.5 %       97.5 %
@@ -6414,7 +6492,7 @@ Not analyzing stomata average becuase density is the average information with th
 sto_den_lm_22 <- do_lmer2(Dat_2022$l10_Stomata_density)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-87-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-87-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-87-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-90-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-90-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-90-3.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 127"
@@ -6470,7 +6548,7 @@ sto_den_lm_22 <- do_lmer2(Dat_2022$l10_Stomata_density)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-87-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-90-4.png)<!-- -->
 
 ```
 ##                                  2.5 %      97.5 %
@@ -6714,7 +6792,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-92-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-95-1.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2021_TwoTrt)+
@@ -6731,7 +6809,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-92-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-95-2.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -6748,7 +6826,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-92-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-95-3.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -6765,7 +6843,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-92-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-95-4.png)<!-- -->
 
 Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference.Scales of both are comparable. 
 
@@ -6802,13 +6880,13 @@ Concerned that line does not explain any variance. Is it true that all the varia
 hist(Dat_2021_TwoTrt$AvgSeedNum)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-94-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-97-1.png)<!-- -->
 
 ``` r
 hist(Dat_2021_TwoTrt$l10_AvgSeedNum)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-94-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-97-2.png)<!-- -->
 2) look within lines for difference in avg seeds/fruit - maybe do subtraction and histogram the differences? but won't work if more than two values
 
 
@@ -6837,7 +6915,7 @@ df_seed_line$Population <- substr(df_seed_line$Line.ID.T, start = 1, stop = 4)
 hist(df_seed_line$AvgSeedNum_n)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-95-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-98-1.png)<!-- -->
 
 ``` r
 # some lines only have 1 pot per treatment -- 10 instances, 7 in Cur
@@ -6954,8 +7032,8 @@ ggplotly(plot_seed)
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-669ef0bda47e281be433" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-669ef0bda47e281be433">{"x":{"data":[{"x":[1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056],"y":[0.2674669162420692,0.50904300965489879,-1.6105696497567332,0.60814421963896215,0.52151324618914841,-0.93832041281694523,-3.7829828164833939,0.16301401842680832,-0.13315980453078638,-0.95391938521042907,0.60814421963896215,-0.11940180820462973,1.3729522074178417,0.34472423022904275,1.3947855616842038,0.2284926700882528,0.76604246385705199,0.75403111393582589],"text":["fitted: 1.684637<br />resid:  0.267466916<br />pop: BELM<br />trt: Current<br />B12-11-C","fitted: 1.684637<br />resid:  0.509043010<br />pop: BELM<br />trt: Current<br />B12-12-C","fitted: 1.684637<br />resid: -1.610569650<br />pop: BELM<br />trt: Current<br />B12-13-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B12-14-C","fitted: 1.684637<br />resid:  0.521513246<br />pop: BELM<br />trt: Current<br />B12-15-C","fitted: 1.684637<br />resid: -0.938320413<br />pop: BELM<br />trt: Current<br />B1-6-C","fitted: 1.684637<br />resid: -3.782982816<br />pop: BELM<br />trt: Current<br />B12-1-C","fitted: 1.684637<br />resid:  0.163014018<br />pop: BELM<br />trt: Current<br />B12-2-C","fitted: 1.684637<br />resid: -0.133159805<br />pop: BELM<br />trt: Current<br />B13-1-C","fitted: 1.684637<br />resid: -0.953919385<br />pop: BELM<br />trt: Current<br />B13-2-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B15-1-C","fitted: 1.684637<br />resid: -0.119401808<br />pop: BELM<br />trt: Current<br />B15-2-C","fitted: 1.684637<br />resid:  1.372952207<br />pop: BELM<br />trt: Current<br />B2-1-C","fitted: 1.684637<br />resid:  0.344724230<br />pop: BELM<br />trt: Current<br />B3-1-C","fitted: 1.684637<br />resid:  1.394785562<br />pop: BELM<br />trt: Current<br />B3-2-C","fitted: 1.684637<br />resid:  0.228492670<br />pop: BELM<br />trt: Current<br />B4-2-C","fitted: 1.684637<br />resid:  0.766042464<br />pop: BELM<br />trt: Current<br />B8-1-C","fitted: 1.684637<br />resid:  0.754031114<br />pop: BELM<br />trt: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599],"y":[1.1032209591299795,-0.51317827674814775,-0.32927409186512946,-1.465323663892748,1.1032209591299795,0.34492239843450484,1.2340289238737077,-1.6415249961527645,0.06491307539388981,-0.12757753348639503,-0.46671425967083219,-1.2530068422517888,1.58142221857721,-0.52874006442835919,0.89361119395706057],"text":["fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-11-F","fitted: 1.657389<br />resid: -0.513178277<br />pop: BELM<br />trt: Future<br />B12-12-F","fitted: 1.657389<br />resid: -0.329274092<br />pop: BELM<br />trt: Future<br />B12-13-F","fitted: 1.657389<br />resid: -1.465323664<br />pop: BELM<br />trt: Future<br />B12-14-F","fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-15-F","fitted: 1.657389<br />resid:  0.344922398<br />pop: BELM<br />trt: Future<br />B1-6-F","fitted: 1.657389<br />resid:  1.234028924<br />pop: BELM<br />trt: Future<br />B12-2-F","fitted: 1.657389<br />resid: -1.641524996<br />pop: BELM<br />trt: Future<br />B15-1-F","fitted: 1.657389<br />resid:  0.064913075<br />pop: BELM<br />trt: Future<br />B15-2-F","fitted: 1.657389<br />resid: -0.127577533<br />pop: BELM<br />trt: Future<br />B2-1-F","fitted: 1.657389<br />resid: -0.466714260<br />pop: BELM<br />trt: Future<br />B2-2-F","fitted: 1.657389<br />resid: -1.253006842<br />pop: BELM<br />trt: Future<br />B3-1-F","fitted: 1.657389<br />resid:  1.581422219<br />pop: BELM<br />trt: Future<br />B3-2-F","fitted: 1.657389<br />resid: -0.528740064<br />pop: BELM<br />trt: Future<br />B8-1-F","fitted: 1.657389<br />resid:  0.893611194<br />pop: BELM<br />trt: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935],"y":[-0.093351985339069174,0.014879333557095789,-0.35653853830621535,-0.84986952501221291,0.76967637412565504,0.6556826530604678,0.66452241993670469,0.47632612899565707,-2.3038033971827234,-0.18325930015027947,-1.1694939735967862,-0.39798735590111789,0.17869432945910024,0.41236876944442147,0.43985582832909204,0.28254299117243636,-1.2164594052325948,0.37553839338668527,0.53966296384139478,-0.0046660907456852023,0.51259381583553698,0.55764690590509425,0.37553839338668527,0.31990027103060731],"text":["fitted: 1.824436<br />resid: -0.093351985<br />pop: RODA<br />trt: Current<br />R11-1-C","fitted: 1.824436<br />resid:  0.014879334<br />pop: RODA<br />trt: Current<br />R11-2-C","fitted: 1.824436<br />resid: -0.356538538<br />pop: RODA<br />trt: Current<br />R15-1-C","fitted: 1.824436<br />resid: -0.849869525<br />pop: RODA<br />trt: Current<br />R15-2-C","fitted: 1.824436<br />resid:  0.769676374<br />pop: RODA<br />trt: Current<br />R2-1-C","fitted: 1.824436<br />resid:  0.655682653<br />pop: RODA<br />trt: Current<br />R2-2-C","fitted: 1.824436<br />resid:  0.664522420<br />pop: RODA<br />trt: Current<br />R21-1-C","fitted: 1.824436<br />resid:  0.476326129<br />pop: RODA<br />trt: Current<br />R21-2-C","fitted: 1.824436<br />resid: -2.303803397<br />pop: RODA<br />trt: Current<br />R26-1-C","fitted: 1.824436<br />resid: -0.183259300<br />pop: RODA<br />trt: Current<br />R29-1-C","fitted: 1.824436<br />resid: -1.169493974<br />pop: RODA<br />trt: Current<br />R29-2-C","fitted: 1.824436<br />resid: -0.397987356<br />pop: RODA<br />trt: Current<br />R33-2-C","fitted: 1.824436<br />resid:  0.178694329<br />pop: RODA<br />trt: Current<br />R35-1-C","fitted: 1.824436<br />resid:  0.412368769<br />pop: RODA<br />trt: Current<br />R40-1-C","fitted: 1.824436<br />resid:  0.439855828<br />pop: RODA<br />trt: Current<br />R40-2-C","fitted: 1.824436<br />resid:  0.282542991<br />pop: RODA<br />trt: Current<br />R47-1-C","fitted: 1.824436<br />resid: -1.216459405<br />pop: RODA<br />trt: Current<br />R47-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R47-3-C","fitted: 1.824436<br />resid:  0.539662964<br />pop: RODA<br />trt: Current<br />R47-6-C","fitted: 1.824436<br />resid: -0.004666091<br />pop: RODA<br />trt: Current<br />R5-1-C","fitted: 1.824436<br />resid:  0.512593816<br />pop: RODA<br />trt: Current<br />R8-1-C","fitted: 1.824436<br />resid:  0.557646906<br />pop: RODA<br />trt: Current<br />R8-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R9-1-C","fitted: 1.824436<br />resid:  0.319900271<br />pop: RODA<br />trt: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177],"y":[0.0023710566782874799,0.82518591138579434,-1.9082250124286038,0.77591649381805705,1.1949160746636953,0.77591649381805705,-1.2860242570637637,0.87408626618145535,1.4563049288487979,0.42020852944520692,0.48516594937326524,-0.29668123742194163,0.56227117849399566,0.72627240027592799,-2.3491126394401269,-0.90723494805496741,0.42020852944520692,-0.64074215706297744,-1.2690899626378249,-0.1099442615025865,0.24823066318501499],"text":["fitted: 1.671015<br />resid:  0.002371057<br />pop: RODA<br />trt: Future<br />R11-1-F","fitted: 1.671015<br />resid:  0.825185911<br />pop: RODA<br />trt: Future<br />R11-2-F","fitted: 1.671015<br />resid: -1.908225012<br />pop: RODA<br />trt: Future<br />R15-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R15-2-F","fitted: 1.671015<br />resid:  1.194916075<br />pop: RODA<br />trt: Future<br />R2-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R2-2-F","fitted: 1.671015<br />resid: -1.286024257<br />pop: RODA<br />trt: Future<br />R21-2-F","fitted: 1.671015<br />resid:  0.874086266<br />pop: RODA<br />trt: Future<br />R29-1-F","fitted: 1.671015<br />resid:  1.456304929<br />pop: RODA<br />trt: Future<br />R29-2-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R33-1-F","fitted: 1.671015<br />resid:  0.485165949<br />pop: RODA<br />trt: Future<br />R33-2-F","fitted: 1.671015<br />resid: -0.296681237<br />pop: RODA<br />trt: Future<br />R35-1-F","fitted: 1.671015<br />resid:  0.562271178<br />pop: RODA<br />trt: Future<br />R35-2-F","fitted: 1.671015<br />resid:  0.726272400<br />pop: RODA<br />trt: Future<br />R40-1-F","fitted: 1.671015<br />resid: -2.349112639<br />pop: RODA<br />trt: Future<br />R40-2-F","fitted: 1.671015<br />resid: -0.907234948<br />pop: RODA<br />trt: Future<br />R47-1-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R47-2-F","fitted: 1.671015<br />resid: -0.640742157<br />pop: RODA<br />trt: Future<br />R47-5-F","fitted: 1.671015<br />resid: -1.269089963<br />pop: RODA<br />trt: Future<br />R8-1-F","fitted: 1.671015<br />resid: -0.109944262<br />pop: RODA<br />trt: Future<br />R8-2-F","fitted: 1.671015<br />resid:  0.248230663<br />pop: RODA<br />trt: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":40.182648401826491,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.6490367618630581,1.8327886080992952],"tickmode":"array","ticktext":["1.65","1.70","1.75","1.80"],"tickvals":[1.6500000000000001,1.7000000000000002,1.7500000000000002,1.8000000000000003],"categoryorder":"array","categoryarray":["1.65","1.70","1.75","1.80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"fitted","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.0512030682364237,1.8496424703302403],"tickmode":"array","ticktext":["-4","-3","-2","-1","0","1"],"tickvals":[-4,-3,-2,-0.99999999999999956,0,1],"categoryorder":"array","categoryarray":["-4","-3","-2","-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"resid","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"trt<br />pop","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2e086a3a331c":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2e086a3a331c","visdat":{"2e086a3a331c":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-183fcf60a8b23892956e" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-183fcf60a8b23892956e">{"x":{"data":[{"x":[1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056],"y":[0.2674669162420692,0.50904300965489879,-1.6105696497567332,0.60814421963896215,0.52151324618914841,-0.93832041281694523,-3.7829828164833939,0.16301401842680832,-0.13315980453078638,-0.95391938521042907,0.60814421963896215,-0.11940180820462973,1.3729522074178417,0.34472423022904275,1.3947855616842038,0.2284926700882528,0.76604246385705199,0.75403111393582589],"text":["fitted: 1.684637<br />resid:  0.267466916<br />pop: BELM<br />trt: Current<br />B12-11-C","fitted: 1.684637<br />resid:  0.509043010<br />pop: BELM<br />trt: Current<br />B12-12-C","fitted: 1.684637<br />resid: -1.610569650<br />pop: BELM<br />trt: Current<br />B12-13-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B12-14-C","fitted: 1.684637<br />resid:  0.521513246<br />pop: BELM<br />trt: Current<br />B12-15-C","fitted: 1.684637<br />resid: -0.938320413<br />pop: BELM<br />trt: Current<br />B1-6-C","fitted: 1.684637<br />resid: -3.782982816<br />pop: BELM<br />trt: Current<br />B12-1-C","fitted: 1.684637<br />resid:  0.163014018<br />pop: BELM<br />trt: Current<br />B12-2-C","fitted: 1.684637<br />resid: -0.133159805<br />pop: BELM<br />trt: Current<br />B13-1-C","fitted: 1.684637<br />resid: -0.953919385<br />pop: BELM<br />trt: Current<br />B13-2-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B15-1-C","fitted: 1.684637<br />resid: -0.119401808<br />pop: BELM<br />trt: Current<br />B15-2-C","fitted: 1.684637<br />resid:  1.372952207<br />pop: BELM<br />trt: Current<br />B2-1-C","fitted: 1.684637<br />resid:  0.344724230<br />pop: BELM<br />trt: Current<br />B3-1-C","fitted: 1.684637<br />resid:  1.394785562<br />pop: BELM<br />trt: Current<br />B3-2-C","fitted: 1.684637<br />resid:  0.228492670<br />pop: BELM<br />trt: Current<br />B4-2-C","fitted: 1.684637<br />resid:  0.766042464<br />pop: BELM<br />trt: Current<br />B8-1-C","fitted: 1.684637<br />resid:  0.754031114<br />pop: BELM<br />trt: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599],"y":[1.1032209591299795,-0.51317827674814775,-0.32927409186512946,-1.465323663892748,1.1032209591299795,0.34492239843450484,1.2340289238737077,-1.6415249961527645,0.06491307539388981,-0.12757753348639503,-0.46671425967083219,-1.2530068422517888,1.58142221857721,-0.52874006442835919,0.89361119395706057],"text":["fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-11-F","fitted: 1.657389<br />resid: -0.513178277<br />pop: BELM<br />trt: Future<br />B12-12-F","fitted: 1.657389<br />resid: -0.329274092<br />pop: BELM<br />trt: Future<br />B12-13-F","fitted: 1.657389<br />resid: -1.465323664<br />pop: BELM<br />trt: Future<br />B12-14-F","fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-15-F","fitted: 1.657389<br />resid:  0.344922398<br />pop: BELM<br />trt: Future<br />B1-6-F","fitted: 1.657389<br />resid:  1.234028924<br />pop: BELM<br />trt: Future<br />B12-2-F","fitted: 1.657389<br />resid: -1.641524996<br />pop: BELM<br />trt: Future<br />B15-1-F","fitted: 1.657389<br />resid:  0.064913075<br />pop: BELM<br />trt: Future<br />B15-2-F","fitted: 1.657389<br />resid: -0.127577533<br />pop: BELM<br />trt: Future<br />B2-1-F","fitted: 1.657389<br />resid: -0.466714260<br />pop: BELM<br />trt: Future<br />B2-2-F","fitted: 1.657389<br />resid: -1.253006842<br />pop: BELM<br />trt: Future<br />B3-1-F","fitted: 1.657389<br />resid:  1.581422219<br />pop: BELM<br />trt: Future<br />B3-2-F","fitted: 1.657389<br />resid: -0.528740064<br />pop: BELM<br />trt: Future<br />B8-1-F","fitted: 1.657389<br />resid:  0.893611194<br />pop: BELM<br />trt: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935],"y":[-0.093351985339069174,0.014879333557095789,-0.35653853830621535,-0.84986952501221291,0.76967637412565504,0.6556826530604678,0.66452241993670469,0.47632612899565707,-2.3038033971827234,-0.18325930015027947,-1.1694939735967862,-0.39798735590111789,0.17869432945910024,0.41236876944442147,0.43985582832909204,0.28254299117243636,-1.2164594052325948,0.37553839338668527,0.53966296384139478,-0.0046660907456852023,0.51259381583553698,0.55764690590509425,0.37553839338668527,0.31990027103060731],"text":["fitted: 1.824436<br />resid: -0.093351985<br />pop: RODA<br />trt: Current<br />R11-1-C","fitted: 1.824436<br />resid:  0.014879334<br />pop: RODA<br />trt: Current<br />R11-2-C","fitted: 1.824436<br />resid: -0.356538538<br />pop: RODA<br />trt: Current<br />R15-1-C","fitted: 1.824436<br />resid: -0.849869525<br />pop: RODA<br />trt: Current<br />R15-2-C","fitted: 1.824436<br />resid:  0.769676374<br />pop: RODA<br />trt: Current<br />R2-1-C","fitted: 1.824436<br />resid:  0.655682653<br />pop: RODA<br />trt: Current<br />R2-2-C","fitted: 1.824436<br />resid:  0.664522420<br />pop: RODA<br />trt: Current<br />R21-1-C","fitted: 1.824436<br />resid:  0.476326129<br />pop: RODA<br />trt: Current<br />R21-2-C","fitted: 1.824436<br />resid: -2.303803397<br />pop: RODA<br />trt: Current<br />R26-1-C","fitted: 1.824436<br />resid: -0.183259300<br />pop: RODA<br />trt: Current<br />R29-1-C","fitted: 1.824436<br />resid: -1.169493974<br />pop: RODA<br />trt: Current<br />R29-2-C","fitted: 1.824436<br />resid: -0.397987356<br />pop: RODA<br />trt: Current<br />R33-2-C","fitted: 1.824436<br />resid:  0.178694329<br />pop: RODA<br />trt: Current<br />R35-1-C","fitted: 1.824436<br />resid:  0.412368769<br />pop: RODA<br />trt: Current<br />R40-1-C","fitted: 1.824436<br />resid:  0.439855828<br />pop: RODA<br />trt: Current<br />R40-2-C","fitted: 1.824436<br />resid:  0.282542991<br />pop: RODA<br />trt: Current<br />R47-1-C","fitted: 1.824436<br />resid: -1.216459405<br />pop: RODA<br />trt: Current<br />R47-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R47-3-C","fitted: 1.824436<br />resid:  0.539662964<br />pop: RODA<br />trt: Current<br />R47-6-C","fitted: 1.824436<br />resid: -0.004666091<br />pop: RODA<br />trt: Current<br />R5-1-C","fitted: 1.824436<br />resid:  0.512593816<br />pop: RODA<br />trt: Current<br />R8-1-C","fitted: 1.824436<br />resid:  0.557646906<br />pop: RODA<br />trt: Current<br />R8-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R9-1-C","fitted: 1.824436<br />resid:  0.319900271<br />pop: RODA<br />trt: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177],"y":[0.0023710566782874799,0.82518591138579434,-1.9082250124286038,0.77591649381805705,1.1949160746636953,0.77591649381805705,-1.2860242570637637,0.87408626618145535,1.4563049288487979,0.42020852944520692,0.48516594937326524,-0.29668123742194163,0.56227117849399566,0.72627240027592799,-2.3491126394401269,-0.90723494805496741,0.42020852944520692,-0.64074215706297744,-1.2690899626378249,-0.1099442615025865,0.24823066318501499],"text":["fitted: 1.671015<br />resid:  0.002371057<br />pop: RODA<br />trt: Future<br />R11-1-F","fitted: 1.671015<br />resid:  0.825185911<br />pop: RODA<br />trt: Future<br />R11-2-F","fitted: 1.671015<br />resid: -1.908225012<br />pop: RODA<br />trt: Future<br />R15-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R15-2-F","fitted: 1.671015<br />resid:  1.194916075<br />pop: RODA<br />trt: Future<br />R2-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R2-2-F","fitted: 1.671015<br />resid: -1.286024257<br />pop: RODA<br />trt: Future<br />R21-2-F","fitted: 1.671015<br />resid:  0.874086266<br />pop: RODA<br />trt: Future<br />R29-1-F","fitted: 1.671015<br />resid:  1.456304929<br />pop: RODA<br />trt: Future<br />R29-2-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R33-1-F","fitted: 1.671015<br />resid:  0.485165949<br />pop: RODA<br />trt: Future<br />R33-2-F","fitted: 1.671015<br />resid: -0.296681237<br />pop: RODA<br />trt: Future<br />R35-1-F","fitted: 1.671015<br />resid:  0.562271178<br />pop: RODA<br />trt: Future<br />R35-2-F","fitted: 1.671015<br />resid:  0.726272400<br />pop: RODA<br />trt: Future<br />R40-1-F","fitted: 1.671015<br />resid: -2.349112639<br />pop: RODA<br />trt: Future<br />R40-2-F","fitted: 1.671015<br />resid: -0.907234948<br />pop: RODA<br />trt: Future<br />R47-1-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R47-2-F","fitted: 1.671015<br />resid: -0.640742157<br />pop: RODA<br />trt: Future<br />R47-5-F","fitted: 1.671015<br />resid: -1.269089963<br />pop: RODA<br />trt: Future<br />R8-1-F","fitted: 1.671015<br />resid: -0.109944262<br />pop: RODA<br />trt: Future<br />R8-2-F","fitted: 1.671015<br />resid:  0.248230663<br />pop: RODA<br />trt: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":40.182648401826491,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.6490367618630581,1.8327886080992952],"tickmode":"array","ticktext":["1.65","1.70","1.75","1.80"],"tickvals":[1.6500000000000001,1.7000000000000002,1.7500000000000002,1.8000000000000003],"categoryorder":"array","categoryarray":["1.65","1.70","1.75","1.80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"fitted","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.0512030682364237,1.8496424703302403],"tickmode":"array","ticktext":["-4","-3","-2","-1","0","1"],"tickvals":[-4,-3,-2,-0.99999999999999956,0,1],"categoryorder":"array","categoryarray":["-4","-3","-2","-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"resid","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"trt<br />pop","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1c683011eaa":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"1c683011eaa","visdat":{"1c683011eaa":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 make a plot with genotype on the x axis and seed count per fruit on the y axis. color by pop and treatment.
@@ -6967,8 +7045,8 @@ make a plot with genotype on the x axis and seed count per fruit on the y axis. 
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-4fd2cdc9ec975158f471" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-4fd2cdc9ec975158f471">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[50.399999999999999,52.299999999999997,37.799999999999997,53.100000000000001,52.399999999999999,41.899999999999999,27.100000000000001,49.600000000000001,47.399999999999999,41.799999999999997,53.100000000000001,47.5,59.700000000000003,null,51,59.899999999999999,null,50.100000000000001,54.399999999999999,54.299999999999997],"text":["Line.ID.T: BELM12Current<br />AvgSeedNum: 50.40000<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.30000<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 37.80000<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.40000<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 27.10000<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 49.60000<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 47.40000<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 41.80000<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 47.50000<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />AvgSeedNum: 59.70000<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 51.00000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 59.90000<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />AvgSeedNum: 50.10000<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.40000<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.30000<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[53.799999999999997,42,43.200000000000003,36.299999999999997,53.799999999999997,47.899999999999999,null,54.8888888888889,null,null,35.3333333333333,45.8888888888889,44.5555555555556,42.299999999999997,37.5,57.8888888888889,null,null,41.899999999999999,52.100000000000001],"text":["Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 42.00000<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 43.20000<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 36.30000<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />AvgSeedNum: 47.90000<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 54.88889<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 35.33333<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 45.88889<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 44.55556<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 42.30000<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 37.50000<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 57.88889<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 52.10000<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[65.799999999999997,66.900000000000006,63.200000000000003,58.600000000000001,75.099999999999994,73.799999999999997,73.900000000000006,71.799999999999997,46.899999999999999,null,64.900000000000006,55.799999999999997,null,62.799999999999997,68.599999999999994,null,71.099999999999994,71.400000000000006,69.700000000000003,55.399999999999999,70.700000000000003,null,null,72.5,66.700000000000003,null,72.200000000000003,72.700000000000003,70.700000000000003,70.099999999999994],"text":["Line.ID.T: RODA11Current<br />AvgSeedNum: 65.80000<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />AvgSeedNum: 66.90000<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 63.20000<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 75.10000<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 73.80000<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 73.90000<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 71.80000<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 64.90000<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 55.80000<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />AvgSeedNum: 62.80000<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />AvgSeedNum: 68.60000<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.10000<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.40000<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 69.70000<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 55.40000<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 72.50000<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />AvgSeedNum: 66.70000<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.20000<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.70000<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.10000<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[46.899999999999999,53.200000000000003,35,52.799999999999997,56.299999999999997,52.799999999999997,null,38.5,null,null,53.600000000000001,58.600000000000001,50,50.5,44.799999999999997,51.100000000000001,52.399999999999999,32.714285714285701,40.799999999999997,50,null,null,42.5,null,null,null,38.600000000000001,46.100000000000001,null,48.700000000000003],"text":["Line.ID.T: RODA11Future<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />AvgSeedNum: 53.20000<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 35.00000<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 56.30000<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />AvgSeedNum: 38.50000<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 53.60000<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.50000<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 44.80000<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 51.10000<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 52.40000<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 32.71429<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 40.80000<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 42.50000<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 38.60000<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 46.10000<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />AvgSeedNum: 48.70000<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.700000000000003,77.5],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"AvgSeedNum","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2e083e6416d3":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2e083e6416d3","visdat":{"2e083e6416d3":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-fb6c80f8ecbd98799136" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-fb6c80f8ecbd98799136">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[50.399999999999999,52.299999999999997,37.799999999999997,53.100000000000001,52.399999999999999,41.899999999999999,27.100000000000001,49.600000000000001,47.399999999999999,41.799999999999997,53.100000000000001,47.5,59.700000000000003,null,51,59.899999999999999,null,50.100000000000001,54.399999999999999,54.299999999999997],"text":["Line.ID.T: BELM12Current<br />AvgSeedNum: 50.40000<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.30000<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 37.80000<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.40000<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 27.10000<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 49.60000<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 47.40000<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 41.80000<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 47.50000<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />AvgSeedNum: 59.70000<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 51.00000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 59.90000<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />AvgSeedNum: 50.10000<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.40000<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.30000<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[53.799999999999997,42,43.200000000000003,36.299999999999997,53.799999999999997,47.899999999999999,null,54.8888888888889,null,null,35.3333333333333,45.8888888888889,44.5555555555556,42.299999999999997,37.5,57.8888888888889,null,null,41.899999999999999,52.100000000000001],"text":["Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 42.00000<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 43.20000<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 36.30000<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />AvgSeedNum: 47.90000<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 54.88889<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 35.33333<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 45.88889<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 44.55556<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 42.30000<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 37.50000<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 57.88889<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 52.10000<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[65.799999999999997,66.900000000000006,63.200000000000003,58.600000000000001,75.099999999999994,73.799999999999997,73.900000000000006,71.799999999999997,46.899999999999999,null,64.900000000000006,55.799999999999997,null,62.799999999999997,68.599999999999994,null,71.099999999999994,71.400000000000006,69.700000000000003,55.399999999999999,70.700000000000003,null,null,72.5,66.700000000000003,null,72.200000000000003,72.700000000000003,70.700000000000003,70.099999999999994],"text":["Line.ID.T: RODA11Current<br />AvgSeedNum: 65.80000<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />AvgSeedNum: 66.90000<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 63.20000<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 75.10000<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 73.80000<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 73.90000<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 71.80000<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 64.90000<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 55.80000<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />AvgSeedNum: 62.80000<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />AvgSeedNum: 68.60000<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.10000<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.40000<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 69.70000<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 55.40000<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 72.50000<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />AvgSeedNum: 66.70000<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.20000<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.70000<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.10000<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[46.899999999999999,53.200000000000003,35,52.799999999999997,56.299999999999997,52.799999999999997,null,38.5,null,null,53.600000000000001,58.600000000000001,50,50.5,44.799999999999997,51.100000000000001,52.399999999999999,32.714285714285701,40.799999999999997,50,null,null,42.5,null,null,null,38.600000000000001,46.100000000000001,null,48.700000000000003],"text":["Line.ID.T: RODA11Future<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />AvgSeedNum: 53.20000<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 35.00000<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 56.30000<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />AvgSeedNum: 38.50000<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 53.60000<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.50000<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 44.80000<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 51.10000<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 52.40000<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 32.71429<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 40.80000<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 42.50000<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 38.60000<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 46.10000<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />AvgSeedNum: 48.70000<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.700000000000003,77.5],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"AvgSeedNum","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1c6875796319":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"1c6875796319","visdat":{"1c6875796319":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 
@@ -6980,8 +7058,8 @@ Compare that to a plot of a trait that does have a genotype effect (just the fir
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-ff1f9483de593679fc80" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-ff1f9483de593679fc80">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[797,550,807,853,1007,888,455,345,220,824,948,1069,494,null,1009,1033,null,166,1023,665],"text":["Line.ID.T: BELM12Current<br />IJ_FruitCount:  797<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  550<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  807<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  853<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />IJ_FruitCount: 1007<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />IJ_FruitCount:  888<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  455<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  345<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />IJ_FruitCount:  220<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />IJ_FruitCount:  824<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />IJ_FruitCount:  948<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />IJ_FruitCount: 1069<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />IJ_FruitCount:  494<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />IJ_FruitCount: 1009<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />IJ_FruitCount: 1033<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />IJ_FruitCount:  166<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />IJ_FruitCount: 1023<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />IJ_FruitCount:  665<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[144,209,141,235,166,196,null,161,null,null,212,321,195,165,172,185,null,null,300,104],"text":["Line.ID.T: BELM12Future<br />IJ_FruitCount:  144<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  209<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  141<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  235<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  166<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />IJ_FruitCount:  196<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  161<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />IJ_FruitCount:  212<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />IJ_FruitCount:  321<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />IJ_FruitCount:  195<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />IJ_FruitCount:  165<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />IJ_FruitCount:  172<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />IJ_FruitCount:  185<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />IJ_FruitCount:   NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />IJ_FruitCount:  300<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />IJ_FruitCount:  104<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[1192,748,401,580,574,730,646,485,627,null,504,569,null,567,513,null,474,555,498,425,558,null,null,680,366,null,599,645,514,807],"text":["Line.ID.T: RODA11Current<br />IJ_FruitCount: 1192<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />IJ_FruitCount:  748<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />IJ_FruitCount:  401<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />IJ_FruitCount:  580<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />IJ_FruitCount:  574<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />IJ_FruitCount:  730<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />IJ_FruitCount:  646<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />IJ_FruitCount:  485<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />IJ_FruitCount:  627<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />IJ_FruitCount:  504<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />IJ_FruitCount:  569<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />IJ_FruitCount:  567<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />IJ_FruitCount:  513<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />IJ_FruitCount:  474<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />IJ_FruitCount:  555<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  498<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  425<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  558<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  680<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />IJ_FruitCount:  366<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />IJ_FruitCount:  599<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />IJ_FruitCount:  645<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />IJ_FruitCount:  514<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />IJ_FruitCount:  807<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[79,109,71,null,92,55,75,254,null,null,62,87,119,84,117,78,73,179,95,81,null,null,77,null,null,null,62,49,null,77],"text":["Line.ID.T: RODA11Future<br />IJ_FruitCount:   79<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />IJ_FruitCount:  109<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />IJ_FruitCount:   71<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />IJ_FruitCount:   92<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />IJ_FruitCount:   55<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />IJ_FruitCount:   75<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />IJ_FruitCount:  254<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />IJ_FruitCount:   62<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />IJ_FruitCount:   87<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />IJ_FruitCount:  119<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />IJ_FruitCount:   84<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />IJ_FruitCount:  117<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />IJ_FruitCount:   78<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />IJ_FruitCount:   73<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />IJ_FruitCount:  179<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   95<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   81<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   77<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />IJ_FruitCount:   62<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />IJ_FruitCount:   49<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />IJ_FruitCount:   77<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":48.949771689497723},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-8.1500000000000057,1249.1500000000001],"tickmode":"array","ticktext":["0","250","500","750","1000"],"tickvals":[0,249.99999999999997,500,750,1000],"categoryorder":"array","categoryarray":["0","250","500","750","1000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"IJ_FruitCount","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2e086d4042e3":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2e086d4042e3","visdat":{"2e086d4042e3":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-f51a0bc37928dc8e752b" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-f51a0bc37928dc8e752b">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[797,550,807,853,1007,888,455,345,220,824,948,1069,494,0,1009,1033,0,166,1023,665],"text":["Line.ID.T: BELM12Current<br />IJ_FruitCount:  797<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  550<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  807<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  853<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />IJ_FruitCount: 1007<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />IJ_FruitCount:  888<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  455<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />IJ_FruitCount:  345<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />IJ_FruitCount:  220<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />IJ_FruitCount:  824<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />IJ_FruitCount:  948<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />IJ_FruitCount: 1069<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />IJ_FruitCount:  494<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />IJ_FruitCount: 1009<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />IJ_FruitCount: 1033<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />IJ_FruitCount:  166<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />IJ_FruitCount: 1023<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />IJ_FruitCount:  665<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[144,209,141,235,166,196,0,161,0,0,212,321,195,165,172,185,0,0,300,104],"text":["Line.ID.T: BELM12Future<br />IJ_FruitCount:  144<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  209<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  141<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  235<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  166<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />IJ_FruitCount:  196<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />IJ_FruitCount:  161<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />IJ_FruitCount:  212<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />IJ_FruitCount:  321<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />IJ_FruitCount:  195<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />IJ_FruitCount:  165<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />IJ_FruitCount:  172<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />IJ_FruitCount:  185<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />IJ_FruitCount:    0<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />IJ_FruitCount:  300<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />IJ_FruitCount:  104<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[1192,748,401,580,574,730,646,485,627,null,504,569,0,567,513,0,474,555,498,425,558,null,null,680,366,0,599,645,514,807],"text":["Line.ID.T: RODA11Current<br />IJ_FruitCount: 1192<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />IJ_FruitCount:  748<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />IJ_FruitCount:  401<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />IJ_FruitCount:  580<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />IJ_FruitCount:  574<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />IJ_FruitCount:  730<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />IJ_FruitCount:  646<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />IJ_FruitCount:  485<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />IJ_FruitCount:  627<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />IJ_FruitCount:  504<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />IJ_FruitCount:  569<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />IJ_FruitCount:  567<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />IJ_FruitCount:  513<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />IJ_FruitCount:  474<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />IJ_FruitCount:  555<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  498<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  425<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  558<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />IJ_FruitCount:  680<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />IJ_FruitCount:  366<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />IJ_FruitCount:  599<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />IJ_FruitCount:  645<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />IJ_FruitCount:  514<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />IJ_FruitCount:  807<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[79,109,71,null,92,55,75,254,0,null,62,87,119,84,117,78,73,179,95,81,null,null,77,0,0,0,62,49,0,77],"text":["Line.ID.T: RODA11Future<br />IJ_FruitCount:   79<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />IJ_FruitCount:  109<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />IJ_FruitCount:   71<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />IJ_FruitCount:   92<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />IJ_FruitCount:   55<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />IJ_FruitCount:   75<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />IJ_FruitCount:  254<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />IJ_FruitCount:   62<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />IJ_FruitCount:   87<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />IJ_FruitCount:  119<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />IJ_FruitCount:   84<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />IJ_FruitCount:  117<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />IJ_FruitCount:   78<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />IJ_FruitCount:   73<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />IJ_FruitCount:  179<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   95<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   81<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:   77<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />IJ_FruitCount:   62<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />IJ_FruitCount:   49<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />IJ_FruitCount:    0<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />IJ_FruitCount:   77<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":48.949771689497723},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-59.600000000000001,1251.5999999999999],"tickmode":"array","ticktext":["0","250","500","750","1000","1250"],"tickvals":[0,250.00000000000003,500,750,999.99999999999989,1250],"categoryorder":"array","categoryarray":["0","250","500","750","1000","1250"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"IJ_FruitCount","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1c6860913b6a":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"1c6860913b6a","visdat":{"1c6860913b6a":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 ```
@@ -6990,8 +7068,8 @@ Compare that to a plot of a trait that does have a genotype effect (just the fir
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-839ac1e73cc62d124fa3" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-839ac1e73cc62d124fa3">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[79,72,80,81,79,80,73,75,73,85,81,81,79,null,82,82,null,54,80,90],"text":["Line.ID.T: BELM12Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />DayToBolt:  72<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />DayToBolt:  73<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />DayToBolt:  75<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />DayToBolt:  73<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />DayToBolt:  85<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />DayToBolt:  82<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />DayToBolt:  82<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />DayToBolt:  54<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />DayToBolt:  90<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[79,80,78,78,78,100,null,76,null,null,84,81,86,88,86,84,null,null,90,101],"text":["Line.ID.T: BELM12Future<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />DayToBolt: 100<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />DayToBolt:  76<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />DayToBolt:  84<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />DayToBolt:  86<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />DayToBolt:  88<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />DayToBolt:  86<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />DayToBolt:  84<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />DayToBolt:  90<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />DayToBolt: 101<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[110,111,112,107,98,105,103,105,105,105,103,104,null,97,105,107,106,105,104,106,105,105,107,106,102,null,106,107,106,98],"text":["Line.ID.T: RODA11Current<br />DayToBolt: 110<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />DayToBolt: 111<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />DayToBolt:  98<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />DayToBolt:  97<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />DayToBolt: 102<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />DayToBolt:  98<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[113,112,113,112,110,107,104,106,null,103,106,104,108,104,105,106,107,106,102,105,106,106,108,null,null,null,136,116,null,107],"text":["Line.ID.T: RODA11Future<br />DayToBolt: 113<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />DayToBolt: 113<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />DayToBolt: 110<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />DayToBolt: 108<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />DayToBolt: 102<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />DayToBolt: 108<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />DayToBolt: 136<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />DayToBolt: 116<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":43.105022831050235},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[49.899999999999999,140.09999999999999],"tickmode":"array","ticktext":["50","75","100","125"],"tickvals":[50,75,100,125],"categoryorder":"array","categoryarray":["50","75","100","125"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"DayToBolt","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2e0833842094":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2e0833842094","visdat":{"2e0833842094":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-a984e4fd7d0e646cc39e" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-a984e4fd7d0e646cc39e">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[79,72,80,81,79,80,73,75,73,85,81,81,79,null,82,82,null,54,80,90],"text":["Line.ID.T: BELM12Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />DayToBolt:  72<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />DayToBolt:  73<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />DayToBolt:  75<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />DayToBolt:  73<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />DayToBolt:  85<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />DayToBolt:  82<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />DayToBolt:  82<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />DayToBolt:  54<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />DayToBolt:  90<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[79,80,78,78,78,100,null,76,null,null,84,81,86,88,86,84,null,null,90,101],"text":["Line.ID.T: BELM12Future<br />DayToBolt:  79<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />DayToBolt:  80<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />DayToBolt:  78<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />DayToBolt: 100<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />DayToBolt:  76<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />DayToBolt:  84<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />DayToBolt:  81<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />DayToBolt:  86<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />DayToBolt:  88<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />DayToBolt:  86<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />DayToBolt:  84<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />DayToBolt:  NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />DayToBolt:  90<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />DayToBolt: 101<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[110,111,112,107,98,105,103,105,105,105,103,104,null,97,105,107,106,105,104,106,105,105,107,106,102,null,106,107,106,98],"text":["Line.ID.T: RODA11Current<br />DayToBolt: 110<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />DayToBolt: 111<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />DayToBolt:  98<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />DayToBolt:  97<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />DayToBolt: 102<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />DayToBolt:  98<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[113,112,113,112,110,107,104,106,null,103,106,104,108,104,105,106,107,106,102,105,106,106,108,null,null,null,136,116,null,107],"text":["Line.ID.T: RODA11Future<br />DayToBolt: 113<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />DayToBolt: 113<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />DayToBolt: 112<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />DayToBolt: 110<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />DayToBolt: 103<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />DayToBolt: 108<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />DayToBolt: 104<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />DayToBolt: 102<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />DayToBolt: 105<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />DayToBolt: 106<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />DayToBolt: 108<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />DayToBolt: 136<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />DayToBolt: 116<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />DayToBolt:  NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />DayToBolt: 107<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":43.105022831050235},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[49.899999999999999,140.09999999999999],"tickmode":"array","ticktext":["50","75","100","125"],"tickvals":[50,75,100,125],"categoryorder":"array","categoryarray":["50","75","100","125"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"DayToBolt","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1c68696763af":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"1c68696763af","visdat":{"1c68696763af":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 ```
@@ -7000,8 +7078,8 @@ Compare that to a plot of a trait that does have a genotype effect (just the fir
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-563525f17565131545ae" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-563525f17565131545ae">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[16.013000000000002,12.272,16.811,14.349,18.686,null,12.099,11.942,15.178000000000001,17.477,18.239000000000001,23.754999999999999,14.443,null,20,18.588999999999999,null,7.2889999999999997,21.105,25.126000000000001],"text":["Line.ID.T: BELM12Current<br />LeafPerimeter: 16.013<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 12.272<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 16.811<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 14.349<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 18.686<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 12.099<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 11.942<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />LeafPerimeter: 15.178<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />LeafPerimeter: 17.477<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />LeafPerimeter: 18.239<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />LeafPerimeter: 23.755<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />LeafPerimeter: 14.443<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />LeafPerimeter: 20.000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />LeafPerimeter: 18.589<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />LeafPerimeter:  7.289<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />LeafPerimeter: 21.105<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />LeafPerimeter: 25.126<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[7.194,7.0250000000000004,6.5469999999999997,6.8479999999999999,7.3150000000000004,11.064,null,6.8399999999999999,null,null,6.7160000000000002,11.012,8.1080000000000005,6.0780000000000003,7.3520000000000003,9.2599999999999998,null,null,11.657,7.4980000000000002],"text":["Line.ID.T: BELM12Future<br />LeafPerimeter:  7.194<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  7.025<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.547<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.848<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  7.315<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />LeafPerimeter: 11.064<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.840<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />LeafPerimeter:  6.716<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />LeafPerimeter: 11.012<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />LeafPerimeter:  8.108<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />LeafPerimeter:  6.078<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />LeafPerimeter:  7.352<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />LeafPerimeter:  9.260<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />LeafPerimeter: 11.657<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />LeafPerimeter:  7.498<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[null,14.202999999999999,17.085999999999999,13.912000000000001,17.698,18.053000000000001,14.894,15.468,14.359,16.241,15.683,14.801,null,18.341999999999999,13.741,null,16.067,17.704999999999998,16.776,12.728999999999999,15.829000000000001,16.754000000000001,12.869999999999999,14.558,15.449,null,13.856999999999999,15.775,15.555,16.155999999999999],"text":["Line.ID.T: RODA11Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />LeafPerimeter: 14.203<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />LeafPerimeter: 17.086<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />LeafPerimeter: 13.912<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />LeafPerimeter: 17.698<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />LeafPerimeter: 18.053<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />LeafPerimeter: 14.894<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />LeafPerimeter: 15.468<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />LeafPerimeter: 14.359<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />LeafPerimeter: 16.241<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />LeafPerimeter: 15.683<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />LeafPerimeter: 14.801<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />LeafPerimeter: 18.342<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />LeafPerimeter: 13.741<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />LeafPerimeter: 16.067<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />LeafPerimeter: 17.705<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 16.776<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 12.729<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 15.829<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 16.754<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 12.870<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 14.558<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />LeafPerimeter: 15.449<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />LeafPerimeter: 13.857<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />LeafPerimeter: 15.775<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />LeafPerimeter: 15.555<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />LeafPerimeter: 16.156<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[10.522,12.506,10.141999999999999,10.315,10.836,9.1120000000000001,8.6869999999999994,11.856,null,9.25,10.948,9.4640000000000004,8.7789999999999999,7.758,9.3249999999999993,9.9730000000000008,8.7059999999999995,7.5650000000000004,8.952,9.6649999999999991,9.8019999999999996,8.7490000000000006,9.9489999999999998,null,null,null,5.5049999999999999,8.0899999999999999,null,10.351000000000001],"text":["Line.ID.T: RODA11Future<br />LeafPerimeter: 10.522<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />LeafPerimeter: 12.506<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />LeafPerimeter: 10.142<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />LeafPerimeter: 10.315<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />LeafPerimeter: 10.836<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />LeafPerimeter:  9.112<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />LeafPerimeter:  8.687<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />LeafPerimeter: 11.856<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />LeafPerimeter:  9.250<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />LeafPerimeter: 10.948<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />LeafPerimeter:  9.464<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />LeafPerimeter:  8.779<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />LeafPerimeter:  7.758<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />LeafPerimeter:  9.325<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />LeafPerimeter:  9.973<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />LeafPerimeter:  8.706<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />LeafPerimeter:  7.565<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  8.952<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.665<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.802<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  8.749<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.949<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />LeafPerimeter:  5.505<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />LeafPerimeter:  8.090<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />LeafPerimeter: 10.351<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[4.5239499999999992,26.107050000000001],"tickmode":"array","ticktext":["5","10","15","20","25"],"tickvals":[5,10,15,20,25],"categoryorder":"array","categoryarray":["5","10","15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"LeafPerimeter","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2e084ce720f9":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2e084ce720f9","visdat":{"2e084ce720f9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-d566fa47bb753cb1eba9" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-d566fa47bb753cb1eba9">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[16.013000000000002,12.272,16.811,14.349,18.686,null,12.099,11.942,15.178000000000001,17.477,18.239000000000001,23.754999999999999,14.443,null,20,18.588999999999999,null,7.2889999999999997,21.105,25.126000000000001],"text":["Line.ID.T: BELM12Current<br />LeafPerimeter: 16.013<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 12.272<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 16.811<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 14.349<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 18.686<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 12.099<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />LeafPerimeter: 11.942<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />LeafPerimeter: 15.178<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />LeafPerimeter: 17.477<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />LeafPerimeter: 18.239<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />LeafPerimeter: 23.755<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />LeafPerimeter: 14.443<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />LeafPerimeter: 20.000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />LeafPerimeter: 18.589<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />LeafPerimeter:  7.289<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />LeafPerimeter: 21.105<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />LeafPerimeter: 25.126<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[7.194,7.0250000000000004,6.5469999999999997,6.8479999999999999,7.3150000000000004,11.064,null,6.8399999999999999,null,null,6.7160000000000002,11.012,8.1080000000000005,6.0780000000000003,7.3520000000000003,9.2599999999999998,null,null,11.657,7.4980000000000002],"text":["Line.ID.T: BELM12Future<br />LeafPerimeter:  7.194<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  7.025<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.547<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.848<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  7.315<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />LeafPerimeter: 11.064<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />LeafPerimeter:  6.840<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />LeafPerimeter:  6.716<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />LeafPerimeter: 11.012<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />LeafPerimeter:  8.108<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />LeafPerimeter:  6.078<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />LeafPerimeter:  7.352<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />LeafPerimeter:  9.260<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />LeafPerimeter:     NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />LeafPerimeter: 11.657<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />LeafPerimeter:  7.498<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[null,14.202999999999999,17.085999999999999,13.912000000000001,17.698,18.053000000000001,14.894,15.468,14.359,16.241,15.683,14.801,null,18.341999999999999,13.741,null,16.067,17.704999999999998,16.776,12.728999999999999,15.829000000000001,16.754000000000001,12.869999999999999,14.558,15.449,null,13.856999999999999,15.775,15.555,16.155999999999999],"text":["Line.ID.T: RODA11Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />LeafPerimeter: 14.203<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />LeafPerimeter: 17.086<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />LeafPerimeter: 13.912<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />LeafPerimeter: 17.698<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />LeafPerimeter: 18.053<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />LeafPerimeter: 14.894<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />LeafPerimeter: 15.468<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />LeafPerimeter: 14.359<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />LeafPerimeter: 16.241<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />LeafPerimeter: 15.683<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />LeafPerimeter: 14.801<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />LeafPerimeter: 18.342<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />LeafPerimeter: 13.741<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />LeafPerimeter: 16.067<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />LeafPerimeter: 17.705<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 16.776<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 12.729<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 15.829<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 16.754<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 12.870<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />LeafPerimeter: 14.558<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />LeafPerimeter: 15.449<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />LeafPerimeter: 13.857<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />LeafPerimeter: 15.775<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />LeafPerimeter: 15.555<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />LeafPerimeter: 16.156<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[10.522,12.506,10.141999999999999,10.315,10.836,9.1120000000000001,8.6869999999999994,11.856,null,9.25,10.948,9.4640000000000004,8.7789999999999999,7.758,9.3249999999999993,9.9730000000000008,8.7059999999999995,7.5650000000000004,8.952,9.6649999999999991,9.8019999999999996,8.7490000000000006,9.9489999999999998,null,null,null,5.5049999999999999,8.0899999999999999,null,10.351000000000001],"text":["Line.ID.T: RODA11Future<br />LeafPerimeter: 10.522<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />LeafPerimeter: 12.506<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />LeafPerimeter: 10.142<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />LeafPerimeter: 10.315<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />LeafPerimeter: 10.836<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />LeafPerimeter:  9.112<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />LeafPerimeter:  8.687<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />LeafPerimeter: 11.856<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />LeafPerimeter:  9.250<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />LeafPerimeter: 10.948<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />LeafPerimeter:  9.464<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />LeafPerimeter:  8.779<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />LeafPerimeter:  7.758<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />LeafPerimeter:  9.325<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />LeafPerimeter:  9.973<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />LeafPerimeter:  8.706<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />LeafPerimeter:  7.565<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  8.952<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.665<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.802<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  8.749<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />LeafPerimeter:  9.949<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />LeafPerimeter:  5.505<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />LeafPerimeter:  8.090<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />LeafPerimeter:     NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />LeafPerimeter: 10.351<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[4.5239499999999992,26.107050000000001],"tickmode":"array","ticktext":["5","10","15","20","25"],"tickvals":[5,10,15,20,25],"categoryorder":"array","categoryarray":["5","10","15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"LeafPerimeter","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1c6879a77f11":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"1c6879a77f11","visdat":{"1c6879a77f11":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 ## Why are some confidence intervals so small?
@@ -7026,7 +7104,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-99-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-102-1.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -7044,7 +7122,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-99-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-102-2.png)<!-- -->
 
 ``` r
 # transformed
@@ -7064,7 +7142,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-99-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-102-3.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -7082,7 +7160,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-99-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-102-4.png)<!-- -->
 
 
 
@@ -7102,7 +7180,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-100-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-103-1.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -7120,7 +7198,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-100-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-103-2.png)<!-- -->
 
 ``` r
 # transformed scale
@@ -7139,7 +7217,7 @@ ggplot(dat = Dat_2021_TwoTrt)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-100-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-103-3.png)<!-- -->
 
 ``` r
 ggplot(dat = Dat_2022)+
@@ -7157,7 +7235,7 @@ ggplot(dat = Dat_2022)+
 ## (`stat_bin()`).
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-100-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-103-4.png)<!-- -->
 
 
 ## Test: Predicted means
@@ -7172,7 +7250,7 @@ lm <- lmer(EmergeToFlwr ~ Treatment * Population + (1|Population:Line) , data = 
 predictmeans(lm, modelterm="Treatment:Population",  plotord = c(1,2), lineplot = TRUE, plotxlab = "Treatment", plotylab = "Days between Emergence and Flowering", mplot = TRUE, pplot = FALSE, bkplot = FALSE, plot = TRUE, jitterv = 0.05, prtplt = TRUE, newwd= FALSE)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-101-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-104-1.png)<!-- -->
 
 ```
 ## $`Predicted Means`

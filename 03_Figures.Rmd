@@ -476,24 +476,13 @@ ggplot(data = Means_2021[["height_means_21"]], aes(x = Treatment, y = Mean)) +
 
 ## fitness + fitness related
 
-IJ_FruitCount
+FruitCount - Basia
 
 ```{r, echo = FALSE}
-# IJ count
+# Basia Fruit Count
 ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
-  geom_line(aes(group = Population, col = Population), size = 1.5)+ 
-  labs(y="l10 Fruit Count (ImageJ)", 
-      x="Treatment")+
-  scale_color_manual(name = "Population",
-                     labels = c("IT", "SW"),
-                     values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))
-
-ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1.5)+ 
   labs(y="Fruit Count (ImageJ)", 
       x="Treatment")+
@@ -501,6 +490,7 @@ ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.6,0))
+
 ```
 
 AvgSeedWt

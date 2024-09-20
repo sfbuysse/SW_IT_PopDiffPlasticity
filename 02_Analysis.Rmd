@@ -82,7 +82,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
 # for the things I can easily get a mean for (num or int). NOTE: These are raw means and confidence intervals, I might not actually want them later on because I will want model predicted means and standard errors.
 ByPop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 
 # transpose for easier viewing
 ByPop_21 <- data.frame(t(ByPop_21))
@@ -90,14 +90,14 @@ ByPop_21 <- data.frame(t(ByPop_21))
 # now do by treatment
 ByTrt_21 <- Dat_2021 %>%
   dplyr::group_by(Treatment) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 ByTrt_21 <- data.frame(t(ByTrt_21))
 
 # Now I want population  means within each treatment
 ByTrt_Pop_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
-  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
+  summarize(across(.col = c(Emergence:LeafNum_08262021, RosetteLeafNum_10042021:Repro_to_Ros, LatBranches:IJ_FruitCount, FruitCollected, NumFlwrLeft:IJ_SeedCount, FruitCount_BL, AG_biomass, AvgSeedWt, AvgSeedNum, fitness), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"), ci_95 = ~conf_int(.x), n = ~sum(!is.na(.x)))))
 
 # get just the sample sizes
 SampleSizes_2021 <- dplyr::select(ByTrt_Pop_21, "Treatment", "Population", ends_with("_n"))
@@ -110,7 +110,7 @@ colnames(ByTrt_Pop_21) <- c("Belm_C", "Belm_CF", "Belm_F", "Roda_C", "Roda_CF", 
 # save this to keep means
 write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
 
-# get just the 
+
 ```
 ## Two Treatment Anovas
 
@@ -694,8 +694,11 @@ as.data.frame(summary(lmer(Height_cm ~ Population + (1|Population:Line), data = 
 ### Fitness
 
 Fruit Count
-only using IJ fruit count becuase of issue with skipping counter for other fruit count.
-```{r}
+at first, only using IJ fruit count because of issue with skipping counter for other fruit count.
+
+Now (9/20/2024) only using Basia's fruit counts
+
+```{r, eval = FALSE}
 # number fruits on plant
 # maybe would want to add done flower or not done flower as a random effect in this model?
 fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
@@ -720,19 +723,29 @@ fruit_means_21 <- get_table_bt(fruit_lm_21)
 
 ```
 
-There is an interaction, so do posthoc analyses.
+```{r}
+# number fruits on plant
+# maybe would want to add done flower or not done flower as a random effect in this model?
+fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$FruitCount_BL)
+fruit_anov_21 <- do_anov(fruit_lm_21)
+fruit_anov_21$trait <- "FruitNum"
+fruit_means_21 <- get_table(fruit_lm_21)
+
+```
+
+
+There is not an interaction, but do post-hoc analyses (there was an interaction with IJ_FruitCount)
 
 ```{r}
 # belm
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+as.data.frame(summary(lmer(FruitCount_BL ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
 #roda
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+as.data.frame(summary(lmer(FruitCount_BL ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
 #cur
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+as.data.frame(summary(lmer(FruitCount_BL ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
 #fut
-as.data.frame(summary(lmer(l10_IJ_Fruits ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+as.data.frame(summary(lmer(FruitCount_BL ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
 ```
-
 
 Average weight of a seed (collected seed weight / count of collected seeds)
 ```{r}
@@ -860,7 +873,7 @@ write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TR
 ```{r}
 # change column names
 # not transformed
-dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21")
+dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21", "fruit_means_21")
 
 for (i in dfs) {
   x=get(i)
@@ -869,7 +882,7 @@ for (i in dfs) {
 }
 
 # transformed
-dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "fruit_means_21", "AG_means_21", "seeds_means_21", "fitness_means_21")
+dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "AG_means_21", "seeds_means_21", "fitness_means_21")
 
 for (i in dfs2) {
   x=get(i)
