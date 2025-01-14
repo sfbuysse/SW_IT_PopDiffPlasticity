@@ -36,7 +36,7 @@ library(rcompanion)
 #library(stargazer)
 library(plotly)
 library(predictmeans)
-
+#library(sjPlot)
 # prep for doing statistical analyses
 options(contrasts = c("contr.sum", "contr.poly"))
 
@@ -698,7 +698,7 @@ at first, only using IJ fruit count because of issue with skipping counter for o
 
 Now (9/20/2024) only using Basia's fruit counts
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 # number fruits on plant
 # maybe would want to add done flower or not done flower as a random effect in this model?
 fruit_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_IJ_Fruits)
@@ -858,6 +858,13 @@ class(seeds_lm) <- "lmerMod"
 stargazer(seeds_lm, align = TRUE, type = "text")
 
 stargazer(RR_2021,RWC_2021, type = "text")
+```
+
+also tried with sjPlot but again is with model outputs and doesn't look great b/c just 'trait' and 'pop1' and 'treat1' instead of more helfpul terms. 
+```{r, eval = FALSE}
+sjPlot::tab_model(AG_lm_21, area_lm_21, AvSeedWt_lm_21, bolting_lm_21, dry_lm_21, emergence_lm_21, eTof_lm_21, fitness_lm_21, flowering_lm_21, fresh_lm_21, fruit_lm_21, height_lm_21, LatBranch_lm_21, LDMC_lm_21, LN_harv_lm_21, LN_PostVern_lm_21, LN_PreVern_lm_21, LN_Vern_lm_21, per_lm_21, PrimStalks_lm_21, Repro_lm_21, Ros_lm_21, RR_lm_21, RWC_lm_21, sat_lm_21, seeds_lm_21, SLA_lm_21) 
+# would actually work to make a table with only p values
+sjPlot::tab_model(anova(RWC_lm_21), anova(LDMC_lm_21), show.r2 = FALSE)
 ```
 
 I made a bunch of anova tables. Can I simply rbind them all together? Current plan is to r bind all these together, r bind all the 2022 models together, and then cbind the 2021 and 2022 models together.
@@ -1097,7 +1104,6 @@ n_2021 %>%
   summarize(min = min(n), mean = mean(n), median = median(n), max = max(n))
 
 ```
-
 
 
 # 2022
