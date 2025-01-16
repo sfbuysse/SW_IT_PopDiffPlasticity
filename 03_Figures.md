@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2024-09-20"
+date: "2025-01-16"
 output: 
   html_document:
     toc: true
@@ -53,6 +53,7 @@ library(dplyr)
 ``` r
 library(ggplot2)
 library(tidyr)
+library(ggpubr)
 
 # would like to phase these out but still used for the growth curves
 # let's make some functions
@@ -75,10 +76,10 @@ Set theme for plots
 
 ``` r
 theme_set(theme_classic())
-theme_update(legend.title = element_text(family = "serif", color = "black", size = 20),
-    legend.text = element_text(family = "serif", color = "black", size = 20),
-    axis.title = element_text(family = "serif", color = "black", size = 20),
-    axis.text = element_text(family = "serif", color = "black", size = 20),
+theme_update(legend.title = element_text(family = "serif", color = "black", size = 12),
+    legend.text = element_text(family = "serif", color = "black", size = 12),
+    axis.title = element_text(family = "serif", color = "black", size = 12),
+    axis.text = element_text(family = "serif", color = "black", size = 12),
     axis.line = element_line(colour = 'black', linewidth = 1),
     axis.ticks = element_line(color = 'black', linewidth = 1),
     axis.ticks.length=unit(.15, "cm"),
@@ -584,7 +585,7 @@ Emergence. days to emergence is shown for both but should be interpreted with ca
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable becuase in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait for the manuscript.
 
-
+![](03_Figures_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 
 ## Single Leaf Individual Traits
@@ -643,3 +644,94 @@ Relative Water Content
 LeafNum_4weeks
 
 ![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
+
+# Manuscript Figures
+creating multipanel figures for the manuscript
+
+Figure 1 \
+
+``` r
+fig1 <- rwc
+fig1
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
+
+Figure 2 \
+
+``` r
+fig2 <- ggarrange(fitness, seed_wt,
+                  labels = c("A", "B"),
+                  ncol = 2, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h")
+fig2
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
+
+Figure 3 \
+
+``` r
+fig3 <- ggarrange(detf +rremove("xlab"), ros_2021+rremove("xlab"), ros_2022+rremove("xlab"), ln_bolt+rremove("xlab"), ln_harv, stoden, bg, rr,
+                  labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+                  ncol = 4, nrow = 2,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "hv"
+                  )
+fig3
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
+
+Figure 4 \
+
+``` r
+fig4 <- ggarrange(sla, ldmc, rs,
+                  labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h"
+                  )
+fig4
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
+
+Figure s1 \
+
+``` r
+figs1 <- ggarrange(detb, repro,
+                  labels = c("A", "B"),
+                  ncol = 2, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h"
+                  )
+figs1
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+
+##Save figures
+
+``` r
+#fig1
+ggsave(fig1, filename = "figures/fig1.jpg", width = 4, height = 2.5, units = "in", dpi = 300)
+
+#fig2
+ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 2.5, units = "in", dpi = 300)
+
+#fig3
+ggsave(fig3, filename = "figures/fig3.jpg", width = 12, height = 5, units = "in", dpi = 300)
+
+#fig4
+ggsave(fig4, filename = "figures/fig4.jpg", width = 8, height = 2.5, units = "in", dpi = 300)
+
+#figs1
+ggsave(figs1, filename = "figures/figs1.jpg", width = 6, height = 2.5, units = "in", dpi = 300)
+```
+

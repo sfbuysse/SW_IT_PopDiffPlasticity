@@ -27,16 +27,12 @@ This chunk sets things that will be constant for the whole document.
 # read in packages
 library(dplyr)
 library(ggplot2)
-#library(car)
 library(lme4)
 library(lmerTest)
 library(tidyr)
-#library(MuMIn) 
 library(rcompanion)
-#library(stargazer)
 library(plotly)
 library(predictmeans)
-#library(sjPlot)
 # prep for doing statistical analyses
 options(contrasts = c("contr.sum", "contr.poly"))
 
