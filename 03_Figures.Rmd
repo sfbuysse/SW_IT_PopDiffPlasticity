@@ -1175,48 +1175,38 @@ ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
 ```
 
 # Manuscript Figures
-creating multipanel figures for the manuscript
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape
 
 Figure 1 \
 ```{r}
-fig1 <- rwc
-fig1
-```
-
-Figure 2 \
-```{r}
-fig2 <- ggarrange(fitness, seed_wt,
+fig1 <- ggarrange(detf, rwc,
                   labels = c("A", "B"),
                   ncol = 2, nrow = 1,
                   common.legend = TRUE,
                   legend = "right",
                   align = "h")
+fig1
+```
+
+Figure 2 \
+```{r}
+fig2 <- ggarrange(sla +rremove("xlab"), ldmc+rremove("xlab"), rs, stoden,
+                  labels = c("A", "B", "C", "D"),
+                  ncol = 2, nrow = 2,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "hv"
+                  )
 fig2
 ```
 
 Figure 3 \
 ```{r}
-fig3 <- ggarrange(detf +rremove("xlab"), ros_2021+rremove("xlab"), ros_2022+rremove("xlab"), ln_bolt+rremove("xlab"), ln_harv, stoden, bg, rr,
-                  labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
-                  ncol = 4, nrow = 2,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "hv"
-                  )
+fig3 <- fitness
 fig3
 ```
 
-Figure 4 \
-```{r}
-fig4 <- ggarrange(sla, ldmc, rs,
-                  labels = c("A", "B", "C"),
-                  ncol = 3, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "h"
-                  )
-fig4
-```
+# supplemental figures not updated
 
 Figure s1 \
 ```{r}

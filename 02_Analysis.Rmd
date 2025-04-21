@@ -33,6 +33,7 @@ library(tidyr)
 library(rcompanion)
 library(plotly)
 library(predictmeans)
+library(sjPlot)
 # prep for doing statistical analyses
 options(contrasts = c("contr.sum", "contr.poly"))
 
@@ -1745,7 +1746,42 @@ n_2022 %>%
 #Notes
 The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis.
 
-The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. Post hoc analyses if there was an interaction between population and treatment are only recorded here (as of 7/19/2024) and are only done for 2021 as of 8/2/2024.
+The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. Post hoc analyses if there was an interaction between population and treatment are only recorded here (as of 7/19/2024) and are only done for 2021 as of 8/2/2024.More were done after and added to the spreadsheet with a note of if there was an interaction or not.
+
+# Results Tables
+
+## Main Text Tables
+```{r}
+sjPlot::tab_model(eTof_lm_21, SLA_lm_21, sla_lm_22, RWC_lm_21, rwc_lm_22, sto_den_lm_22,RS_lm_22 , Ros_lm_21, AG_lm_22, fitness_lm_21, AvSeedWt_lm_21,
+                   collapse.ci = TRUE, 
+                  dv.labels = c("Emergence To Flower 21", "SLA 21", "SLA 22", "RWC 21", "RWC 22", "Stomatal Density 22", "Root-to-Shoot 22", "Ros Biomass 21", "Ros Biomass 22", "Fitness 21", "Avg. Seed Wt 21"), 
+                 pred.labels = c("(Intercept)", "Treatment", "Population", "Trt x Pop Interaction", "Current Trt x Chamber", "Future Trt x Chamber")
+                 
+        )
+
+#show.reflvl = TRUE 
+#p.style = "stars" or "scientific"
+#digits.p=
+# I think I can use css code from this tutorial to remove the intercept row if I want?? https://strengejacke.github.io/sjPlot/articles/table_css.html
+```
+
+## Supplemental Tables
+```{r}
+drought_extra <- sjPlot::tab_model(fresh_lm_21, fresh_lm_22, sat_lm_21, hyd_lm_22, dry_lm_21, dry_lm_22, area_lm_21, area_lm_22, per_lm_21, per_lm_22, LDMC_lm_21, ldmc_lm_22,
+                                   collapse.ci = TRUE, 
+                                   dv.labels = c("Fresh 21", "Fresh 22", "Sat 21", "Sat 22", "Dry 21", "Dry 22", "area 21", "area 22", "perimeter 21", "perimeter 22", "LDMC 21", "LDMC 22")
+                                   )
+growth_extra <- sjPlot::tab_model(emergence_lm_21, emergence_lm_22, bolting_lm_21, bolting_lm_22, RR_lm_21, Repro_lm_21, AG_lm_21, LN_Vern_lm_21, LN_PreVern_lm_21, LN_PreVern_lm_22, LN_PostVern_lm_21, LN_Jun6_lm_22, LN_Jun13_lm_22, LN_harv_lm_21, LN_bolt_lm_22, BG_lm_22,
+                                  collapse.ci = TRUE, 
+                                  dv.labels = c("Emergence 21", "Emergence 22", "Bolting 21", "Bolting 22", "Ros:Repro 21", "Repro 21", "AG 21", "LN Vern 21", "LN Prevern 21", "Ln Prevern 22", "LN Postvern 21", "LN June 6 22", "LN June 13 22", "LN harvest 21", "Ln bolt 22", "BG 22"))
+fitness_extra <- sjPlot::tab_model(seeds_lm_21, PrimStalks_lm_21, LatBranch_lm_21, height_lm_21, fruit_lm_21,
+                                   collapse.ci = TRUE,
+                                   dv.labels = c("SeedsPerFruit", "Primary Stalks", "Lateral Branches", "Height", "Fruit Number"))
+
+#flowering_lm_21 vs eTof_lm_21??
+ 
+                                                    
+```
 
 # Problem Solve
 ## Dry weight difference in signficance
@@ -1997,3 +2033,6 @@ predictmeans(lm, modelterm="Treatment:Population",  plotord = c(1,2), lineplot =
 
 ```
 
+
+        
+        
