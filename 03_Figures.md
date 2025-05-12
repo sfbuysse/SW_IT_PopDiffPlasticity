@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-01-16"
+date: "2025-04-22"
 output: 
   html_document:
     toc: true
@@ -271,9 +271,9 @@ forplot3_2021 <- merge(tmp_mean_21, tmp_ci_21)
 
 # plot
 ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
-  geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1.5)+ 
+  geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
+  #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
+  geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -371,10 +371,10 @@ forplot2_2021$Population <- substr(forplot2_2021$Line.ID, start = 1, stop = 4)
 # Avg Seeds per fruit
 ggplot(data = forplot2_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
   geom_point(aes(col=Population), size = 2, alpha = 0.7, show.legend = TRUE) +
-  #geom_errorbar(aes(group = Line.ID, ymin=AvgSeedNum_mean-AvgSeedNum_ci_95, ymax = AvgSeedNum_mean + AvgSeedNum_ci_95, col = Population), width = 0.1, size = 1, alpha = 0.7, show.legend = TRUE)+
+  #geom_errorbar(aes(group = Line.ID, ymin=AvgSeedNum_mean-AvgSeedNum_ci_95, ymax = AvgSeedNum_mean + AvgSeedNum_ci_95, col = Population), width = 0.1, size = 0.8, alpha = 0.7, show.legend = TRUE)+
   geom_line(aes(group = Line.ID, col = Population), size = 0.7, alpha = 0.7)+
   #geom_line(data = forplot_2021, aes(group = Population, col = Population), size= 1.5)+
-  #geom_point(data = forplot_2021, aes(col = Population), size = 4, show.legend = TRUE)+
+  #geom_point(data = forplot_2021, aes(col = Population), size = 2, show.legend = TRUE)+
   labs(y="Average Seeds/Fruit", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -496,9 +496,9 @@ forplot3_2022 <- merge(tmp_mean, tmp_ci)
 
 # plot
 ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population), size = 4, show.legend = TRUE) +
-  #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 1, show.legend = TRUE)+
-  geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1.5)+ 
+  geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
+  #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
+  geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
       x="Treatment")+
   scale_color_manual(name = "Population",
@@ -591,27 +591,27 @@ EmergenceToBolting. While this was measured in both experiments, it is not compa
 ## Single Leaf Individual Traits
 FreshWt
 
-![](03_Figures_files/figure-html/unnamed-chunk-38-1.png)<!-- -->
+
 
 
 HydWt
 
-![](03_Figures_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+
 
 
 DryWt
 
-![](03_Figures_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
+
 
 
 LeafArea
 
-![](03_Figures_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+
 
 
 LeafPerimeter
 
-![](03_Figures_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
+
 
 
 
@@ -646,12 +646,19 @@ LeafNum_4weeks
 ![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 # Manuscript Figures
-creating multipanel figures for the manuscript
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape
 
 Figure 1 \
 
 ``` r
-fig1 <- rwc
+fig1 <- ggarrange(detf, rwc,
+                  labels = c("A", "B"),
+                  ncol = 2, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h",
+                  label.x = c(0, -0.1)
+)
 fig1
 ```
 
@@ -660,12 +667,15 @@ fig1
 Figure 2 \
 
 ``` r
-fig2 <- ggarrange(fitness, seed_wt,
-                  labels = c("A", "B"),
-                  ncol = 2, nrow = 1,
+fig2 <- ggarrange(sla +rremove("xlab"), rs, stoden,
+                  labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 1,
                   common.legend = TRUE,
                   legend = "right",
-                  align = "h")
+                  align = "hv",
+                  label.x = -0.05,
+                  label.y = 1
+                  )
 fig2
 ```
 
@@ -674,39 +684,20 @@ fig2
 Figure 3 \
 
 ``` r
-fig3 <- ggarrange(detf +rremove("xlab"), ros_2021+rremove("xlab"), ros_2022+rremove("xlab"), ln_bolt+rremove("xlab"), ln_harv, stoden, bg, rr,
-                  labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
-                  ncol = 4, nrow = 2,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "hv"
-                  )
+fig3 <- fitness
 fig3
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
 
-Figure 4 \
+# supplemental figures
+
+Figure s1 - single leaf traits \
 
 ``` r
-fig4 <- ggarrange(sla, ldmc, rs,
-                  labels = c("A", "B", "C"),
-                  ncol = 3, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "h"
-                  )
-fig4
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
-
-Figure s1 \
-
-``` r
-figs1 <- ggarrange(detb, repro,
-                  labels = c("A", "B"),
-                  ncol = 2, nrow = 1,
+figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, perim, ldmc,
+                  labels = c("A", "B", "C", "D", "E", "F"),
+                  ncol = 3, nrow = 2,
                   common.legend = TRUE,
                   legend = "right",
                   align = "h"
@@ -714,24 +705,62 @@ figs1 <- ggarrange(detb, repro,
 figs1
 ```
 
+![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
+
+Figure s2 - biomass \
+
+``` r
+figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"), ros_2022, bg, ln_bolt,
+                  labels = c("A", "B", "C", "D", "E", "F"),
+                  ncol = 3, nrow = 2,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h",
+                  label.x = c(0, -0.1, 0, 0, 0)
+                  )
+figs2
+```
+
 ![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+
+
+Figure s3 - fitness related \
+
+``` r
+figs3 <- ggarrange(rr, seed_wt,
+                  labels = c("A", "B"),
+                  ncol = 2, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "right",
+                  align = "h"
+                  )
+figs3
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+
 
 ##Save figures
 
 ``` r
 #fig1
-ggsave(fig1, filename = "figures/fig1.jpg", width = 4, height = 2.5, units = "in", dpi = 300)
+ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 2.5, units = "in", dpi = 300)
 
 #fig2
-ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 2.5, units = "in", dpi = 300)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 2.5, units = "in", dpi = 300)
 
 #fig3
-ggsave(fig3, filename = "figures/fig3.jpg", width = 12, height = 5, units = "in", dpi = 300)
+ggsave(fig3, filename = "figures/fig3.jpg", width = 3, height = 2.5, units = "in", dpi = 300)
 
-#fig4
-ggsave(fig4, filename = "figures/fig4.jpg", width = 8, height = 2.5, units = "in", dpi = 300)
+
 
 #figs1
-ggsave(figs1, filename = "figures/figs1.jpg", width = 6, height = 2.5, units = "in", dpi = 300)
+ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 5, units = "in", dpi = 300)
+
+#figs2
+ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 5, units = "in", dpi = 300)
+
+#figs3
+ggsave(figs3, filename = "figures/figs3.jpg", width = 5, height = 2.5, units = "in", dpi = 300)
 ```
 

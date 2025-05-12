@@ -1652,6 +1652,10 @@ sto_den_anov_22 <- do_anov2(sto_den_lm_22)
 sto_den_anov_22$trait <- "l10_Stomatal Density"
 sto_den_means_22 <- get_table_bt(sto_den_lm_22)
 # no interaction
+
+# check results don't change if using stomatal average
+do_anov2(do_lmer2(Dat_2022$l10_Stomata_avg))
+# results don't change. might want to switch to this if can't figure out actual area of those photos. Published rates for Arabidopsis are 87-204 stomata/mm2
 ```
 
 No interaction but do individual models to see difference in future environment. no chamber effect in full model so not included here

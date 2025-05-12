@@ -686,8 +686,25 @@ CleanData_2022$LDMC = CleanData_2022$SL_DryWt / CleanData_2022$SL_HydWt
 CleanData_2022$RWC = (CleanData_2022$SL_FreshWt - CleanData_2022$SL_DryWt) / (CleanData_2022$SL_HydWt - CleanData_2022$SL_DryWt)
 # Root_to_Shoot
 CleanData_2022$Root_to_Shoot <- CleanData_2022$BG_DryBiomass/(CleanData_2022$AG_DryBiomass)
-# stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2
+# stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2 if square (or .000683 mm2). 536.2546 if oval
 CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg/ 683.17 
+
+## density  noodling
+22.87*29.87
+#> 30/6.83
+#[1] 4.392387
+#> .2987*.2287
+#[1] 0.06831269
+#> 30/.068
+#[1] 441.1765
+#> 30/.68
+#[1] 44.11765
+# to match low end of published 80- 200 stomata/mm2, would expect the area to be 0.5mm2 or 500um2
+
+# if density was 100 stomata per mm2, go backward to what our counts would be
+#100 * 0.000683 - so less than one stomata in our viewing range which does not make sense
+# test in mm2
+# CleanData_2022$Stomata_avg / 0.000683
 ```
 
 ## Transformations
