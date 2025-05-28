@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2024-09-20"
+date: "2025-05-28"
 output:
   html_document:
     toc: true
@@ -75,12 +75,12 @@ Raw Data files not on github.
 
 
 ``` r
-SingleLeaf <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
-Harv_blue <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
-Harv_pink <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
-LeafNum <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
-Phenology <-read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
-PlantingDay <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
+SingleLeaf <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
+Harv_blue <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
+Harv_pink <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
+LeafNum <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
+Phenology <-read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
+PlantingDay <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
 ```
 
 ## Clean up data
@@ -2029,13 +2029,13 @@ Raw data files not saved in github. All intermediate files are.
 
 
 ``` r
-Dat1 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
-Dat2 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
-Dat3 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
-Dat4 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
+Dat1 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
+Dat2 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
+Dat3 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
+Dat4 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
 
 # this file already has averages calcuated. Tori did it in excel. To get a file without averages, read in KBS_Stomata_Count.csv
-Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
+Stomata <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
 ```
 
 ## Clean up data
@@ -2148,8 +2148,13 @@ CleanData_2022$LDMC = CleanData_2022$SL_DryWt / CleanData_2022$SL_HydWt
 CleanData_2022$RWC = (CleanData_2022$SL_FreshWt - CleanData_2022$SL_DryWt) / (CleanData_2022$SL_HydWt - CleanData_2022$SL_DryWt)
 # Root_to_Shoot
 CleanData_2022$Root_to_Shoot <- CleanData_2022$BG_DryBiomass/(CleanData_2022$AG_DryBiomass)
-# stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2
-CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg/ 683.17 
+# 2022 info: stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2 if square (or .000683 mm2). 536.2546 if oval
+# new info from Tori on 5/28/2025 is: The lens on the microscope was a 40x magnification but the eyepiece was also a 10x magnification so the total magnification for our images is 400x. 
+# Our images are 3584 pixels wide by 2748 pixels tall. Using the pixel dimensions and the scale that 0.1mm = 1200 pixels, our images should be 298.67µm x 229.00µm (or .29867mm x .229 mm). That should make the area of the FOV approximately 0.068395 mm^2 or 68,395.43 µm^2
+# SB notes: these values are still like 3x higher than I was expecting, but are the best we have so far
+CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg / ((3584 * (0.1 / 1200)) * (2748 * (0.1 / 1200)) )
+
+# to match low end of published 80- 200 stomata/mm2, would expect the area to be 0.5mm2 or 500um2
 ```
 
 ## Transformations
@@ -2799,35 +2804,40 @@ explore_trans(CleanData_2022$Stomata_avg)
 ``` r
 CleanData_2022$l10_Stomata_avg <- log10(CleanData_2022$Stomata_avg)
 
-explore_trans(CleanData_2022$Stomata_density)
+#explore_trans(CleanData_2022$Stomata_density)
+hist(CleanData_2022$Stomata_density)
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-44-5.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-6.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-7.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-44-8.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-44-5.png)<!-- -->
+
+``` r
+shapiro.test(CleanData_2022$Stomata_density)
+```
 
 ```
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
-## data:  trait
+## data:  CleanData_2022$Stomata_density
 ## W = 0.9763, p-value = 0.02495
-## 
+```
+
+``` r
+hist(log10(CleanData_2022$Stomata_density))
+```
+
+![](01_CleanData_files/figure-html/unnamed-chunk-44-6.png)<!-- -->
+
+``` r
+shapiro.test(log10(CleanData_2022$Stomata_density))
+```
+
+```
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
-## data:  log10(trait)
+## data:  log10(CleanData_2022$Stomata_density)
 ## W = 0.99305, p-value = 0.7869
-## 
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  exp(trait)
-## W = 0.97421, p-value = 0.01575
-## 
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  sqrt(trait)
-## W = 0.9889, p-value = 0.399
 ```
 
 ``` r

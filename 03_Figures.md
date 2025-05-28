@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-04-22"
+date: "2025-05-28"
 output: 
   html_document:
     toc: true
@@ -646,7 +646,7 @@ LeafNum_4weeks
 ![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 # Manuscript Figures
-creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order.
 
 Figure 1 \
 
@@ -667,7 +667,7 @@ fig1
 Figure 2 \
 
 ``` r
-fig2 <- ggarrange(sla +rremove("xlab"), rs, stoden,
+fig2 <- ggarrange(stoden, sla , rs,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
                   common.legend = TRUE,
@@ -676,6 +676,7 @@ fig2 <- ggarrange(sla +rremove("xlab"), rs, stoden,
                   label.x = -0.05,
                   label.y = 1
                   )
+# +rremove("xlab")
 fig2
 ```
 

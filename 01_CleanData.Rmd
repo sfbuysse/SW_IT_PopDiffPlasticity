@@ -76,12 +76,12 @@ conf_int <- function(x, conf.interval = 0.95){
 Raw Data files not on github.
 
 ```{r data}
-SingleLeaf <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
-Harv_blue <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
-Harv_pink <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
-LeafNum <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
-Phenology <-read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
-PlantingDay <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
+SingleLeaf <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
+Harv_blue <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
+Harv_pink <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
+LeafNum <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
+Phenology <-read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
+PlantingDay <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
 ```
 
 ## Clean up data
@@ -571,13 +571,13 @@ write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
 Raw data files not saved in github. All intermediate files are.
 
 ```{r load}
-Dat1 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
-Dat2 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
-Dat3 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
-Dat4 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
+Dat1 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
+Dat2 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
+Dat3 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
+Dat4 <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
 
 # this file already has averages calcuated. Tori did it in excel. To get a file without averages, read in KBS_Stomata_Count.csv
-Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
+Stomata <- read.csv("C:/Users/Sophia/OneDrive - Michigan State University (1)/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
 ```
 
 ## Clean up data
@@ -686,25 +686,14 @@ CleanData_2022$LDMC = CleanData_2022$SL_DryWt / CleanData_2022$SL_HydWt
 CleanData_2022$RWC = (CleanData_2022$SL_FreshWt - CleanData_2022$SL_DryWt) / (CleanData_2022$SL_HydWt - CleanData_2022$SL_DryWt)
 # Root_to_Shoot
 CleanData_2022$Root_to_Shoot <- CleanData_2022$BG_DryBiomass/(CleanData_2022$AG_DryBiomass)
-# stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2 if square (or .000683 mm2). 536.2546 if oval
-CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg/ 683.17 
+# 2022 info: stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2 if square (or .000683 mm2). 536.2546 if oval
+# new info from Tori on 5/28/2025 is: The lens on the microscope was a 40x magnification but the eyepiece was also a 10x magnification so the total magnification for our images is 400x. 
+# Our images are 3584 pixels wide by 2748 pixels tall. Using the pixel dimensions and the scale that 0.1mm = 1200 pixels, our images should be 298.67µm x 229.00µm (or .29867mm x .229 mm). That should make the area of the FOV approximately 0.068395 mm^2 or 68,395.43 µm^2
+# SB notes: these values are still like 3x higher than I was expecting, but are the best we have so far
+CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg / ((3584 * (0.1 / 1200)) * (2748 * (0.1 / 1200)) )
 
-## density  noodling
-22.87*29.87
-#> 30/6.83
-#[1] 4.392387
-#> .2987*.2287
-#[1] 0.06831269
-#> 30/.068
-#[1] 441.1765
-#> 30/.68
-#[1] 44.11765
 # to match low end of published 80- 200 stomata/mm2, would expect the area to be 0.5mm2 or 500um2
 
-# if density was 100 stomata per mm2, go backward to what our counts would be
-#100 * 0.000683 - so less than one stomata in our viewing range which does not make sense
-# test in mm2
-# CleanData_2022$Stomata_avg / 0.000683
 ```
 
 ## Transformations
@@ -795,7 +784,11 @@ Stomata
 explore_trans(CleanData_2022$Stomata_avg)
 CleanData_2022$l10_Stomata_avg <- log10(CleanData_2022$Stomata_avg)
 
-explore_trans(CleanData_2022$Stomata_density)
+#explore_trans(CleanData_2022$Stomata_density)
+hist(CleanData_2022$Stomata_density)
+shapiro.test(CleanData_2022$Stomata_density)
+hist(log10(CleanData_2022$Stomata_density))
+shapiro.test(log10(CleanData_2022$Stomata_density))
 CleanData_2022$l10_Stomata_density <- log10(CleanData_2022$Stomata_density)
 ```
 ## Save file

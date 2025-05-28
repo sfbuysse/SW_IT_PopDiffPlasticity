@@ -558,12 +558,12 @@ fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y 
   geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
   geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1)+ 
-  labs(y="Fitness", 
+  labs(y="Total Fitness", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))
+  scale_x_discrete(expand = c(0.4,0))
 fitness
 ```
 
@@ -823,7 +823,7 @@ stoden <- ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y =
   geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
   geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted")+ 
-  labs(y="Stomatal Density", 
+  labs(y="Stomatal Density (per mm^2)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -1177,7 +1177,7 @@ ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
 ```
 
 # Manuscript Figures
-creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order.
 
 Figure 1 \
 ```{r}
@@ -1194,7 +1194,7 @@ fig1
 
 Figure 2 \
 ```{r}
-fig2 <- ggarrange(sla +rremove("xlab"), rs, stoden,
+fig2 <- ggarrange(stoden, sla , rs,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
                   common.legend = TRUE,
@@ -1203,6 +1203,7 @@ fig2 <- ggarrange(sla +rremove("xlab"), rs, stoden,
                   label.x = -0.05,
                   label.y = 1
                   )
+# +rremove("xlab")
 fig2
 ```
 
