@@ -554,6 +554,7 @@ ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Mean)) +
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.6,0))
 
+# for below, can divide everything by 10000 but decided I like the other better in the multipanel for now
 fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
   geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
   geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
@@ -563,7 +564,8 @@ fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y 
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.4,0))
+  scale_x_discrete(expand = c(0.4,0))+
+  scale_y_continuous(labels = function(x) format(x, scientific = 10))
 fitness
 ```
 
@@ -823,7 +825,7 @@ stoden <- ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y =
   geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
   geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted")+ 
-  labs(y="Stomatal Density (per mm^2)", 
+  labs(y=expression(paste("Stomatal Density  ", (mm^-2))),
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -1177,7 +1179,23 @@ ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
 ```
 
 # Manuscript Figures
-creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order.
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order. Updated 7/1/2025 with a single figure for all main results.
+
+Single Figure \
+```{r}
+main_fig2 <- ggarrange(rwc+rremove("xlab"), detf+rremove("xlab"), stoden+rremove("xlab"), sla , rs, fitness,
+                  labels = c("A", "B", "C", "D", "E", "F"),
+                  ncol = 3, nrow = 2,
+                  common.legend = TRUE, # goes based on the first plot
+                  legend = "top",
+                  align = "hv"
+)
+#label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
+#vjust = 00
+main_fig
+main_fig2
+```
+
 
 Figure 1 \
 ```{r}
@@ -1256,6 +1274,10 @@ figs3
 
 ##Save figures
 ```{r}
+
+# main fig
+ggsave(main_fig2, filename = "figures/main_fig2.jpg", width = 9, height = 6, units = "in", dpi = 300)
+
 #fig1
 ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 2.5, units = "in", dpi = 300)
 
