@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-06-16"
+date: "2025-07-03"
 output: 
   html_document:
     toc: true
@@ -76,17 +76,18 @@ Set theme for plots
 
 ``` r
 theme_set(theme_classic())
-theme_update(legend.title = element_text(family = "serif", color = "black", size = 12),
-    legend.text = element_text(family = "serif", color = "black", size = 12),
-    axis.title = element_text(family = "serif", color = "black", size = 12),
-    axis.text = element_text(family = "serif", color = "black", size = 12),
+theme_update(legend.title = element_text(family = "serif", color = "black", size = 14),
+    legend.text = element_text(family = "serif", color = "black", size = 14),
+    axis.title = element_text(family = "serif", color = "black", size = 14),
+    axis.text = element_text(family = "serif", color = "black", size = 14),
     axis.line = element_line(colour = 'black', linewidth = 1),
     axis.ticks = element_line(color = 'black', linewidth = 1),
     axis.ticks.length=unit(.15, "cm"),
     legend.spacing.y = unit(0.03, "cm"),
     panel.border = element_blank(),
     panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
+    panel.grid.minor.x = element_blank(),
+    plot.margin = margin(t=1, r=0.075, b=0.075, l=0.05, unit = "in")
     )
 
 # If I want to add back in that the y axis should always start at 0:
@@ -271,7 +272,7 @@ forplot3_2021 <- merge(tmp_mean_21, tmp_ci_21)
 
 # plot
 ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
+  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
   #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
@@ -370,7 +371,7 @@ forplot2_2021$Population <- substr(forplot2_2021$Line.ID, start = 1, stop = 4)
 
 # Avg Seeds per fruit
 ggplot(data = forplot2_2021, aes(x = Treatment, y = AvgSeedNum_mean)) +
-  geom_point(aes(col=Population), size = 2, alpha = 0.7, show.legend = TRUE) +
+  geom_point(aes(col=Population, shape = Population), size = 2, alpha = 0.7, show.legend = TRUE) +
   #geom_errorbar(aes(group = Line.ID, ymin=AvgSeedNum_mean-AvgSeedNum_ci_95, ymax = AvgSeedNum_mean + AvgSeedNum_ci_95, col = Population), width = 0.1, size = 0.8, alpha = 0.7, show.legend = TRUE)+
   geom_line(aes(group = Line.ID, col = Population), size = 0.7, alpha = 0.7)+
   #geom_line(data = forplot_2021, aes(group = Population, col = Population), size= 1.5)+
@@ -496,7 +497,7 @@ forplot3_2022 <- merge(tmp_mean, tmp_ci)
 
 # plot
 ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population), size = 2, show.legend = TRUE) +
+  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
   #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
@@ -646,7 +647,38 @@ LeafNum_4weeks
 ![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 # Manuscript Figures
-creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order.
+creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order. Updated 7/1/2025 with a single figure for all main results.
+
+Draft 2 figures updated 7/3/2025 \
+
+``` r
+main_fig <- ggarrange(rwc+rremove("xlab"), detf+rremove("xlab"), stoden+rremove("xlab"), sla , rs,
+                  labels = c("A", "B", "C", "D", "E"),
+                  ncol = 3, nrow = 2,
+                  common.legend = TRUE, # goes based on the first plot
+                  legend = "top",
+                  align = "hv"
+)
+#label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
+#vjust = 00
+main_fig
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
+
+``` r
+fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
+                  labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 1,
+                  common.legend = TRUE, # goes based on the first plot
+                  legend = "top",
+                  align = "h"
+)
+fitness_fig
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-47-2.png)<!-- -->
+
 
 Figure 1 \
 
@@ -662,11 +694,12 @@ fig1 <- ggarrange(detf, rwc,
 fig1
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
 
 Figure 2 \
 
 ``` r
+# if I go back to this figure, chang the plot margins for stoden so A doesn't fall off the side.
 fig2 <- ggarrange(stoden, sla , rs,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
@@ -680,7 +713,7 @@ fig2 <- ggarrange(stoden, sla , rs,
 fig2
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
 
 Figure 3 \
 
@@ -689,7 +722,7 @@ fig3 <- fitness
 fig3
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
 
 # supplemental figures
 
@@ -706,7 +739,7 @@ figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, 
 figs1
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
 
 Figure s2 - biomass \
 
@@ -722,7 +755,7 @@ figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rrem
 figs2
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
 
 
 Figure s3 - fitness related \
@@ -738,30 +771,36 @@ figs3 <- ggarrange(rr, seed_wt,
 figs3
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-53-1.png)<!-- -->
 
 
 ##Save figures
 
 ``` r
+# trait fig
+ggsave(main_fig, filename = "figures/main_fig.jpg", width = 9, height = 8, units = "in", dpi = 300)
+
+# fitness fig
+ggsave(fitness_fig, filename = "figures/fitness_fig.jpg", width = 9, height = 4, units = "in", dpi = 300)
+
 #fig1
-ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 2.5, units = "in", dpi = 300)
+ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
 
 #fig2
-ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 2.5, units = "in", dpi = 300)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 300)
 
 #fig3
-ggsave(fig3, filename = "figures/fig3.jpg", width = 3, height = 2.5, units = "in", dpi = 300)
+ggsave(fig3, filename = "figures/fig3.jpg", width = 3, height = 4, units = "in", dpi = 300)
 
 
 
 #figs1
-ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 8, units = "in", dpi = 300)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 8, units = "in", dpi = 300)
 
 #figs3
-ggsave(figs3, filename = "figures/figs3.jpg", width = 5, height = 2.5, units = "in", dpi = 300)
+ggsave(figs3, filename = "figures/figs3.jpg", width = 5, height = 4, units = "in", dpi = 300)
 ```
 
