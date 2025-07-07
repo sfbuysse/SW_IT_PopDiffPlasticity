@@ -548,30 +548,32 @@ seed_per_fruit
 fitness - avg seed num/fruit * fruit num
 
 ```{r, echo = FALSE}
-ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Mean)) +
+fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
-  geom_line(aes(group = Population, col = Population), size = 1)+ 
-  labs(y="l10(Fitness)", 
-      x="Treatment")+
-  scale_color_manual(name = "Population",
-                     labels = c("IT", "SW"),
-                     values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.6,0))
-
-# for below, can divide everything by 10000 but decided I like the other better in the multipanel for now
-fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
-  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1)+ 
   labs(y="Total Fitness", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
-  scale_x_discrete(expand = c(0.4,0))+
-  scale_y_continuous(labels = function(x) format(x, scientific = 10))
+  scale_x_discrete(expand = c(0.6,0))
 fitness
+
+# for below, can divide everything by 10000 but decided I like the other better in the multipanel for now
+# this is old code from when I had a log 10 tranformation, not used any longer.
+#ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Bk_Mean)) +
+#  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
+#  geom_errorbar(aes(ymin=Bk_LL_95, ymax = Bk_UL_95, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
+#  geom_line(aes(group = Population, col = Population), size = 1)+ 
+#  labs(y="Total Fitness", 
+#      x="Treatment")+
+#  scale_color_manual(name = "Population",
+#                     labels = c("IT", "SW"),
+#                     values = c("#CC79A7", "#009E73"))+
+#  scale_x_discrete(expand = c(0.4,0))+
+#  scale_y_continuous(labels = function(x) format(x, scientific = 10))
+
 ```
 
 

@@ -145,7 +145,7 @@ SingleLeaf$RWC = (SingleLeaf$FreshWt_g - SingleLeaf$DriedWt_g) / (SingleLeaf$Sat
 
 At this point, sorted each dataframe by values to identify any high or low outliers. Did not find anything that was attributed to data entry errors. Also went through the notes columns to see if anything should be removed. 
 
-Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well.
+Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had Basia recount a third time and used those values.
 
 Leaf number is also variable with some counted at bolting and some at flowering so may need to toss that trait.
 
@@ -443,7 +443,7 @@ explore_trans(CleanData_2021$Height_cm)
 ```
 Fruit Number
 
-I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, so looking only at Currents and Futures)
+I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
 ```{r}
 fruit_comp<- CleanData_2021[CleanData_2021$Treatment %in% c("Current", "Future"), c("TotFruit", "IJ_FruitCount", "FruitCount_BL")]
 
@@ -530,9 +530,11 @@ CleanData_2021$l10_AvgSeedNum <- log10(CleanData_2021$AvgSeedNum)
 Fitness - calculated with Basia's fruit counts
 ```{r}
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
+# if fruit count is a 0, need to also make total fitness a 0 (and  not an NA)
+CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("FruitCount_BL", "fitness") ] <- 0
 
 plotNormalHistogram(CleanData_2021$fitness)
-plotNormalHistogram(log10(CleanData_2021$fitness))
+#plotNormalHistogram(log10(CleanData_2021$fitness))
 #plotNormalHistogram(exp(CleanData_2021$fitness))
 plotNormalHistogram(sqrt(CleanData_2021$fitness))
   # want the one with the largest value
@@ -541,7 +543,7 @@ print(shapiro.test(log10(CleanData_2021$fitness)))
 #print(shapiro.test(exp(CleanData_2021$fitness)))
 print(shapiro.test(sqrt(CleanData_2021$fitness))) 
 
-CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness)
+#CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness) doesn't work with added zeros cause get -Inf
 CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
 ```
 

@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2025-06-16"
+date: "2025-07-07"
 output:
   html_document:
     toc: true
@@ -145,7 +145,7 @@ SingleLeaf$RWC = (SingleLeaf$FreshWt_g - SingleLeaf$DriedWt_g) / (SingleLeaf$Sat
 
 At this point, sorted each dataframe by values to identify any high or low outliers. Did not find anything that was attributed to data entry errors. Also went through the notes columns to see if anything should be removed. 
 
-Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well.
+Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had Basia recount a third time and used those values.
 
 Leaf number is also variable with some counted at bolting and some at flowering so may need to toss that trait.
 
@@ -1362,7 +1362,7 @@ explore_trans(CleanData_2021$Height_cm)
 ```
 Fruit Number
 
-I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, so looking only at Currents and Futures)
+I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
 
 ``` r
 fruit_comp<- CleanData_2021[CleanData_2021$Treatment %in% c("Current", "Future"), c("TotFruit", "IJ_FruitCount", "FruitCount_BL")]
@@ -1818,6 +1818,8 @@ Fitness - calculated with Basia's fruit counts
 
 ``` r
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
+# if fruit count is a 0, need to also make total fitness a 0 (and  not an NA)
+CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("FruitCount_BL", "fitness") ] <- 0
 
 plotNormalHistogram(CleanData_2021$fitness)
 ```
@@ -1825,17 +1827,12 @@ plotNormalHistogram(CleanData_2021$fitness)
 ![](01_CleanData_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ``` r
-plotNormalHistogram(log10(CleanData_2021$fitness))
-```
-
-![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
-
-``` r
+#plotNormalHistogram(log10(CleanData_2021$fitness))
 #plotNormalHistogram(exp(CleanData_2021$fitness))
 plotNormalHistogram(sqrt(CleanData_2021$fitness))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
 
 ``` r
   # want the one with the largest value
@@ -1847,7 +1844,7 @@ print(shapiro.test(CleanData_2021$fitness))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$fitness
-## W = 0.88275, p-value = 3.13e-06
+## W = 0.84361, p-value = 6.937e-09
 ```
 
 ``` r
@@ -1859,7 +1856,7 @@ print(shapiro.test(log10(CleanData_2021$fitness)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(CleanData_2021$fitness)
-## W = 0.90295, p-value = 2.033e-05
+## W = NaN, p-value = NA
 ```
 
 ``` r
@@ -1872,11 +1869,11 @@ print(shapiro.test(sqrt(CleanData_2021$fitness)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$fitness)
-## W = 0.90074, p-value = 1.64e-05
+## W = 0.91116, p-value = 4.926e-06
 ```
 
 ``` r
-CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness)
+#CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness) doesn't work with added zeros cause get -Inf
 CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
 ```
 

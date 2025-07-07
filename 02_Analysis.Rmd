@@ -821,24 +821,24 @@ Total Fitness
 
 ```{r}
 # total fitness 
-fitness_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_fitness)
+fitness_lm_21 <- do_lmer(Dat_2021_TwoTrt$fitness)
 fitness_anov_21 <- do_anov(fitness_lm_21)
-fitness_anov_21$trait <- "l10_Total Fitness"
-fitness_means_21 <- get_table_bt(fitness_lm_21)
+fitness_anov_21$trait <- "Total Fitness"
+fitness_means_21 <- get_table(fitness_lm_21)
 
 ```
 
-There is an interaction, so do posthoc analyses.
+There is no interaction (but there was when this was log10 transformed, before I corrected a 0s issue), so do posthoc analyses.
 
 ```{r}
 # belm
-as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
+as.data.frame(summary(lmer(fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "BELM")))$coefficients) 
 #roda
-as.data.frame(summary(lmer(l10_fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
+as.data.frame(summary(lmer(fitness ~ Treatment + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Population == "RODA")))$coefficients)
 #cur
-as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
+as.data.frame(summary(lmer(fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Current")))$coefficients) 
 #fut
-as.data.frame(summary(lmer(l10_fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
+as.data.frame(summary(lmer(fitness ~ Population + (1|Population:Line), data = subset(Dat_2021_TwoTrt, Treatment == "Future")))$coefficients)
 ```
 
 
@@ -877,7 +877,7 @@ write.csv(AnovaResults_2021, file = "data/AnovaResults_2021.csv", row.names = TR
 ```{r}
 # change column names
 # not transformed
-dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21", "fruit_means_21")
+dfs <- c("emergence_means_21", "bolting_means_21", "flowering_means_21", "eTof_means_21", "RWC_means_21", 'LN_PreVern_means_21', 'LN_Vern_means_21', "LN_PostVern_means_21", "LN_harv_means_21", 'LatBranch_means_21', "PrimStalks_means_21", "height_means_21", "AvSeedWt_means_21", "fruit_means_21", "fitness_means_21")
 
 for (i in dfs) {
   x=get(i)
@@ -886,7 +886,7 @@ for (i in dfs) {
 }
 
 # transformed
-dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "AG_means_21", "seeds_means_21", "fitness_means_21")
+dfs2 <- c("fresh_means_21", 'sat_means_21', "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "Ros_means_21", "Repro_means_21", 'RR_means_21', "AG_means_21", "seeds_means_21")
 
 for (i in dfs2) {
   x=get(i)

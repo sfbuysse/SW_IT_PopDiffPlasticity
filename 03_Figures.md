@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-07-03"
+date: "2025-07-07"
 output: 
   html_document:
     toc: true
@@ -330,7 +330,7 @@ AvgSeedNum
 
 fitness - avg seed num/fruit * fruit num
 
-![](03_Figures_files/figure-html/unnamed-chunk-24-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 
 ## graphs by line - include?
@@ -773,6 +773,31 @@ figs3
 
 ![](03_Figures_files/figure-html/unnamed-chunk-53-1.png)<!-- -->
 
+Create Legend for main figures
+
+For the traits figure, I need the colors with the shaped points and I need the line types with the years of the experiment
+
+``` r
+legend_points <- data.frame(xvals = c(1.1, 1.1), yvals = c(4, 3), text = c("Italy", "Sweden"), Pop = as.factor(c("IT", "SW")))
+#legend_lines <- c(xvals = c(1, 1), yvals = c(2, 1), text = c("2021", "2022"))
+
+legend_fig <- ggplot()+
+  geom_point(data = legend_points, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
+  geom_segment(aes(x = 1.09, y = 2, xend = 1.11, yend = 2), linetype = "solid", linewidth = 2)+
+  geom_segment(aes(x = 1.09, y = 1, xend = 1.11, yend = 1), linetype = "dotted", linewidth = 2)+
+  geom_text(aes(x = c(1.115, 1.115, 1.115, 1.115), y = c(4, 3, 2, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  xlim(c(1.087, 1.12))+
+  theme_void()
+  #theme(plot.margin = margin(t = 0, r = 0.5, b = 0.075, l=0, unit = "in"))
+legend_fig
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-54-1.png)<!-- -->
+
+
 
 ##Save figures
 
@@ -782,6 +807,9 @@ ggsave(main_fig, filename = "figures/main_fig.jpg", width = 9, height = 8, units
 
 # fitness fig
 ggsave(fitness_fig, filename = "figures/fitness_fig.jpg", width = 9, height = 4, units = "in", dpi = 300)
+
+# legend_fig
+ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 2.5, height = 2, units = "in", dpi = 300)
 
 #fig1
 ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
