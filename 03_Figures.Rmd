@@ -76,6 +76,9 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
 
 # If I want to add back in that the y axis should always start at 0:
 #  expand_limits(y=0)
+
+# what font is serif??
+windowsFonts()$serif
     
 ```
 
