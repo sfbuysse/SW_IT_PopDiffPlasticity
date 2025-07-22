@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-07-07"
+date: "2025-07-22"
 output: 
   html_document:
     toc: true
@@ -13,7 +13,7 @@ output:
 
 # description
 
-This code creates figures from both experiments. First, there are figures specific to each experiment showing phenology trends throughout the growing period. Then, there are reaction norms for the traits only collected in one experiment. Finally, there are reaction norms for the traits that were measured in both experiments with lines from both on the same graph. Below is the coloring guide to be consistent between all experiments and be color-blind accessible.
+This code creates figures from both experiments. First, there are figures specific to each experiment showing phenology trends throughout the growing period. Then, there are reaction norms for the traits only collected in one experiment. Finally, there are reaction norms for the traits that were measured in both experiments with lines from both on the same graph. Below is the coloring guide to be consistent between all experiments and be color-blind accessible. If a trait was transformed, it is back transformed for the figures. I would need to go back to the analysis code and export the log10 scale values to make figures not on the back-transformed scale.
 
 
 
@@ -92,6 +92,13 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
 
 # If I want to add back in that the y axis should always start at 0:
 #  expand_limits(y=0)
+
+# what font is serif??
+windowsFonts()$serif
+```
+
+```
+## [1] "TT Times New Roman"
 ```
 
 
@@ -112,8 +119,7 @@ Dat_2021 <- Dat_2021 %>% dplyr::mutate(
   BranchStructure = as.factor(BranchStructure),
   DoneFlwr = as.factor(DoneFlwr)
 )
-# subset to two treatments
-Dat_2021 <- Dat_2021[which(Dat_2021$Treatment == "Current"| Dat_2021$Treatment == "Future") , ]
+
 # for plotting - this file was made with only two treatments
 load("data/ModelMeans_2021.robj")
 load("data/SampleSizes_2021.robj")
@@ -288,19 +294,19 @@ ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
 ## Plant Structure
 RosetteDry_harvest
 
-![](03_Figures_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 DryReproG
 
-![](03_Figures_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 AG_biomass (Ros+Repro)
 
-![](03_Figures_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
 Repro_to_Ros
 
-![](03_Figures_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 LatBranches
 
@@ -326,7 +332,7 @@ AvgSeedWt
 
 AvgSeedNum
 
-![](03_Figures_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 fitness - avg seed num/fruit * fruit num
 
@@ -454,7 +460,7 @@ LeafNum_Jun13 (if included)
 
 LeafNum_bolt
 
-![](03_Figures_files/figure-html/unnamed-chunk-29-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-29-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
 
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
 
@@ -514,7 +520,7 @@ ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
 ## Biomass
 AG_Dry_bolt
 
-![](03_Figures_files/figure-html/unnamed-chunk-31-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 BG_Dry_bolt
 
@@ -522,12 +528,12 @@ BG_Dry_bolt
 
 Root_to_Shoot
 
-![](03_Figures_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ## Stomata
 Stomata Density
 
-![](03_Figures_files/figure-html/unnamed-chunk-34-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
 
 # both
 Steps to be completed here.
@@ -581,7 +587,7 @@ for (i in 1:length(both_dfs)){
 
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
-![](03_Figures_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-36-1.png)<!-- -->
 
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable becuase in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait for the manuscript.
@@ -619,13 +625,7 @@ LeafPerimeter
 ## Single Leaf Calculated Traits
 Specific Leaf Area
 
-![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](03_Figures_files/figure-html/unnamed-chunk-43-3.png)<!-- -->
-
-```
-## Saving 7 x 5 in image
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-43-4.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
 ```
 ## Saving 7 x 5 in image
@@ -680,49 +680,9 @@ fitness_fig
 ![](03_Figures_files/figure-html/unnamed-chunk-47-2.png)<!-- -->
 
 
-Figure 1 \
+Old Figure 1 for label.x adjustment reminder if I need it again\
 
-``` r
-fig1 <- ggarrange(detf, rwc,
-                  labels = c("A", "B"),
-                  ncol = 2, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "h",
-                  label.x = c(0, -0.1)
-)
-fig1
-```
 
-![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
-
-Figure 2 \
-
-``` r
-# if I go back to this figure, chang the plot margins for stoden so A doesn't fall off the side.
-fig2 <- ggarrange(stoden, sla , rs,
-                  labels = c("A", "B", "C"),
-                  ncol = 3, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "hv",
-                  label.x = -0.05,
-                  label.y = 1
-                  )
-# +rremove("xlab")
-fig2
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
-
-Figure 3 \
-
-``` r
-fig3 <- fitness
-fig3
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
 
 # supplemental figures
 
@@ -739,7 +699,7 @@ figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, 
 figs1
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
 
 Figure s2 - biomass \
 
@@ -755,7 +715,7 @@ figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rrem
 figs2
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
 
 
 Figure s3 - fitness related \
@@ -771,7 +731,7 @@ figs3 <- ggarrange(rr, seed_wt,
 figs3
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-53-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
 
 Create Legend for main figures
 
@@ -783,9 +743,9 @@ legend_points <- data.frame(xvals = c(1.1, 1.1), yvals = c(4, 3), text = c("Ital
 
 legend_fig <- ggplot()+
   geom_point(data = legend_points, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
-  geom_segment(aes(x = 1.09, y = 2, xend = 1.11, yend = 2), linetype = "solid", linewidth = 2)+
-  geom_segment(aes(x = 1.09, y = 1, xend = 1.11, yend = 1), linetype = "dotted", linewidth = 2)+
-  geom_text(aes(x = c(1.115, 1.115, 1.115, 1.115), y = c(4, 3, 2, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  geom_segment(aes(x = 1.09, y = 2, xend = 1.11, yend = 2), linetype = "solid", linewidth = 1.25)+
+  geom_segment(aes(x = 1.09, y = 1, xend = 1.11, yend = 1), linetype = "dotted", linewidth = 1.25)+
+  geom_text(aes(x = c(1.11, 1.11, 1.115, 1.115), y = c(4, 3, 2, 1), label = c("Italy", "Sweden", "2021", "2022")))+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
@@ -795,7 +755,7 @@ legend_fig <- ggplot()+
 legend_fig
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-54-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
 
 
 
@@ -812,13 +772,7 @@ ggsave(fitness_fig, filename = "figures/fitness_fig.jpg", width = 9, height = 4,
 ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 2.5, height = 2, units = "in", dpi = 300)
 
 #fig1
-ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
-
-#fig2
-ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 300)
-
-#fig3
-ggsave(fig3, filename = "figures/fig3.jpg", width = 3, height = 4, units = "in", dpi = 300)
+#ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
 
 
 

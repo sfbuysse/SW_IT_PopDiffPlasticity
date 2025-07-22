@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2025-07-07"
+date: "2025-07-21"
 output:
   html_document:
     toc: true
@@ -13,7 +13,7 @@ output:
 
 # description
 
-This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder.
+This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript.
 
 # Set basic info for all code
 
@@ -391,8 +391,11 @@ myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.
 
 CleanData_2021 <- CleanData_2021[ ,myCols]
 
-# add another trait: Above ground biomass
+# add another trait: total Above ground biomass
 CleanData_2021$AG_biomass <- CleanData_2021$DryRosetteG + CleanData_2021$DryReproG
+
+# we are only analyzing the Current and Future treatments, so remove rows for C/F treatment
+CleanData_2021 <- CleanData_2021[!(CleanData_2021$Treatment == "Current/Future"), ]
 ```
 
 ## Transformations
@@ -411,16 +414,11 @@ CleanData_2021 %>% select_if(is.numeric) %>% gather(cols, value) %>%
 ```
 
 ```
-## Warning: attributes are not identical across measure variables; they will be
-## dropped
-```
-
-```
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
 ```
-## Warning: Removed 1171 rows containing non-finite outside the scale range
+## Warning: Removed 768 rows containing non-finite outside the scale range
 ## (`stat_bin()`).
 ```
 
@@ -441,25 +439,25 @@ explore_trans(CleanData_2021$FreshWt_g)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.84589, p-value = 3.1e-10
+## W = 0.9056, p-value = 1.233e-05
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.978, p-value = 0.03519
+## W = 0.97715, p-value = 0.1358
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.82508, p-value = 4.898e-11
+## W = 0.88855, p-value = 2.293e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.94348, p-value = 4.245e-05
+## W = 0.96445, p-value = 0.01918
 ```
 
 ``` r
@@ -481,25 +479,25 @@ explore_trans(CleanData_2021$SatWt_g)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.85674, p-value = 8.659e-10
+## W = 0.91295, p-value = 2.675e-05
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.97819, p-value = 0.03679
+## W = 0.97853, p-value = 0.1681
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.83463, p-value = 1.12e-10
+## W = 0.89542, p-value = 4.434e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.94732, p-value = 8.099e-05
+## W = 0.96717, p-value = 0.02901
 ```
 
 ``` r
@@ -519,25 +517,25 @@ explore_trans(CleanData_2021$DriedWt_g)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.93379, p-value = 9.101e-06
+## W = 0.95771, p-value = 0.007096
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.95336, p-value = 0.0002341
+## W = 0.97096, p-value = 0.05199
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.93267, p-value = 7.669e-06
+## W = 0.95692, p-value = 0.006325
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.98365, p-value = 0.1267
+## W = 0.99067, p-value = 0.808
 ```
 
 ``` r
@@ -559,25 +557,25 @@ explore_trans(CleanData_2021$LeafArea)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.82413, p-value = 5.71e-11
+## W = 0.87193, p-value = 6.526e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.98079, p-value = 0.07044
+## W = 0.98163, p-value = 0.2827
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.11083, p-value < 2.2e-16
+## W = 0.14901, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.93074, p-value = 6.701e-06
+## W = 0.95212, p-value = 0.003693
 ```
 
 ``` r
@@ -598,25 +596,25 @@ explore_trans(CleanData_2021$LeafPerimeter)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.91897, p-value = 1.262e-06
+## W = 0.95879, p-value = 0.009396
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.97393, p-value = 0.01544
+## W = 0.97101, p-value = 0.05734
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.089588, p-value < 2.2e-16
+## W = 0.12196, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.95414, p-value = 0.0003048
+## W = 0.9715, p-value = 0.06181
 ```
 
 ``` r
@@ -661,7 +659,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$SLA
-## W = 0.85913, p-value = 1.354e-09
+## W = 0.85508, p-value = 1.607e-07
 ```
 
 ``` r
@@ -673,7 +671,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(CleanData_2021$SLA)
-## W = 0.95206, p-value = 0.0002101
+## W = 0.94791, p-value = 0.002092
 ```
 
 ``` r
@@ -697,7 +695,7 @@ plotNormalHistogram(CleanData_2021$SLA)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$SLA)
-## W = 0.92148, p-value = 1.781e-06
+## W = 0.91325, p-value = 3.39e-05
 ```
 
 ``` r
@@ -718,25 +716,25 @@ explore_trans(CleanData_2021$LDMC)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.90569, p-value = 1.874e-07
+## W = 0.93104, p-value = 0.0002097
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.97973, p-value = 0.05209
+## W = 0.97751, p-value = 0.1436
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.88927, p-value = 2.632e-08
+## W = 0.92338, p-value = 8.52e-05
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.95537, p-value = 0.000338
+## W = 0.96055, p-value = 0.01073
 ```
 
 ``` r
@@ -756,29 +754,29 @@ explore_trans(CleanData_2021$RWC)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.86963, p-value = 3.139e-09
+## W = 0.98, p-value = 0.2099
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.76309, p-value = 4.275e-13
+## W = 0.9769, p-value = 0.1308
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.91935, p-value = 1.125e-06
+## W = 0.98111, p-value = 0.2479
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.82197, p-value = 3.765e-11
+## W = 0.9787, p-value = 0.1725
 ```
 
 ``` r
-# none of these are really good. leave alone.
+# none of these are really good. leave alone. Exp i technically better
 ```
 
 Leaf Number, early stages
@@ -792,7 +790,7 @@ print(shapiro.test(CleanData_2021$LeafNum_.07222021))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$LeafNum_.07222021
-## W = 0.91613, p-value = 1.204e-07
+## W = 0.92413, p-value = 2.348e-05
 ```
 
 ``` r
@@ -816,7 +814,7 @@ print(shapiro.test(exp(CleanData_2021$LeafNum_.07222021)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(CleanData_2021$LeafNum_.07222021)
-## W = 0.31683, p-value < 2.2e-16
+## W = 0.3897, p-value < 2.2e-16
 ```
 
 ``` r
@@ -828,7 +826,7 @@ print(shapiro.test(sqrt(CleanData_2021$LeafNum_.07222021)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$LeafNum_.07222021)
-## W = 0.76426, p-value = 3.01e-14
+## W = 0.7751, p-value = 4.559e-11
 ```
 
 Leaf number, during winter
@@ -842,7 +840,7 @@ print(shapiro.test(CleanData_2021$LeafNum_08262021))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$LeafNum_08262021
-## W = 0.90527, p-value = 2.652e-08
+## W = 0.90702, p-value = 3.069e-06
 ```
 
 ``` r
@@ -866,7 +864,7 @@ print(shapiro.test(exp(CleanData_2021$LeafNum_08262021)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(CleanData_2021$LeafNum_08262021)
-## W = 0.2265, p-value < 2.2e-16
+## W = 0.28669, p-value < 2.2e-16
 ```
 
 ``` r
@@ -878,7 +876,7 @@ print(shapiro.test(sqrt(CleanData_2021$LeafNum_08262021)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$LeafNum_08262021)
-## W = 0.74508, p-value = 7.654e-15
+## W = 0.75493, p-value = 1.267e-11
 ```
 
 leaf number about bolting time
@@ -894,25 +892,25 @@ explore_trans(CleanData_2021$RosetteLeafNum_10042021)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.98412, p-value = 0.1376
+## W = 0.98359, p-value = 0.3473
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.94467, p-value = 4.828e-05
+## W = 0.94753, p-value = 0.00159
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.085649, p-value < 2.2e-16
+## W = 0.1153, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.96935, p-value = 0.00508
+## W = 0.97055, p-value = 0.04655
 ```
 
 leaf number at bolting
@@ -928,25 +926,25 @@ explore_trans(CleanData_2021$RosetteLeafNum_bolt)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.98596, p-value = 0.6437
+## W = 0.99054, p-value = 0.9579
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.98686, p-value = 0.6956
+## W = 0.97151, p-value = 0.2663
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.11637, p-value < 2.2e-16
+## W = 0.14488, p-value = 1.657e-15
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.98938, p-value = 0.8351
+## W = 0.98417, p-value = 0.7355
 ```
 
 Leaf number at flowering
@@ -962,25 +960,25 @@ explore_trans(CleanData_2021$RosetteLeafNum_Flower)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.96101, p-value = 0.3287
+## W = 0.98465, p-value = 0.9898
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.88984, p-value = 0.004781
+## W = 0.97534, p-value = 0.9159
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.18475, p-value = 8.492e-12
+## W = 0.2799, p-value = 5.08e-08
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.9341, p-value = 0.06317
+## W = 0.98925, p-value = 0.9988
 ```
 
 Rosette Leaf Num at Harvest
@@ -996,25 +994,25 @@ explore_trans(CleanData_2021$RosetteLeafNum)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.99224, p-value = 0.7036
+## W = 0.98314, p-value = 0.3334
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.94182, p-value = 3.23e-05
+## W = 0.93039, p-value = 0.000194
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.12061, p-value < 2.2e-16
+## W = 0.16121, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.97814, p-value = 0.03634
+## W = 0.96687, p-value = 0.02768
 ```
 
 Dry Rosette Biomass
@@ -1031,25 +1029,25 @@ explore_trans(CleanData_2021$DryRosetteG)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.89989, p-value = 1.103e-07
+## W = 0.9331, p-value = 0.0003212
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.94833, p-value = 0.0001097
+## W = 0.96355, p-value = 0.01875
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.8495, p-value = 5.407e-10
+## W = 0.88858, p-value = 2.904e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.97926, p-value = 0.04997
+## W = 0.98828, p-value = 0.6593
 ```
 
 ``` r
@@ -1071,25 +1069,25 @@ explore_trans(CleanData_2021$DryReproG)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.74166, p-value = 1.33e-13
+## W = 0.82996, p-value = 2.362e-08
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.88948, p-value = 3.272e-08
+## W = 0.87421, p-value = 7.95e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.66011, p-value = 1.124e-15
+## W = 0.78691, p-value = 1.286e-09
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.81035, p-value = 1.842e-11
+## W = 0.85078, p-value = 1.142e-07
 ```
 
 ``` r
@@ -1108,25 +1106,25 @@ explore_trans(CleanData_2021$AG_biomass)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.74836, p-value = 2.699e-13
+## W = 0.83731, p-value = 5.388e-08
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.87811, p-value = 1.148e-08
+## W = 0.87049, p-value = 7.433e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.63013, p-value = 3.256e-16
+## W = 0.7561, p-value = 2.806e-10
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.80973, p-value = 2.236e-11
+## W = 0.85463, p-value = 2.029e-07
 ```
 
 ``` r
@@ -1146,25 +1144,25 @@ explore_trans(CleanData_2021$DryRootG)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.92287, p-value = 0.213
+## W = 0.90577, p-value = 0.2171
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.92521, p-value = 0.2311
+## W = 0.85983, p-value = 0.0573
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.91936, p-value = 0.1884
+## W = 0.90758, p-value = 0.2283
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.93365, p-value = 0.3091
+## W = 0.89214, p-value = 0.1479
 ```
 
 ``` r
@@ -1184,25 +1182,25 @@ explore_trans(CleanData_2021$Root_to_Shoot)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.9323, p-value = 0.2953
+## W = 0.89223, p-value = 0.1483
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.90168, p-value = 0.101
+## W = 0.90644, p-value = 0.2212
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.9274, p-value = 0.2495
+## W = 0.87682, p-value = 0.09478
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.92796, p-value = 0.2543
+## W = 0.90851, p-value = 0.2341
 ```
 
 ``` r
@@ -1222,25 +1220,25 @@ explore_trans(CleanData_2021$Repro_to_Ros)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.88574, p-value = 2.621e-08
+## W = 0.91541, p-value = 5.244e-05
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.95306, p-value = 0.000284
+## W = 0.92605, p-value = 0.000169
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.23704, p-value < 2.2e-16
+## W = 0.30394, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.94898, p-value = 0.0001399
+## W = 0.93999, p-value = 0.0008853
 ```
 
 ``` r
@@ -1261,25 +1259,25 @@ explore_trans(CleanData_2021$LatBranches)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.97083, p-value = 0.009486
+## W = 0.96235, p-value = 0.01769
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.93694, p-value = 2.304e-05
+## W = 0.90226, p-value = 1.359e-05
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.37349, p-value < 2.2e-16
+## W = 0.42399, p-value = 3.104e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.96293, p-value = 0.00197
+## W = 0.94351, p-value = 0.001379
 ```
 
 ``` r
@@ -1299,25 +1297,25 @@ explore_trans(CleanData_2021$PrimaryStalks)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.96572, p-value = 0.003387
+## W = 0.963, p-value = 0.01941
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.77741, p-value = 2.552e-12
+## W = 0.70148, p-value = 1.526e-11
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.12298, p-value < 2.2e-16
+## W = 0.16388, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.90351, p-value = 2.473e-07
+## W = 0.87349, p-value = 9.606e-07
 ```
 
 ``` r
@@ -1336,25 +1334,25 @@ explore_trans(CleanData_2021$Height_cm)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.86383, p-value = 4.102e-09
+## W = 0.88146, p-value = 2.181e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.86389, p-value = 4.125e-09
+## W = 0.88679, p-value = 3.519e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.11772, p-value < 2.2e-16
+## W = 0.15738, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.89653, p-value = 1.31e-07
+## W = 0.88581, p-value = 3.218e-06
 ```
 
 ``` r
@@ -1419,7 +1417,7 @@ This tells me that everything is still rather highly correlated. Basia's counts 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$TotFruit
-## W = 0.81145, p-value = 2.766e-12
+## W = 0.87943, p-value = 3.035e-07
 ```
 
 ``` r
@@ -1455,7 +1453,7 @@ This tells me that everything is still rather highly correlated. Basia's counts 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$TotFruit)
-## W = 0.92504, p-value = 7.724e-07
+## W = 0.92094, p-value = 2.502e-05
 ```
 
 ``` r
@@ -1468,7 +1466,7 @@ print(shapiro.test(CleanData_2021$IJ_FruitCount))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$IJ_FruitCount
-## W = 0.81124, p-value = 3.409e-12
+## W = 0.88528, p-value = 6.683e-07
 ```
 
 ``` r
@@ -1504,7 +1502,7 @@ print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$IJ_FruitCount)
-## W = 0.94273, p-value = 1.547e-05
+## W = 0.94284, p-value = 0.0004919
 ```
 
 ``` r
@@ -1519,7 +1517,7 @@ print(shapiro.test(CleanData_2021$FruitCount_BL))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$FruitCount_BL
-## W = 0.87073, p-value = 5.308e-08
+## W = 0.88821, p-value = 6.364e-07
 ```
 
 ``` r
@@ -1555,7 +1553,7 @@ print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$FruitCount_BL)
-## W = 0.92064, p-value = 1.159e-05
+## W = 0.9347, p-value = 0.0001292
 ```
 
 ``` r
@@ -1572,7 +1570,7 @@ print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$NumFlwrLeft
-## W = 0.71143, p-value = 6.393e-14
+## W = 0.80012, p-value = 4.786e-09
 ```
 
 ``` r
@@ -1596,7 +1594,7 @@ print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(CleanData_2021$NumFlwrLeft)
-## W = 0.066304, p-value < 2.2e-16
+## W = 0.088904, p-value < 2.2e-16
 ```
 
 ``` r
@@ -1608,7 +1606,7 @@ print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$NumFlwrLeft)
-## W = 0.82353, p-value = 1.417e-10
+## W = 0.87751, p-value = 1.542e-06
 ```
 
 
@@ -1623,25 +1621,25 @@ explore_trans(CleanData_2021$FruitColWt_mg)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.97915, p-value = 0.06134
+## W = 0.96889, p-value = 0.05317
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.94779, p-value = 0.0001598
+## W = 0.97471, p-value = 0.1228
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.07917, p-value < 2.2e-16
+## W = 0.108, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.97869, p-value = 0.05566
+## W = 0.97548, p-value = 0.1371
 ```
 
 
@@ -1656,25 +1654,25 @@ explore_trans(CleanData_2021$SeedColWt_mg)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.97459, p-value = 0.02348
+## W = 0.96426, p-value = 0.02754
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.80803, p-value = 3.635e-11
+## W = 0.96982, p-value = 0.0608
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.14825, p-value < 2.2e-16
+## W = 0.19575, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.94847, p-value = 0.0001787
+## W = 0.97181, p-value = 0.08091
 ```
 
 ``` r
@@ -1690,25 +1688,25 @@ explore_trans(CleanData_2021$AvgSeedWt)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.94152, p-value = 5.832e-05
+## W = 0.94131, p-value = 0.001336
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.71162, p-value = 5.585e-14
+## W = 0.97122, p-value = 0.07435
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.94255, p-value = 6.854e-05
+## W = 0.93983, p-value = 0.001114
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.87037, p-value = 8.722e-09
+## W = 0.96168, p-value = 0.0192
 ```
 
 
@@ -1744,7 +1742,7 @@ print(shapiro.test(CleanData_2021$IJ_SeedCount))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$IJ_SeedCount
-## W = 0.96627, p-value = 0.004388
+## W = 0.96702, p-value = 0.04071
 ```
 
 ``` r
@@ -1756,7 +1754,7 @@ print(shapiro.test(log10(CleanData_2021$IJ_SeedCount)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(CleanData_2021$IJ_SeedCount)
-## W = 0.97123, p-value = 0.01177
+## W = 0.95244, p-value = 0.005492
 ```
 
 ``` r
@@ -1769,7 +1767,7 @@ print(shapiro.test(sqrt(CleanData_2021$IJ_SeedCount)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$IJ_SeedCount)
-## W = 0.97556, p-value = 0.02876
+## W = 0.96684, p-value = 0.03973
 ```
 
 ``` r
@@ -1789,25 +1787,25 @@ explore_trans(CleanData_2021$AvgSeedNum)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.96186, p-value = 0.00189
+## W = 0.96427, p-value = 0.02758
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.97758, p-value = 0.04398
+## W = 0.9681, p-value = 0.04749
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.1534, p-value < 2.2e-16
+## W = 0.20486, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.9749, p-value = 0.02505
+## W = 0.97041, p-value = 0.06614
 ```
 
 ``` r
@@ -1819,7 +1817,8 @@ Fitness - calculated with Basia's fruit counts
 ``` r
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
 # if fruit count is a 0, need to also make total fitness a 0 (and  not an NA)
-CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("FruitCount_BL", "fitness") ] <- 0
+CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("fitness") ] <- 0
+# there are 7 remaining NA values in fitness. 4 are because of missing fruit counts. 3 are because of missing seed per fruit counts
 
 plotNormalHistogram(CleanData_2021$fitness)
 ```
@@ -1827,12 +1826,18 @@ plotNormalHistogram(CleanData_2021$fitness)
 ![](01_CleanData_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ``` r
+plotNormalHistogram(CleanData_2021$fitness, breaks = 100)
+```
+
+![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+
+``` r
 #plotNormalHistogram(log10(CleanData_2021$fitness))
 #plotNormalHistogram(exp(CleanData_2021$fitness))
 plotNormalHistogram(sqrt(CleanData_2021$fitness))
 ```
 
-![](01_CleanData_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
+![](01_CleanData_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
 
 ``` r
   # want the one with the largest value
@@ -1844,7 +1849,7 @@ print(shapiro.test(CleanData_2021$fitness))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  CleanData_2021$fitness
-## W = 0.84361, p-value = 6.937e-09
+## W = 0.86214, p-value = 8.021e-08
 ```
 
 ``` r
@@ -1869,12 +1874,35 @@ print(shapiro.test(sqrt(CleanData_2021$fitness)))
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(CleanData_2021$fitness)
-## W = 0.91116, p-value = 4.926e-06
+## W = 0.92479, p-value = 4.78e-05
 ```
 
 ``` r
 #CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness) doesn't work with added zeros cause get -Inf
 CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
+
+# look at just the zeros to see if there are differences to explore with zero-inflated or hurdle models
+CleanData_2021 %>%
+  group_by(Treatment) %>%
+  group_by(Population, .add= TRUE) %>%
+  filter(fitness == 0) %>%
+  summarize(count = n())
+```
+
+```
+## `summarise()` has grouped output by 'Treatment'. You can override using the
+## `.groups` argument.
+```
+
+```
+## # A tibble: 4 × 3
+## # Groups:   Treatment [2]
+##   Treatment Population count
+##   <fct>     <fct>      <int>
+## 1 Current   BELM           2
+## 2 Current   RODA           3
+## 3 Future    BELM           5
+## 4 Future    RODA           5
 ```
 
 Phenology
@@ -1890,25 +1918,25 @@ explore_trans(CleanData_2021$Emergence)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.47151, p-value < 2.2e-16
+## W = 0.43409, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.77882, p-value = 2.051e-13
+## W = 0.79455, p-value = 3.999e-10
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.057458, p-value < 2.2e-16
+## W = 0.079101, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.62719, p-value < 2.2e-16
+## W = 0.62444, p-value = 3.754e-14
 ```
 
 ``` r
@@ -1924,25 +1952,25 @@ explore_trans(CleanData_2021$DayToBolt)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.90279, p-value = 1.193e-07
+## W = 0.8865, p-value = 1.681e-06
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.87986, p-value = 8.367e-09
+## W = 0.86521, p-value = 2.511e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.061929, p-value < 2.2e-16
+## W = 0.084229, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.89316, p-value = 3.749e-08
+## W = 0.87793, p-value = 7.644e-07
 ```
 
 ``` r
@@ -1956,25 +1984,25 @@ explore_trans(CleanData_2021$DayToFlwr)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.96854, p-value = 0.004487
+## W = 0.94273, p-value = 0.0009065
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.94491, p-value = 5.383e-05
+## W = 0.95006, p-value = 0.002415
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.080457, p-value < 2.2e-16
+## W = 0.10826, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.97271, p-value = 0.01092
+## W = 0.95783, p-value = 0.007216
 ```
 
 ``` r
@@ -1990,25 +2018,25 @@ explore_trans(CleanData_2021$EmergeToFlwr)
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  trait
-## W = 0.90531, p-value = 1.786e-07
+## W = 0.87737, p-value = 8.205e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  log10(trait)
-## W = 0.88634, p-value = 1.891e-08
+## W = 0.86496, p-value = 2.791e-07
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  exp(trait)
-## W = 0.0623, p-value < 2.2e-16
+## W = 0.08497, p-value < 2.2e-16
 ## 
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  sqrt(trait)
-## W = 0.8968, p-value = 6.326e-08
+## W = 0.87202, p-value = 5.116e-07
 ```
 ## Save file
 Save this file to read in to analysis script

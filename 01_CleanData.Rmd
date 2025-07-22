@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # description
 
-This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder.
+This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript.
 
 # Set basic info for all code
 
@@ -262,8 +262,11 @@ myCols <- c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "Soil.Mix.
 
 CleanData_2021 <- CleanData_2021[ ,myCols]
 
-# add another trait: Above ground biomass
+# add another trait: total Above ground biomass
 CleanData_2021$AG_biomass <- CleanData_2021$DryRosetteG + CleanData_2021$DryReproG
+
+# we are only analyzing the Current and Future treatments, so remove rows for C/F treatment
+CleanData_2021 <- CleanData_2021[!(CleanData_2021$Treatment == "Current/Future"), ]
 ```
 
 ## Transformations
@@ -345,7 +348,7 @@ CleanData_2021$l10_LDMC <- log10(CleanData_2021$LDMC)
 Relative Water Content
 ```{r}
 explore_trans(CleanData_2021$RWC)
-# none of these are really good. leave alone.
+# none of these are really good. leave alone. Exp i technically better
 ```
 
 Leaf Number, early stages
@@ -531,9 +534,11 @@ Fitness - calculated with Basia's fruit counts
 ```{r}
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
 # if fruit count is a 0, need to also make total fitness a 0 (and  not an NA)
-CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("FruitCount_BL", "fitness") ] <- 0
+CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("fitness") ] <- 0
+# there are 7 remaining NA values in fitness. 4 are because of missing fruit counts. 3 are because of missing seed per fruit counts
 
 plotNormalHistogram(CleanData_2021$fitness)
+plotNormalHistogram(CleanData_2021$fitness, breaks = 100)
 #plotNormalHistogram(log10(CleanData_2021$fitness))
 #plotNormalHistogram(exp(CleanData_2021$fitness))
 plotNormalHistogram(sqrt(CleanData_2021$fitness))
@@ -545,6 +550,13 @@ print(shapiro.test(sqrt(CleanData_2021$fitness)))
 
 #CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness) doesn't work with added zeros cause get -Inf
 CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
+
+# look at just the zeros to see if there are differences to explore with zero-inflated or hurdle models
+CleanData_2021 %>%
+  group_by(Treatment) %>%
+  group_by(Population, .add= TRUE) %>%
+  filter(fitness == 0) %>%
+  summarize(count = n())
 ```
 
 Phenology
