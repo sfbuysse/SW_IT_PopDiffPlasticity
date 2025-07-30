@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-07-22"
+date: "2025-07-30"
 output: 
   html_document:
     toc: true
@@ -522,9 +522,25 @@ AG_Dry_bolt
 
 ![](03_Figures_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
+```
+## [1] -0.2225461
+```
+
+```
+## [1] -0.02154174
+```
+
 BG_Dry_bolt
 
 ![](03_Figures_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+
+```
+## [1] -0.2170143
+```
+
+```
+## [1] -0.09097503
+```
 
 Root_to_Shoot
 
@@ -650,37 +666,51 @@ LeafNum_4weeks
 creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order. Updated 7/1/2025 with a single figure for all main results.
 
 Draft 2 figures updated 7/3/2025 \
+Draft 3 figures updated 7/30/2025 \
+
 
 ``` r
-main_fig <- ggarrange(rwc+rremove("xlab"), detf+rremove("xlab"), stoden+rremove("xlab"), sla , rs,
-                  labels = c("A", "B", "C", "D", "E"),
-                  ncol = 3, nrow = 2,
+fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
+                  labels = c("A", "B", "C", "D"),
+                  ncol = 2, nrow = 2,
                   common.legend = TRUE, # goes based on the first plot
                   legend = "top",
                   align = "hv"
 )
 #label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
 #vjust = 00
-main_fig
+fig1
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
 
 ``` r
+fig2 <- ggarrange(rs, ros_2022, bg,
+                  labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "top",
+                  align = "hv")
+fig2
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-47-2.png)<!-- -->
+
+``` r
 fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
-                  common.legend = TRUE, # goes based on the first plot
+                  common.legend = TRUE,
                   legend = "top",
                   align = "h"
 )
 fitness_fig
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-47-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-47-3.png)<!-- -->
 
 
-Old Figure 1 for label.x adjustment reminder if I need it again\
+Old for label.x adjustment reminder if I need it again\
 
 
 
@@ -693,7 +723,7 @@ figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, 
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "right",
+                  legend = "top",
                   align = "h"
                   )
 figs1
@@ -701,37 +731,21 @@ figs1
 
 ![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
 
-Figure s2 - biomass \
+Figure s2 - biomass + fitness \
 
 ``` r
-figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"), ros_2022, bg, ln_bolt,
+figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "right",
-                  align = "h",
-                  label.x = c(0, -0.1, 0, 0, 0)
+                  legend = "top",
+                  align = "h"
                   )
 figs2
 ```
 
 ![](03_Figures_files/figure-html/unnamed-chunk-50-1.png)<!-- -->
 
-
-Figure s3 - fitness related \
-
-``` r
-figs3 <- ggarrange(rr, seed_wt,
-                  labels = c("A", "B"),
-                  ncol = 2, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "right",
-                  align = "h"
-                  )
-figs3
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
 
 Create Legend for main figures
 
@@ -741,7 +755,8 @@ For the traits figure, I need the colors with the shaped points and I need the l
 legend_points <- data.frame(xvals = c(1.1, 1.1), yvals = c(4, 3), text = c("Italy", "Sweden"), Pop = as.factor(c("IT", "SW")))
 #legend_lines <- c(xvals = c(1, 1), yvals = c(2, 1), text = c("2021", "2022"))
 
-legend_fig <- ggplot()+
+# legend to take up space of a plot
+ggplot()+
   geom_point(data = legend_points, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
   geom_segment(aes(x = 1.09, y = 2, xend = 1.11, yend = 2), linetype = "solid", linewidth = 1.25)+
   geom_segment(aes(x = 1.09, y = 1, xend = 1.11, yend = 1), linetype = "dotted", linewidth = 1.25)+
@@ -751,25 +766,44 @@ legend_fig <- ggplot()+
                      values = c("#CC79A7", "#009E73"))+
   xlim(c(1.087, 1.12))+
   theme_void()
+```
+
+![](03_Figures_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
+
+``` r
   #theme(plot.margin = margin(t = 0, r = 0.5, b = 0.075, l=0, unit = "in"))
+
+# top legend
+legend_points2 <- data.frame(xvals = c(1, 1.5), yvals = c(1, 1), text = c("Italy", "Sweden"), Pop = as.factor(c("IT", "SW")))
+legend_fig <- ggplot()+
+  geom_point(data = legend_points2, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
+  geom_segment(aes(x = 2.2, y = 1, xend = 2.7, yend = 1), linetype = "solid", linewidth = 1.25)+
+  geom_segment(aes(x = 3.2, y = 1, xend = 3.7, yend = 1), linetype = "dotted", linewidth = 1.25)+
+  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  xlim(c(0.087, 4.12))+
+  theme_void()
 legend_fig
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-51-2.png)<!-- -->
 
 
 
 ##Save figures
 
 ``` r
-# trait fig
-ggsave(main_fig, filename = "figures/main_fig.jpg", width = 9, height = 8, units = "in", dpi = 300)
+# trait figs
+ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 300)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 300)
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fitness_fig.jpg", width = 9, height = 4, units = "in", dpi = 300)
+ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 300)
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 2.5, height = 2, units = "in", dpi = 300)
+ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 300)
 
 #fig1
 #ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
@@ -781,8 +815,5 @@ ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 8, units = "in
 
 #figs2
 ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 8, units = "in", dpi = 300)
-
-#figs3
-ggsave(figs3, filename = "figures/figs3.jpg", width = 5, height = 4, units = "in", dpi = 300)
 ```
 

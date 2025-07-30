@@ -576,6 +576,80 @@ fruit_pairs_21 <- as.data.frame(pairs(fruit_emmeans_21))
 fruit_pairs_21$trait <- "FruitNum"
 
 ```
+#jump here
+```{r}
+# try a hurdle model
+library(pscl)
+mod.hurdle <- hurdle(FruitCount_BL ~ Treatment * Population  , data = Dat_2021_TwoTrt, dist = "poisson", zero.dist = "binomial") #+ (1|Population:Line) contrasts = list(Treatment=contr.sum, Population = contr.sum)
+# same as this:
+# mod.hurdle <- hurdle(visits ~ ., data = nmes, dist = "poisson", 
+#                          zero.dist = "binomial")
+summary(mod.hurdle)
+hist(residuals(mod.hurdle), breaks = 15) # decent
+plot(fitted(mod.hurdle), residuals(mod.hurdle, type = "pearson", scaled = TRUE)) # this looks very similar
+
+
+mod.zeroinf <- zeroinfl(FruitCount_BL ~ Treatment * Population  , data = Dat_2021_TwoTrt, dist = "poisson")
+summary(mod.zeroinf)
+
+# can I match these at all if I remove zeros from my initial model?
+mod.nozero <- lmer(FruitCount_BL ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt[Dat_2021_TwoTrt$FruitCount_BL >0, ],contrasts = list(Treatment=contr.sum, Population = contr.sum))
+summary(mod.nozero)
+hist(residuals(mod.nozero), breaks = 15) # this is more normal
+plot(fitted(mod.nozero), residuals(mod.nozero, type = "pearson", scaled = TRUE)) # this looks very similar
+
+# try to get random component back in there
+library(glmmTMB)
+mod.zeroinf2 <- glmmTMB(FruitCount_BL ~ Treatment * Population + (1|Population:Line), data = Dat_2021_TwoTrt, ziformula = ~Treatment * Population, family = poisson)
+summary(mod.zeroinf2)
+mod.poisson <- glmmTMB(FruitCount_BL ~ Treatment * Population + (1|Population:Line), data = Dat_2021_TwoTrt, ziformula = ~0, family = poisson)
+summary(mod.poisson)
+hist(residuals(mod.poisson), breaks = 15) # okay
+plot(fitted(mod.poisson), residuals(mod.poisson, type = "pearson")) #, scaled = TRUE; I think this looks better but not sure what taking otu scaled as an argument did
+plot(fitted(fruit_lm_21), residuals(fruit_lm_21, type = "pearson"))
+# okay, so if I fit a poisson model is really where the changes happen, not for adding inthe zero inflated component
+
+
+# get emmeans from the poisson
+#mod.poisson_anov <- do_anov(mod.poisson) # can't do anova on glmmTMB
+#mod.poisson_anov$trait <- "FruitNum_Pois"
+mod.poisson_emmeans <- get_table(mod.poisson)
+mod.poisson_means <- as.data.frame(mod.poisson_emmeans)
+mod.poisson_pairs <- as.data.frame(pairs(mod.poisson_emmeans))
+mod.poisson_pairs$trait <- "FruitNumP_Pois"
+
+# tester fig
+ggplot(data = mod.poisson_means, aes(x = Treatment, y = rate)) +
+  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=asymp.LCL, ymax = asymp.UCL, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
+  labs(y="Fruit Count Poisson Model (rate)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+
+
+# zero inflated poisson
+mod.zeroinf2_emmeans <- get_table(mod.zeroinf2)
+mod.zeroinf2_means <- as.data.frame(mod.zeroinf2_emmeans)
+mod.zeroinf2_pairs <- as.data.frame(pairs(mod.zeroinf2_emmeans))
+mod.zeroinf2_pairs$trait <- "FruitNumP_PoisZI"
+
+# tester fig
+ggplot(data = mod.zeroinf2_means, aes(x = Treatment, y = rate)) +
+  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=asymp.LCL, ymax = asymp.UCL, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
+  labs(y="Fruit Count Poisson ZI Model (rate)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+```
 
 
 Average weight of a seed (collected seed weight / count of collected seeds)

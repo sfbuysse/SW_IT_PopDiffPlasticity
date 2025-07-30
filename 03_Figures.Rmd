@@ -200,8 +200,8 @@ Days Emergence to bolting
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["bolting_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Days Emergence to Bolting", 
        x="Treatment")+
@@ -217,8 +217,8 @@ DaysBoltingToFlwr
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["flowering_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Days Bolting to Flowering", 
       x="Treatment")+
@@ -232,8 +232,8 @@ ggplot(data = Means_2021[["flowering_means_21"]], aes(x = Treatment, y = Mean)) 
 Days Emergence to Flower
 ```{r, echo = FALSE}
 detf <- ggplot(data = Means_2021[["eTof_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Days to Flowering", 
       x="Treatment")+
@@ -249,8 +249,8 @@ LeafNum_duringvern (if included)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["LN_Vern_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number: during vern", 
       x="Treatment")+
@@ -264,8 +264,8 @@ LeafNum_Oct4 (if included)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["LN_PostVern_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number: 6 weeks post vern", 
       x="Treatment")+
@@ -279,8 +279,8 @@ RosetteLeafNum_harvest
 
 ```{r, echo = FALSE}
 ln_harv <- ggplot(data = Means_2021[["LN_harv_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number \n at harvest", 
       x="Treatment")+
@@ -316,7 +316,7 @@ forplot3_2021 <- merge(tmp_mean_21, tmp_ci_21)
 
 # plot
 ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
+  geom_point(aes(col=Population, shape = Population), size = 3, show.legend = TRUE) +
   #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
@@ -332,8 +332,8 @@ RosetteDry_harvest
 
 ```{r, echo = FALSE}
 ros_2021 <- ggplot(data = Means_2021[["Ros_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Rosette Dry Biomass (g) at harvest", 
       x="Treatment")+
@@ -350,8 +350,8 @@ DryReproG
 
 ```{r, echo = FALSE}
 repro <- ggplot(data = Means_2021[["Repro_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Reproductive Dry Biomass (g)", 
       x="Treatment")+
@@ -367,8 +367,8 @@ AG_biomass (Ros+Repro)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["AG_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Total Above Ground Biomass (g)", 
       x="Treatment")+
@@ -383,8 +383,8 @@ Repro_to_Ros
 
 ```{r, echo = FALSE}
 rr <- ggplot(data = Means_2021[["RR_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Reproductive / Rosette Dry Biomass", 
       x="Treatment")+
@@ -401,8 +401,8 @@ LatBranches
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["LatBranch_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Number of Lateral Branches", 
       x="Treatment")+
@@ -416,8 +416,8 @@ PrimaryStalks - how many stalks are coming out of the top of the rosette?
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["PrimStalks_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Number of Primary Stalks", 
       x="Treatment")+
@@ -431,8 +431,8 @@ Height_cm (of main stalk)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2021[["height_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Height (cm)", 
       x="Treatment")+
@@ -449,8 +449,8 @@ FruitCount - Basia
 ```{r, echo = FALSE}
 # Basia Fruit Count
 fruits <- ggplot(data = Means_2021[["fruit_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Fruit Count", 
       x="Treatment")+
@@ -466,8 +466,8 @@ AvgSeedWt
 
 ```{r, echo = FALSE}
 seed_wt <- ggplot(data = Means_2021[["AvSeedWt_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Average Seed\nWeight (mg)", 
       x="Treatment")+
@@ -482,10 +482,10 @@ AvgSeedNum
 
 ```{r, echo = FALSE}
 seed_per_fruit <- ggplot(data = Means_2021[["seeds_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
-  labs(y="Average Number of Seeds per Fruit", 
+  labs(y="Average Seeds per Fruit", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -499,8 +499,8 @@ fitness - avg seed num/fruit * fruit num
 
 ```{r, echo = FALSE}
 fitness <- ggplot(data = Means_2021[["fitness_means_21"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
   labs(y="Total Fitness", 
       x="Treatment")+
@@ -597,8 +597,8 @@ LeafNum_Jun6 (if included)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2022[["LN_Jun6_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number 1 week post vern", 
       x="Treatment")+
@@ -612,8 +612,8 @@ LeafNum_Jun13 (if included)
 
 ```{r, echo = FALSE}
 ggplot(data = Means_2022[["LN_Jun13_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number 2 weeks post vern", 
       x="Treatment")+
@@ -627,8 +627,8 @@ LeafNum_bolt
 
 ```{r, echo = FALSE}
 ln_bolt <- ggplot(data = Means_2022[["LN_bolt_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
   labs(y="Leaf Number at Bolting", 
       x="Treatment")+
@@ -682,10 +682,10 @@ AG_Dry_bolt
 
 ```{r, echo = FALSE}
 ros_2022 <- ggplot(data = Means_2022[["AG_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
-  labs(y="Above Ground Biomass (g) at bolting", 
+  labs(y="Shoot Biomass (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -693,30 +693,43 @@ ros_2022 <- ggplot(data = Means_2022[["AG_means_22"]], aes(x = Treatment, y = Me
   scale_x_discrete(expand = c(0.6,0))
 
 ros_2022
+
+# what are the percent decreases for each pop?
+# Italy
+(0.1654970 - 0.2128705)/0.2128705
+# Sweden
+(0.4577489 - 0.4678267) / 0.4678267
+
 ```
 
 BG_Dry_bolt
 
 ```{r, echo = FALSE}
 bg <- ggplot(data = Means_2022[["BG_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
-  labs(y="Root Biomass (g)\nat bolting", 
+  labs(y="Root Biomass (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.6,0))
 bg
+
+# what are the percent decreases?
+#Italy
+(0.02796990 - 0.03572211 )/ 0.03572211 
+# Sweden
+(0.05366088 - 0.05903125 ) / 0.05903125 
 ```
 
 Root_to_Shoot
 
 ```{r, echo = FALSE}
 rs <- ggplot(data = Means_2022[["RS_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
   labs(y="Root:Shoot Ratio", 
       x="Treatment")+
@@ -735,8 +748,8 @@ Stomata Density
 
 ```{r, echo = FALSE}
 stoden <- ggplot(data = Means_2022[["sto_den_means_22"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = TRUE) +
-  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.1, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
   labs(y=expression(paste("Stomatal Density  ", (mm^-2))), 
       x="Treatment")+
@@ -801,7 +814,7 @@ Emergence. days to emergence is shown for both but should be interpreted with ca
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["emergence"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Days To Emergence", 
@@ -821,7 +834,7 @@ EmergenceToBolting. While this was measured in both experiments, it is not compa
 
 ```{r, echo = FALSE, eval = TRUE}
 detb <- ggplot(data = both_dfs[["bolting"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge2(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge2(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95,group = Exp:Population, col = Population), width = 0.3, size = 0.8, position = position_dodge2(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population,col = Population, linetype = Exp), size = 1, position = position_dodge2(width = 0.3), show.legend = TRUE)+
   labs(y="Days to Bolting", 
@@ -842,7 +855,7 @@ FreshWt
 
 ```{r, echo = FALSE}
 freshwt <- ggplot(data = both_dfs[["fresh"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Fresh Weight (g)", 
@@ -861,7 +874,7 @@ HydWt
 
 ```{r, echo = FALSE}
 hydwt <- ggplot(data = both_dfs[["hyd"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Saturated Weight (g)", 
@@ -880,7 +893,7 @@ DryWt
 
 ```{r, echo = FALSE}
 drywt <- ggplot(data = both_dfs[["dry"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Dried Weight (g)", 
@@ -899,7 +912,7 @@ LeafArea
 
 ```{r, echo = FALSE}
 area <- ggplot(data = both_dfs[["area"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Area (cm^2)", 
@@ -918,7 +931,7 @@ LeafPerimeter
 
 ```{r, echo = FALSE}
 perim <- ggplot(data = both_dfs[["per"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Perimeter (cm)", 
@@ -939,7 +952,7 @@ Specific Leaf Area
 
 ```{r, echo = FALSE}
 sla <- ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Specific Leaf Area (cm^2 / g)", 
@@ -972,7 +985,7 @@ Leaf Dry Matter Content
 
 ```{r, echo = FALSE}
 ldmc <- ggplot(data = both_dfs[["ldmc"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Dry Matter Content (%)", 
@@ -992,7 +1005,7 @@ Relative Water Content
 
 ```{r, echo = FALSE}
 rwc <- ggplot(data = both_dfs[["rwc"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Relative Water Content (%)", 
@@ -1012,7 +1025,7 @@ LeafNum_4weeks
 
 ```{r, echo = FALSE}
 ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
-  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 2, position = position_dodge(width = 0.3), show.legend = FALSE) +
+  geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
   labs(y="Leaf Number (4 weeks post planting)", 
@@ -1030,32 +1043,42 @@ ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
 creating multipanel figures for the manuscript. Updated 4/17/2025 with ideas for cutting down/restructuring results to focus on avoidance/escape. Updated 5/28/2025 with different figure order. Updated 7/1/2025 with a single figure for all main results.
 
 Draft 2 figures updated 7/3/2025 \
+Draft 3 figures updated 7/30/2025 \
+
 ```{r}
-main_fig <- ggarrange(rwc+rremove("xlab"), detf+rremove("xlab"), stoden+rremove("xlab"), sla , rs,
-                  labels = c("A", "B", "C", "D", "E"),
-                  ncol = 3, nrow = 2,
+fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
+                  labels = c("A", "B", "C", "D"),
+                  ncol = 2, nrow = 2,
                   common.legend = TRUE, # goes based on the first plot
-                  legend = "top",
+                  legend = "none",
                   align = "hv"
 )
 #label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
 #vjust = 00
-main_fig
+fig1
+
+fig2 <- ggarrange(rs, ros_2022, bg,
+                  labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 1,
+                  common.legend = TRUE,
+                  legend = "none",
+                  align = "hv")
+fig2
 
 fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
-                  common.legend = TRUE, # goes based on the first plot
-                  legend = "top",
+                  common.legend = TRUE,
+                  legend = "none",
                   align = "h"
 )
 fitness_fig
 ```
 
 
-Old Figure 1 for label.x adjustment reminder if I need it again\
+Old for label.x adjustment reminder if I need it again\
 ```{r, eval = F, echo = F}
-fig1 <- ggarrange(detf, rwc,
+ggarrange(detf, rwc,
                   labels = c("A", "B"),
                   ncol = 2, nrow = 1,
                   common.legend = TRUE,
@@ -1063,7 +1086,7 @@ fig1 <- ggarrange(detf, rwc,
                   align = "h",
                   label.x = c(0, -0.1)
 )
-fig1
+
 ```
 
 
@@ -1075,37 +1098,24 @@ figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, 
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "top",
+                  legend = "none",
                   align = "h"
                   )
 figs1
 ```
 
-Figure s2 - biomass \
+Figure s2 - biomass + fitness \
 ```{r}
-figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"), ros_2022, bg, ln_bolt,
+figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "top",
-                  align = "h",
-                  label.x = c(0, -0.1, 0, 0, 0)
+                  legend = "none",
+                  align = "h"
                   )
 figs2
 ```
 
-
-Figure s3 - fitness related \
-```{r}
-figs3 <- ggarrange(rr, seed_wt,
-                  labels = c("A", "B"),
-                  ncol = 2, nrow = 1,
-                  common.legend = TRUE,
-                  legend = "top",
-                  align = "h"
-                  )
-figs3
-```
 
 Create Legend for main figures
 
@@ -1114,7 +1124,8 @@ For the traits figure, I need the colors with the shaped points and I need the l
 legend_points <- data.frame(xvals = c(1.1, 1.1), yvals = c(4, 3), text = c("Italy", "Sweden"), Pop = as.factor(c("IT", "SW")))
 #legend_lines <- c(xvals = c(1, 1), yvals = c(2, 1), text = c("2021", "2022"))
 
-legend_fig <- ggplot()+
+# legend to take up space of a plot
+ggplot()+
   geom_point(data = legend_points, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
   geom_segment(aes(x = 1.09, y = 2, xend = 1.11, yend = 2), linetype = "solid", linewidth = 1.25)+
   geom_segment(aes(x = 1.09, y = 1, xend = 1.11, yend = 1), linetype = "dotted", linewidth = 1.25)+
@@ -1125,6 +1136,19 @@ legend_fig <- ggplot()+
   xlim(c(1.087, 1.12))+
   theme_void()
   #theme(plot.margin = margin(t = 0, r = 0.5, b = 0.075, l=0, unit = "in"))
+
+# top legend
+legend_points2 <- data.frame(xvals = c(1, 1.5), yvals = c(1, 1), text = c("Italy", "Sweden"), Pop = as.factor(c("IT", "SW")))
+legend_fig <- ggplot()+
+  geom_point(data = legend_points2, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
+  geom_segment(aes(x = 2.2, y = 1, xend = 2.7, yend = 1), linetype = "solid", linewidth = 1.25)+
+  geom_segment(aes(x = 3.2, y = 1, xend = 3.7, yend = 1), linetype = "dotted", linewidth = 1.25)+
+  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  xlim(c(0.087, 4.12))+
+  theme_void()
 legend_fig
 ```
 
@@ -1133,14 +1157,15 @@ legend_fig
 ##Save figures
 ```{r}
 
-# trait fig
-ggsave(main_fig, filename = "figures/main_fig.jpg", width = 9, height = 8, units = "in", dpi = 300)
+# trait figs
+ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 300)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 300)
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fitness_fig.jpg", width = 9, height = 4, units = "in", dpi = 300)
+ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 300)
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 2.5, height = 2, units = "in", dpi = 300)
+ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 300)
 
 #fig1
 #ggsave(fig1, filename = "figures/fig1.jpg", width = 5, height = 4, units = "in", dpi = 300)
@@ -1148,13 +1173,11 @@ ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 2.5, height = 2,
 
 
 #figs1
-ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 8, units = "in", dpi = 300)
+ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 300)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 8, units = "in", dpi = 300)
+ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 300)
 
-#figs3
-ggsave(figs3, filename = "figures/figs3.jpg", width = 5, height = 4, units = "in", dpi = 300)
 
 ```
 

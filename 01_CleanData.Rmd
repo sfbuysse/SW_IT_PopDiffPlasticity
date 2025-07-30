@@ -478,7 +478,7 @@ print(shapiro.test(CleanData_2021$IJ_FruitCount))
 print(shapiro.test(log10(CleanData_2021$IJ_FruitCount)))
 print(shapiro.test(exp(CleanData_2021$IJ_FruitCount)))
 print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
-CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
+#CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 
 # Basia recounts
 print(shapiro.test(CleanData_2021$FruitCount_BL))
@@ -486,6 +486,7 @@ print(shapiro.test(log10(CleanData_2021$FruitCount_BL)))
 print(shapiro.test(exp(CleanData_2021$FruitCount_BL)))
 print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 # none of the transformations do better than the raw counts.But honestly it is not normally distributed.
+# Can't use log transformation because it turns the zeros to -INF and we want to keep that data
 ```
 
 ```{r}
