@@ -576,7 +576,7 @@ fruit_pairs_21 <- as.data.frame(pairs(fruit_emmeans_21))
 fruit_pairs_21$trait <- "FruitNum"
 
 ```
-#jump here
+
 ```{r}
 # try a hurdle model
 library(pscl)
@@ -723,8 +723,8 @@ cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$AvgSeedNum, D
 plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$AvgSeedNum, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$AvgSeedWt)
 
 # just fut?
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$AvgSeedNum, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedWt)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedNum, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$AvgSeedWt)
+cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedNum, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedWt)
+plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedNum, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$AvgSeedWt)
 ```
 
 
@@ -1507,9 +1507,47 @@ The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and
 
 Choosing to only include SLA and move LDMC to the supplemental so I want correlation information for the two traits.
 ```{r}
+# 2021
+# overall
 cor.test(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
+plot(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
 
+# just in SW
+cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
+plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
+
+# just in IT
+cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
+plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
+
+# just cur?
+cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
+plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
+
+# just fut?
+cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
+plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
+
+# 2022
+# overall
 cor.test(Dat_2022$SLA, Dat_2022$LDMC)
+plot(Dat_2022$SLA, Dat_2022$LDMC)
+
+# just in SW
+cor.test(Dat_2022[Dat_2022$Population == "R", ]$SLA, Dat_2022[Dat_2022$Population == "R", ]$LDMC)
+plot(Dat_2022[Dat_2022$Population == "R", ]$SLA, Dat_2022[Dat_2022$Population == "R", ]$LDMC)
+
+# just in IT
+cor.test(Dat_2022[Dat_2022$Population == "B", ]$SLA, Dat_2022[Dat_2022$Population == "B", ]$LDMC)
+plot(Dat_2022[Dat_2022$Population == "B", ]$SLA, Dat_2022[Dat_2022$Population == "B", ]$LDMC)
+
+# just cur?
+cor.test(Dat_2022[Dat_2022$Treatment == "Current", ]$SLA, Dat_2022[Dat_2022$Treatment == "Current", ]$LDMC)
+plot(Dat_2022[Dat_2022$Treatment == "Current", ]$SLA, Dat_2022[Dat_2022$Treatment == "Current", ]$LDMC)
+
+# just fut?
+cor.test(Dat_2022[Dat_2022$Treatment == "Current", ]$SLA, Dat_2022[Dat_2022$Treatment == "Future", ]$LDMC)
+plot(Dat_2022[Dat_2022$Treatment == "Future", ]$SLA, Dat_2022[Dat_2022$Treatment == "Current", ]$LDMC)
 ```
 
 
@@ -1803,13 +1841,60 @@ predictmeans(lm, modelterm="Treatment:Population",  plotord = c(1,2), lineplot =
 # test selection gradient?
 Do I want this? discuss with Emily and Jeff
 ```{r}
+# create subset for each pop x trt combination (4 subsets) - only keeping traits related to avoidance/escape that are not too highly correlated and keeps the number of predictors decently low
+
+# sweden - cur has 27 plants, fut has 25
+sw_cur <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Treatment == "Current", c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "RWC", "SLA", "EmergeToFlwr", "fitness")]
+
+sw_fut <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Treatment == "Future", c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "RWC", "SLA", "EmergeToFlwr", "fitness")]
+
+# italy - cur has 18 plants, fut has 15 plants
+it_cur <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Treatment == "Current", c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "RWC", "SLA", "EmergeToFlwr", "fitness")]
+
+it_fut <- Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Treatment == "Future", c("Pot.ID", "Population", "Line", "Replicate", "Treatment", "RWC", "SLA", "EmergeToFlwr", "fitness")]
+
 # need to calculate relative fitness and scale the variables
-sg_SW <- lmer(fitness ~ RWC + SLA + EmergeToFlwr + (1|Line), data = Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ])
-summary(sg_SW)
+sw_cur <- sw_cur %>%
+  mutate(rel.fit = fitness / max(fitness, na.rm = T),
+         RWC = c(scale(RWC, center = T, scale = T)),
+         SLA = c(scale(SLA, center = T, scale = T)),
+         EmergeToFlwr = c(scale(EmergeToFlwr, center = T, scale = T))
+  )
 
+sw_fut <- sw_fut %>%
+  mutate(rel.fit = fitness / max(fitness, na.rm = T),
+         RWC = c(scale(RWC, center = T, scale = T)),
+         SLA = c(scale(SLA, center = T, scale = T)),
+         EmergeToFlwr = c(scale(EmergeToFlwr, center = T, scale = T))
+  )
 
-sg_IT <- lmer(fitness ~ RWC + SLA + EmergeToFlwr + (1|Line), data = Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ])
-summary(sg_SW)
+it_cur <- it_cur %>%
+  mutate(rel.fit = fitness / max(fitness, na.rm = T),
+         RWC = c(scale(RWC, center = T, scale = T)),
+         SLA = c(scale(SLA, center = T, scale = T)),
+         EmergeToFlwr = c(scale(EmergeToFlwr, center = T, scale = T))
+  )
+
+it_fut <- it_fut %>%
+  mutate(rel.fit = fitness / max(fitness, na.rm = T),
+         RWC = c(scale(RWC, center = T, scale = T)),
+         SLA = c(scale(SLA, center = T, scale = T)),
+         EmergeToFlwr = c(scale(EmergeToFlwr, center = T, scale = T))
+  )
+
+# run the selection gradients
+sg_sw_cur <- lmer(rel.fit ~ RWC + SLA + EmergeToFlwr + (1|Line), data = sw_cur)
+summary(sg_sw_cur) # nothing significant
+
+sg_sw_fut <- lmer(rel.fit ~ RWC + SLA + EmergeToFlwr + (1|Line), data = sw_fut)
+summary(sg_sw_fut) # actually does show selection for earlier flowering
+
+sg_it_cur <- lmer(rel.fit ~ RWC + SLA + EmergeToFlwr + (1|Line), data = it_cur)
+summary(sg_it_cur) # nothing significant
+
+sg_it_fut <- lmer(rel.fit ~ RWC + SLA + EmergeToFlwr + (1|Line), data = it_fut)
+summary(sg_it_fut) # nothing significant
+
 ```
 
         

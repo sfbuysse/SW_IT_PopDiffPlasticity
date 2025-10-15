@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-07-30"
+date: "2025-09-17"
 output: 
   html_document:
     toc: true
@@ -278,7 +278,7 @@ forplot3_2021 <- merge(tmp_mean_21, tmp_ci_21)
 
 # plot
 ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
-  geom_point(aes(col=Population, shape = Population), size = 2, show.legend = TRUE) +
+  geom_point(aes(col=Population, shape = Population), size = 3, show.legend = TRUE) +
   #geom_errorbar(aes(ymin=mean-ci, ymax = mean + ci, col = Population), width = 0.1, size = 0.8, show.legend = TRUE)+
   geom_line(aes(group = Treatment:Population, col = Population, linetype = Treatment), size = 1)+ 
   labs(y="Leaf Number", 
@@ -674,7 +674,7 @@ fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
                   labels = c("A", "B", "C", "D"),
                   ncol = 2, nrow = 2,
                   common.legend = TRUE, # goes based on the first plot
-                  legend = "top",
+                  legend = "none",
                   align = "hv"
 )
 #label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
@@ -689,7 +689,7 @@ fig2 <- ggarrange(rs, ros_2022, bg,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
                   common.legend = TRUE,
-                  legend = "top",
+                  legend = "none",
                   align = "hv")
 fig2
 ```
@@ -701,7 +701,7 @@ fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
                   labels = c("A", "B", "C"),
                   ncol = 3, nrow = 1,
                   common.legend = TRUE,
-                  legend = "top",
+                  legend = "none",
                   align = "h"
 )
 fitness_fig
@@ -719,11 +719,11 @@ Old for label.x adjustment reminder if I need it again\
 Figure s1 - single leaf traits \
 
 ``` r
-figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, perim, ldmc,
+figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xlab"), freshwt, hydwt, drywt, 
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "top",
+                  legend = "none",
                   align = "h"
                   )
 figs1
@@ -738,7 +738,7 @@ figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rrem
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
-                  legend = "top",
+                  legend = "none",
                   align = "h"
                   )
 figs2
@@ -811,9 +811,9 @@ ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5,
 
 
 #figs1
-ggsave(figs1, filename = "figures/figs1.jpg", width = 7, height = 8, units = "in", dpi = 300)
+ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 300)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 7, height = 8, units = "in", dpi = 300)
+ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 300)
 ```
 

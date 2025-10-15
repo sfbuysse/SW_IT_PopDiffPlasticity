@@ -469,7 +469,7 @@ seed_wt <- ggplot(data = Means_2021[["AvSeedWt_means_21"]], aes(x = Treatment, y
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
-  labs(y="Average Seed\nWeight (mg)", 
+  labs(y="Seed Weight (mg)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -485,7 +485,7 @@ seed_per_fruit <- ggplot(data = Means_2021[["seeds_means_21"]], aes(x = Treatmen
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
   geom_line(aes(group = Population, col = Population), size = 1, position = position_dodge(width = 0.3))+ 
-  labs(y="Average Seeds per Fruit", 
+  labs(y="Seeds per Fruit", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -877,7 +877,7 @@ hydwt <- ggplot(data = both_dfs[["hyd"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
-  labs(y="Saturated Weight (g)", 
+  labs(y="Rehydrated Weight (g)", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -915,7 +915,7 @@ area <- ggplot(data = both_dfs[["area"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
-  labs(y="Leaf Area (cm^2)", 
+  labs(y=expression(paste("Leaf Area ", (cm^2))), 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -955,7 +955,7 @@ sla <- ggplot(data = both_dfs[["sla"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
   geom_line(aes(group = Exp:Population, col = Population, linetype = Exp), size = 1, position = position_dodge(width = 0.3), show.legend = TRUE)+
-  labs(y="Specific Leaf Area (cm^2 / g)", 
+  labs(y=expression(paste("Specific Leaf Area ", (cm^2 / g))),
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
@@ -1094,7 +1094,7 @@ ggarrange(detf, rwc,
 
 Figure s1 - single leaf traits \
 ```{r}
-figs1 <- ggarrange(freshwt+rremove("xlab"), hydwt+rremove("xlab"), drywt, area, perim, ldmc,
+figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xlab"), freshwt, hydwt, drywt, 
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
