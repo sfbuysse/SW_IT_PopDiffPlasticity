@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2025-07-21"
+date: "2025-10-17"
 output:
   html_document:
     toc: true
@@ -13,7 +13,7 @@ output:
 
 # description
 
-This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript.
+This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript. (the third treatment, where plants were in the Current treatment before vernalization but the Future treatment after was completed and is present in the raw data but was not included in analyses.)
 
 # Set basic info for all code
 
@@ -96,18 +96,18 @@ Note: There was a labelling error that is fixed later on. IT RIL Parent seeds or
 Harv_blue <- Harv_blue[!(is.na(Harv_blue$Line)), c(1:14)]
 colnames(Harv_blue) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "Harvest.Date", "RosetteLeafNum", "FreshRosetteG", "DryRosetteG", "FreshReproG", "DryReproG", "FreshRootG", "DryRootG", "Notes")
 
-# calculate some other traits
-# root to shoot ratio is the root mass devided by all above ground biomass (dry)
+# calculate biomass allocation
+# root to shoot ratio is the root mass divided by all above ground biomass (dry)
 Harv_blue$Root_to_Shoot <- Harv_blue$DryRootG/(Harv_blue$DryRosetteG + Harv_blue$DryReproG)
-# reproducive to rosette is the reproductive weight divided by the rosette weight. Decided to go this way so that a higher value indicates more investment in 
+# reproductive to rosette is the reproductive weight divided by the rosette weight. Decided to go this way so that a higher value indicates more investment in 
 # reproductive tissue relative to the rosette weight it has
 Harv_blue$Repro_to_Ros <- Harv_blue$DryReproG / Harv_blue$DryRosetteG
 
-# fix envelope labelling mistake and fill in with accurate values; while there was a mistake here, my lab notebook says " I put some of the R47-1-C reproductive in the R21-1-C reproductive envelope. I could kind of fix it, but R47-1 might be low and R21-1 might be high so I should discard both of these reproductive weights. Thus, commenting out these lines.
+# fix envelope labeling mistake and fill in with accurate values; while there was a mistake here, my lab notebook says " I put some of the R47-1-C reproductive in the R21-1-C reproductive envelope. I could kind of fix it, but R47-1 might be low and R21-1 might be high so I should discard both of these reproductive weights. Thus, commenting out these lines and leaving them as NA values.
 #Harv_blue[Harv_blue$Pot.ID == "R21-1-C", "DryReproG"] <- 2.0414
 #Harv_blue[Harv_blue$Pot.ID == "R47-1-C", "DryReproG"] <- 1.2501
 
-#R35-2-C was dropped before flowering (on 10/14) so I am dropping the value on anything collected post the drop.
+#R35-2-C was dropped before flowering (on 10/14) so I am dropping the value on anything collected post the drop (i.e., the harvest datasheets, the other is done below).
 Harv_blue <- Harv_blue[!(Harv_blue$Pot.ID == "R35-2-C"), ]
 
 colnames(Harv_pink) <- c("Population", "Line", "Replicate", "Treatment", "Pot.ID", "IJ_FruitCount", "FruitCounter", "BranchStructure", "LatBranches", "PrimaryStalks", "Height_cm", "TotFruit", "FruitCollected", "FruitColLocation", "DoneFlwr", "NumFlwrLeft", "Notes", "FruitColWt_mg", "SeedColWt_mg", "ScanPosition", "ScanPhotoName", "IJ_SeedCount", "SeedCounter", "FruitCount_BL", "Notes2")
@@ -133,7 +133,7 @@ SingleLeaf[SingleLeaf$Pot.ID == "B3-2-CF2", "Pot.ID"] <- "B3-2-CF"
 # and get rid of extra rows at the end
 SingleLeaf <- SingleLeaf[!(is.na(SingleLeaf$Line)), ]
 
-# Calculate other traits
+# Calculate drought traits
 # SLA = leaf area / leaf dry mass
 SingleLeaf$SLA <- SingleLeaf$LeafArea/SingleLeaf$DriedWt_g
 # LDMC = dry mass / saturated mass
@@ -145,7 +145,7 @@ SingleLeaf$RWC = (SingleLeaf$FreshWt_g - SingleLeaf$DriedWt_g) / (SingleLeaf$Sat
 
 At this point, sorted each dataframe by values to identify any high or low outliers. Did not find anything that was attributed to data entry errors. Also went through the notes columns to see if anything should be removed. 
 
-Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had Basia recount a third time and used those values.
+Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had Basia recount fruit number from images a third time and used those values in the manuscript.
 
 Leaf number is also variable with some counted at bolting and some at flowering so may need to toss that trait.
 
@@ -293,8 +293,7 @@ write.csv(AllData_2021,"data/AllData_2021.csv", row.names = FALSE)
 ```
 
 
-
-Now clean up environment
+Now clean up R environment
 
 ``` r
 rm("Harv_blue", "Harv_pink", "LeafNum", "Phenology", "PlantingDay", "SingleLeaf", "change.these", "rm_these")
@@ -303,7 +302,7 @@ rm("Harv_blue", "Harv_pink", "LeafNum", "Phenology", "PlantingDay", "SingleLeaf"
 Now clean up AllData dataframe
 
 ``` r
-# first make some factors
+# first make factors
 AllData_2021$Population <- as.factor(AllData_2021$Population)
 AllData_2021$Treatment <- as.factor(AllData_2021$Treatment)
 AllData_2021$Soil.Mix.Batch.Number.x <- as.factor(AllData_2021$Soil.Mix.Batch.Number.x)
@@ -312,8 +311,8 @@ AllData_2021$DoneFlwr <- as.factor(AllData_2021$DoneFlwr)
 AllData_2021$FruitCounter <- as.factor(AllData_2021$FruitCounter)
 AllData_2021$SeedCounter <- as.factor(AllData_2021$SeedCounter)
 
-# and some num
-AllData_2021$TotFruit <- as.numeric(AllData_2021$TotFruit) # forces columns with "some fruit" or similar to NA which is OK because these were harvested early (root washed)
+# and  numeric
+AllData_2021$TotFruit <- as.numeric(AllData_2021$TotFruit) # forces columns with "some fruit" or similar to NA which is OK because these were harvested early (root washed) and fruit number is not total fitness
 ```
 
 ```
@@ -354,7 +353,7 @@ AllData_2021$Wilted_Died <- julian(as.Date(AllData_2021$Wilted_Died, "%m/%d/%Y")
 AllData_2021$Leaf_Collected <- julian(as.Date(AllData_2021$Leaf_Collected, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
 AllData_2021$Harvest.Date <- julian(as.Date(AllData_2021$Harvest.Date, "%m/%d/%Y"), origin = as.Date("2021-06-24"))
 
-# Calculate the days between each phenological timepoint
+# Calculate the days between each phenological time point
 # days to bolt - days to emergence
 AllData_2021$DayToBolt = AllData_2021$Bolting - AllData_2021$Emergence
 
@@ -381,7 +380,7 @@ CleanData_2021$Notes.y <- NULL
 CleanData_2021$Notes <- NULL
 CleanData_2021$Notes2 <- NULL
 
-# add zeros to TotFruit so it is a better measure of fitness and includes the plants that died.Keep NA if is a missing value only (plants root harvested or missed). Way of doing this is that if it is an NA in harvest date, make a 0 for fruit columns
+# add zeros to TotFruit so it is a better measure of fitness and includes the plants that died. Keep NA if is a missing value only (plants root harvested or missed). Way of doing this is that if it is an NA in harvest date, make a 0 for fruit columns
 CleanData_2021$TotFruit[is.na(CleanData_2021$Harvest.Date)] <- 0
 CleanData_2021$IJ_FruitCount[is.na(CleanData_2021$Harvest.Date)] <- 0
 CleanData_2021$FruitCount_BL[is.na(CleanData_2021$Harvest.Date)] <- 0
@@ -400,7 +399,7 @@ CleanData_2021 <- CleanData_2021[!(CleanData_2021$Treatment == "Current/Future")
 
 ## Transformations
 
-This code is determining which traits may need to be transformed when I run model analysis in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
+This code is determining which traits may need to be transformed when I run linear models and ANOVAs in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
 
 Start with big overview of everything
 
@@ -423,8 +422,6 @@ CleanData_2021 %>% select_if(is.numeric) %>% gather(cols, value) %>%
 ```
 
 ![](01_CleanData_files/figure-html/histograms-1.png)<!-- -->
-
-Start to go through traits one at a time. Make each one its own code chunk for ease of viewing figures. 
 
 Fresh weight of Single Leaf
 
@@ -625,7 +622,7 @@ Specific Leaf Area
 
 ``` r
 #explore_trans(CleanData_2021$SLA)
-#function throws an error so did it by hand (probably because of NAs, issue with exponential transformation)
+#function throws an error so did it by hand (because of NAs, issue with exponential transformation)
 plotNormalHistogram(CleanData_2021$SLA)
 ```
 
@@ -776,7 +773,7 @@ explore_trans(CleanData_2021$RWC)
 ```
 
 ``` r
-# none of these are really good. leave alone. Exp i technically better
+# none of these are really good. leave alone. Exponential is technically better
 ```
 
 Leaf Number, early stages
@@ -1280,10 +1277,6 @@ explore_trans(CleanData_2021$LatBranches)
 ## W = 0.94351, p-value = 0.001379
 ```
 
-``` r
-# leave it alone
-```
-
 Number of Primary Stalks
 
 ``` r
@@ -1318,10 +1311,6 @@ explore_trans(CleanData_2021$PrimaryStalks)
 ## W = 0.87349, p-value = 9.606e-07
 ```
 
-``` r
-# leave it alone
-```
-
 
 ``` r
 explore_trans(CleanData_2021$Height_cm)
@@ -1354,13 +1343,9 @@ explore_trans(CleanData_2021$Height_cm)
 ## data:  sqrt(trait)
 ## W = 0.88581, p-value = 3.218e-06
 ```
-
-``` r
-# none are great, so I'm going to leave it alone for now.
-```
 Fruit Number
 
-I have 3 fruit numbers - the one when harvested, the imageJ 1 from many people, and the imageJ 2 where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
+I have 3 fruit numbers - the one when harvested, the imageJ round one from many people, and the imageJ round two where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
 
 ``` r
 fruit_comp<- CleanData_2021[CleanData_2021$Treatment %in% c("Current", "Future"), c("TotFruit", "IJ_FruitCount", "FruitCount_BL")]
@@ -1506,7 +1491,7 @@ print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
 ```
 
 ``` r
-CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
+#CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 
 # Basia recounts
 print(shapiro.test(CleanData_2021$FruitCount_BL))
@@ -1557,7 +1542,8 @@ print(shapiro.test(sqrt(CleanData_2021$FruitCount_BL)))
 ```
 
 ``` r
-# none of the transformations do better than the raw counts.But honestly it is not normally distributed.
+# none of the transformations do better than the raw counts
+# Can't use log transformation because it turns the zeros to -INF and we want to keep that data
 ```
 
 
@@ -1676,7 +1662,7 @@ explore_trans(CleanData_2021$SeedColWt_mg)
 ```
 
 ``` r
-# what actually matters is the average seed weight, not the total
+# what matters is the average seed weight, not the total
 CleanData_2021$AvgSeedWt <- CleanData_2021$SeedColWt_mg / CleanData_2021$IJ_SeedCount
 explore_trans(CleanData_2021$AvgSeedWt)
 ```
@@ -1816,7 +1802,7 @@ Fitness - calculated with Basia's fruit counts
 
 ``` r
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
-# if fruit count is a 0, need to also make total fitness a 0 (and  not an NA)
+# if fruit count is a 0, need to also make total fitness a 0 (and not an NA)
 CleanData_2021[(CleanData_2021$FruitCount_BL == 0 & !is.na(CleanData_2021$FruitCount_BL)), c("fitness") ] <- 0
 # there are 7 remaining NA values in fitness. 4 are because of missing fruit counts. 3 are because of missing seed per fruit counts
 
@@ -1878,7 +1864,7 @@ print(shapiro.test(sqrt(CleanData_2021$fitness)))
 ```
 
 ``` r
-#CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness) doesn't work with added zeros cause get -Inf
+#CleanData_2021$l10_fitness <- log10(CleanData_2021$fitness)
 CleanData_2021$SQR_fitness <- sqrt(CleanData_2021$fitness)
 
 # look at just the zeros to see if there are differences to explore with zero-inflated or hurdle models
@@ -2050,7 +2036,7 @@ write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
 
 ## Load in Data
 
-Raw data files not saved in github. All intermediate files are.
+Raw data files not saved in github. All intermediate files are in the data subfolder.
 
 
 ``` r
@@ -2065,7 +2051,7 @@ Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabid
 
 ## Clean up data
 
-Now, organize data to rows with data.
+Now, remove extra rows
 
 ``` r
 # remove test rows. note: total leaf number wasn't split into rosette and under until partway through harvesting
@@ -2103,7 +2089,7 @@ Alldata_2022 <- merge(Dat1, Dat2, by = c("PotID", "Treatment"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat3, by =c("PotID"), all = TRUE)
 Alldata_2022 <- merge(Alldata_2022, Dat4, by = c("PotID", "Treatment"), all = TRUE)
 
-# has one more row than Dat4 because of "B15-1-C (E)" - removed below
+# has one more row than Dat4 because of "B15-1-C (E)" - this was a new emergent that appeared mid experiment and the data is removed below
 
 # add in stomata averages. the just stomata data frame won't merge nicely because of the format.
 Alldata_2022 <- merge(Alldata_2022, Stomata_avg, by = c("PotID", "Treatment"), all = TRUE)
@@ -2116,7 +2102,7 @@ Alldata_2022$RootHarvest <- julian(as.Date(Alldata_2022$RootHarvestDate, "%m/%d/
 
 # calculate days between dates
 Alldata_2022$EmergenceToBolting <- Alldata_2022$Bolting - Alldata_2022$Emergence
-# ideally, bolting to harvest is zero and harvest to root harvest is zero but hasn't always feasible. May want the difference in a model
+# ideally, bolting to harvest is zero and harvest to root harvest is zero but wasn't always feasible. May want the difference in a model
 Alldata_2022$BoltingToRootWashing <- Alldata_2022$RootHarvest - Alldata_2022$Bolting
 Alldata_2022$BoltingToHarvest <- Alldata_2022$Harvest - Alldata_2022$Bolting 
 
@@ -2142,18 +2128,17 @@ CleanData_2022 <- Alldata_2022
 
 keepCols <- c("PotID", "Treatment", "Population", "Line.x", "Replicate", "Chamber", "Flat", "transplanted", "Emergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest", "Number.Emerged", "Leaf.Number.PreVern..post.transplant", "LeafNumber_6.6.2022", "LeafNumber_6.13.2022", "SingleLeaf_FreshWt.g.", "SingleLeafHydratedWt.g.", "SingleLeafDryWt.g.", "Area", "Perim.", "TotalLeafNumber", "RosetteLeafNumber", "UnderLeavesNumber", "AG_DryBiomass.g.", "BG_DryBiomass.g.", "Stom_avg")
 
-# Note: plants that died are still included at this point. by keeping Line.x, all the plants that were transplanted into with a genotype (so their line no longer exists in the dataframe) have an NA in the line column. I want to remove these because they are not helfpul, and I know from later on in the analysis that days to emergence and leaf number at 4 weeks are not important traits in the analysis (maybe not even being included in the supplemental) so I should exclude these plants that only have those 2 traits measured and died before bolting when the important traits were measured.
+# Note: plants that died are still included at this point. by keeping Line.x, all the plants that were transplanted into with a genotype (so their line no longer exists in the dataframe) have an NA in the line column. I want to remove these because they are not helpful, and I know from later on in the analysis that days to emergence and leaf number at 4 weeks are not differentiated between populations or treatments so I can exclude these plants that only have those 2 traits measured and died before bolting when the more relevant traits were measured.
 
 
 # for the columns, I am reordering so all the general info is in the first few columns, then dates of things only keeping the "days to" calculations, leaf numbers through growth period, single leaf traits, then whole plant harvest traits
 
 CleanData_2022 <- CleanData_2022[!(is.na(CleanData_2022$Line.x)) , keepCols ]
 
-# now Clean up those column names!
-# NoTe: The flat column is for after vernalization. Before vernalization the chamber column is equivalent to the different flats and all plants were in the same chamber.
+# Note: The flat column is for after vernalization. Before vernalization the chamber column is equivalent to the different flats and all plants were in the same chamber.
 colnames(CleanData_2022) <- c("PotID", "Treatment", "Population", "Line", "Replicate", "Chamber", "Flat", "Transplanted", "DaysToEmergence", "EmergenceToBolting", "BoltingToRootWashing", "BoltingToHarvest",  "NumEmerged", "LeafNumber_PreVern", "LeafNumber_Jun6", "LeafNumber_Jun13", "SL_FreshWt", "SL_HydWt", "SL_DryWt", "SL_Area", "SL_Perim", "LeafNumber_Total", "LeafNumber_Rosette", "LeafNumber_UnderLeaves", "AG_DryBiomass", "BG_DryBiomass", "Stomata_avg")
 
-# Change some things to factors
+# Change some cols to factors
 CleanData_2022$Treatment <- as.factor(CleanData_2022$Treatment)
 CleanData_2022$Population <- as.factor(CleanData_2022$Population)
 CleanData_2022$Chamber <- as.factor(CleanData_2022$Chamber)
@@ -2173,24 +2158,16 @@ CleanData_2022$LDMC = CleanData_2022$SL_DryWt / CleanData_2022$SL_HydWt
 CleanData_2022$RWC = (CleanData_2022$SL_FreshWt - CleanData_2022$SL_DryWt) / (CleanData_2022$SL_HydWt - CleanData_2022$SL_DryWt)
 # Root_to_Shoot
 CleanData_2022$Root_to_Shoot <- CleanData_2022$BG_DryBiomass/(CleanData_2022$AG_DryBiomass)
-# 2022 info: stomatal density - FOV under 40x magnification is 29.87μm in width, 22.87 μm in height. Area is 683.17 μm2 if square (or .000683 mm2). 536.2546 if oval
-# new info from Tori on 5/28/2025 is: The lens on the microscope was a 40x magnification but the eyepiece was also a 10x magnification so the total magnification for our images is 400x. 
-# Our images are 3584 pixels wide by 2748 pixels tall. Using the pixel dimensions and the scale that 0.1mm = 1200 pixels, our images should be 298.67µm x 229.00µm (or .29867mm x .229 mm). That should make the area of the FOV approximately 0.068395 mm^2 or 68,395.43 µm^2
-# SB notes: these values are still like 3x higher than I was expecting, but are the best we have so far
-
-# Tori went back an remeasured (did more research, found out pixel method is unreliable, used a better way with micrometer images) and got 0.290mm length x 0.228mm width
+# 2022 info: stomatal density - FOV is 0.290mm length x 0.228mm width
 CleanData_2022$Stomata_density <- CleanData_2022$Stomata_avg / (0.290 * 0.228 )
-
-# to match low end of published 80- 200 stomata/mm2, would expect the area to be 0.5mm2 or 500um2
 ```
 
 ## Transformations
-This code is determining which traits may need to be transformed when I run model analysis in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
+This code is determining which traits may need to be transformed when we run linear models in the next script. It checks general distributions, tries different transformations, and adds a column to CleanData with the transformed phenotype if transformation increases normality. Note: for the models, the residuals need to be normal for the linear regression assumption, not necessarily the variables themselves.
 
 Start with big overview of everything
 
 ``` r
-# get a giant view of all the traits, not a super helpful figure honestly
 CleanData_2022 %>% select_if(is.numeric) %>% gather(cols, value) %>% 
   ggplot(aes(x = value)) + 
   geom_histogram() + 
@@ -2278,7 +2255,7 @@ explore_trans(CleanData_2022$EmergenceToBolting)
 ```
 
 ``` r
-# just check distributions
+# check distributions
 plotNormalHistogram(CleanData_2022$BoltingToRootWashing)
 ```
 
@@ -2546,7 +2523,7 @@ explore_trans(CleanData_2022$RWC)
 ```
 
 ``` r
-#exp best but rest really similar so not doing anything for consistency
+#exponential is best but the others are quite similar so not doing anything for consistency unless issues with model fit
 
 explore_trans(CleanData_2022$LDMC)
 ```
