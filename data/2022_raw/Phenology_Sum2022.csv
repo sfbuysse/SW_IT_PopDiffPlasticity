@@ -1,0 +1,150 @@
+Treatment,PotID,Population,Line,Replicate,Emergence Date,"Leaf Number PreVern, post transplant",transplanted,transplant_notes,Number Emerged,Notes
+Current,B1-1-C,B,1,1,4/15/2022,10,no,no,2,
+Current,B1-2-C,B,1,2,4/16/2022,10,no,to B2-3-C,3,
+Current,B1-3-C,B,1,3,4/15/2022,11,no,to B2-1-C,3,
+Current,B1-4-C,B,1,4,4/15/2022,10,no,no,3,
+Current,B1-5-C,B,1,5,,11,yes,yes; from B1-3-C,,
+Current,B1-6-C,B,1,6,,10,yes,yes; from B1-2-C,,
+Current,B2-1-C,B,2,1,,,yes,yes; from B1-3-C,0,changed geno
+Current,B2-2-C,B,2,2,4/22/2022,4,no,no,2,"kept both, second had 2 leaves and died"
+Current,B2-3-C,B,2,3,4/26/2022,,yes,yes; from B1-2-C,1,looks empty 4/19; changed geno
+Current,B2-4-C,B,2,4,4/18/2022,,yes,yes; from B15-4-C,1,looks empty 4/19; changed geno
+Current,B3-1-C,B,3,1,4/15/2022,10,no,to B4-1-F,5,
+Current,B3-2-C,B,3,2,4/16/2022,7,no,no,3,
+Current,B3-3-C,B,3,3,4/15/2022,10,no,to B4-3-F,4,
+Current,B3-4-C,B,3,4,4/15/2022,11,no,no,5,
+Current,B3-5-C,B,3,5,,10,yes,yes; from B3-1-C,,
+Current,B3-6-C,B,3,6,,8,yes,yes; from B3-3-C,,
+Current,B4-1-C,B,4,1,,,yes,yes; from B8-2-C,0,changed geno
+Current,B4-2-C,B,4,2,,,yes,yes; from B8-3-C,0,changed geno
+Current,B4-3-C,B,4,3,,,yes,yes; from B8-4-C,0,changed geno
+Current,B4-4-C,B,4,4,4/18/2022,,yes,yes; from B8-4-F,1,looks dead 5/3; changed geno
+Current,B8-1-C,B,8,1,4/16/2022,8,no,no,5,
+Current,B8-2-C,B,8,2,4/16/2022,8,no,to B4-1-C,5,
+Current,B8-3-C,B,8,3,4/15/2022,10,no,to B4-2-C,5,
+Current,B8-4-C,B,8,4,4/15/2022,10,no,to B4-3-C,3,
+Current,B8-7-C,B,8,7,,8,yes,yes; from B8-4-C,,
+Current,B8-8-C,B,8,8,,10,yes,yes; from B8-4-F,,
+Current,B12-1-C,B,12,1,4/21/2022,,yes,yes; from B13-4-F,1,looks dead 5/3; changed geno
+Current,B12-2-C,B,12,2,4/20/2022,7,no,no,1,
+Current,B12-3-C,B,12,3,4/18/2022,8,no,no,1,
+Current,B12-4-C,B,12,4,4/18/2022,6,no,no,1,
+Current,B13-1-C,B,13,1,4/18/2022,7,yes,yes form B13-2-C,1,looks empty 4/29
+Current,B13-2-C,B,13,2,4/17/2022,9,no,to B13-4-C and B13-1-C,5,left 2 in case 1 dies -> down to 1 on 5/24
+Current,B13-3-C,B,13,3,4/15/2022,8,no,to B13-1-F,5,
+Current,B13-4-C,B,13,4,4/21/2022,6,yes,yes from B13-2-C,1,looks empty 5/3
+Current,B13-5-C,B,13,5,,8,yes,yes; from B13-4-F,,
+Current,B15-1-C,B,15,1,4/16/2022,10,no,to B2-4-F,3,
+Current,B15-2-C,B,15,2,4/16/2022,10,no,no,3,
+Current,B15-3-C,B,15,3,4/15/2022,11,no,no,3,
+Current,B15-4-C,B,15,4,4/15/2022,10,no,no,4,
+Current,B15-5-C,B,15,5,,9,yes,yes; from B15-4-F,,
+Current,R2-1-C,R,2,1,4/15/2022,8,no,no,4,
+Current,R2-2-C,R,2,2,4/15/2022,9,no,no,4,
+Current,R2-3-C,R,2,3,4/16/2022,8,no,no,3,
+Current,R2-4-C,R,2,4,4/16/2022,8,no,no,4,
+Current,R8-1-C,R,8,1,4/15/2022,8,no,no,5,
+Current,R8-2-C,R,8,2,4/16/2022,8,no,no,3,
+Current,R8-3-C,R,8,3,4/15/2022,8,no,no,3,
+Current,R8-4-C,R,8,4,4/16/2022,7,no,no,3,
+Current,R11-1-C,R,11,1,4/15/2022,10,no,no,4,
+Current,R11-2-C,R,11,2,4/16/2022,8,no,no,2,
+Current,R11-3-C,R,11,3,4/15/2022,10,no,no,4,
+Current,R11-4-C,R,11,4,4/15/2022,9,no,no,6,
+Current,R21-1-C,R,21,1,4/16/2022,8,no,no,1,
+Current,R21-2-C,R,21,2,4/16/2022,8,no,no,2,
+Current,R21-3-C,R,21,3,4/16/2022,7,no,no,2,
+Current,R21-4-C,R,21,4,4/16/2022,8,no,no,4,
+Current,R29-1-C,R,29,1,4/16/2022,8,no,no,3,
+Current,R29-2-C,R,29,2,4/15/2022,7,no,no,3,
+Current,R29-3-C,R,29,3,4/15/2022,9,no,no,4,
+Current,R29-4-C,R,29,4,4/15/2022,7,no,no,3,
+Current,R35-1-C,R,35,1,4/15/2022,10,no,no,3,
+Current,R35-2-C,R,35,2,4/15/2022,9,no,no,4,
+Current,R35-3-C,R,35,3,4/16/2022,8,no,no,3,
+Current,R35-4-C,R,35,4,4/15/2022,9,no,no,3,
+Current,R40-1-C,R,40,1,4/16/2022,7,no,no,4,
+Current,R40-2-C,R,40,2,4/16/2022,7,no,no,4,
+Current,R40-3-C,R,40,3,4/16/2022,9,no,no,1,
+Current,R40-4-C,R,40,4,4/16/2022,7,no,no,3,
+Current,R47-1-C,R,47,1,4/18/2022,6,no,no,2,
+Current,R47-2-C,R,47,2,4/17/2022,7,no,no,3,
+Current,R47-3-C,R,47,3,4/16/2022,6,no,no,3,
+Current,R47-4-C,R,47,4,4/17/2022,4,no,no,2,kept both
+Future,B1-1-F,B,1,1,4/14/2022,8,no,no,1,
+Future,B1-2-F,B,1,2,4/14/2022,12,no,no,2,
+Future,B1-3-F,B,1,3,4/15/2022,11,no,no,3,
+Future,B1-4-F,B,1,4,4/15/2022,11,no,to B2-1-F (now B1-5-F),2,
+Future,B1-5-F,B,1,5,,11,yes,from B1-4-F,,
+Future,B2-1-F,B,2,1,4/24/2022,,yes,from B1-4-F,1,looks empty 5/3; changed geno
+Future,B2-2-F,B,2,2,4/24/2022,4,no,no,2,
+Future,B2-3-F,B,2,3,4/15/2022,11,no,no,1,
+Future,B2-4-F,B,2,4,4/25/2022,,yes,from B15-1-C,1,looks empty 4/19; changed geno
+Future,B3-1-F,B,3,1,4/15/2022,11,no,no,4,
+Future,B3-2-F,B,3,2,4/14/2022,10,no,no,2,
+Future,B3-3-F,B,3,3,4/15/2022,10,no,no,2,
+Future,B3-4-F,B,3,4,4/15/2022,10,no,to B4-4-F,,
+Future,B3-7-F,B,3,7,,9,yes,yes; from B3-4-F,,
+Future,B4-1-F,B,4,1,,,yes,from B3-1-C,0,changed geno
+Future,B4-2-F,B,4,2,4/22/2022,4,no,no,2,left 2 to transplant later -> down to 1 on 5/30
+Future,B4-3-F,B,4,3,,,yes,from B3-3-C,0,changed geno
+Future,B4-4-F,B,4,4,,,yes,from B3-4-F,0,changed geno
+Future,B8-1-F,B,8,1,4/14/2022,9,no,no,4,
+Future,B8-2-F,B,8,2,4/15/2022,10,no,no,3,
+Future,B8-3-F,B,8,3,4/16/2022,10,no,no,5,
+Future,B8-4-F,B,8,4,4/16/2022,9,no,to B4-4-C,4,
+Future,B8-5-F,B,8,5,,9,yes,yes; from B8-2-C,,
+Future,B8-6-F,B,8,6,,9,yes,yes; from B8-3-C,,
+Future,B12-1-F,B,12,1,4/17/2022,8,no,no,2,(second looks dried)
+Future,B12-2-F,B,12,2,4/18/2022,9,yes,yes; from B12-4-F,1,looks dead 4/27
+Future,B12-3-F,B,12,3,4/20/2022,6,no,no,1,
+Future,B12-4-F,B,12,4,4/16/2022,9,no,to B12-2-F,2,
+Future,B13-1-F,B,13,1,4/19/2022,9,yes,yes; from B13-3-C,1,looks dead 5/3
+Future,B13-2-F,B,13,2,4/15/2022,10,no,no,2,
+Future,B13-3-F,B,13,3,4/15/2022,7,no,no,4,Emerged date was for the rogue capsella. The rogue capsella was transplanted to a new pot. 
+Future,B13-4-F,B,13,4,4/16/2022,12,no,to B12-1-C,5,
+Future,B15-1-F,B,15,1,4/16/2022,12,no,no,3,
+Future,B15-2-F,B,15,2,4/14/2022,10,no,no,5,
+Future,B15-3-F,B,15,3,4/16/2022,12,no,no,3,
+Future,B15-4-F,B,15,4,4/15/2022,11,no,to B2-4-C,4,
+Future,B15-5-F,B,15,5,,10,yes,yes; from B15-1-C,,
+Future,R2-1-F,R,2,1,4/15/2022,10,no,no,4,
+Future,R2-2-F,R,2,2,4/14/2022,10,no,no,5,
+Future,R2-3-F,R,2,3,4/15/2022,10,no,no,4,
+Future,R2-4-F,R,2,4,4/15/2022,8,no,no,4,
+Future,R8-1-F,R,8,1,4/15/2022,8,no,no,2,
+Future,R8-2-F,R,8,2,4/15/2022,8,no,no,5,
+Future,R8-3-F,R,8,3,4/15/2022,9,no,no,4,
+Future,R8-4-F,R,8,4,4/15/2022,8,no,no,2,
+Future,R11-1-F,R,11,1,4/14/2022,10,no,no,6,
+Future,R11-2-F,R,11,2,4/14/2022,11,no,no,5,
+Future,R11-3-F,R,11,3,4/15/2022,8,no,no,5,
+Future,R11-4-F,R,11,4,4/14/2022,10,no,no,5,
+Future,R21-1-F,R,21,1,4/14/2022,8,no,no,2,
+Future,R21-2-F,R,21,2,4/15/2022,9,no,no,3,
+Future,R21-3-F,R,21,3,4/16/2022,4,no,no,2,kept both
+Future,R21-4-F,R,21,4,4/15/2022,8,no,no,1,
+Future,R29-1-F,R,29,1,4/15/2022,9,no,no,3,
+Future,R29-2-F,R,29,2,4/15/2022,8,no,no,5,
+Future,R29-3-F,R,29,3,4/15/2022,8,no,no,3,
+Future,R29-4-F,R,29,4,4/15/2022,8,no,no,5,
+Future,R35-1-F,R,35,1,4/15/2022,10,no,no,5,
+Future,R35-2-F,R,35,2,4/15/2022,8,no,no,4,
+Future,R35-3-F,R,35,3,4/15/2022,8,no,no,5,
+Future,R35-4-F,R,35,4,4/15/2022,10,no,no,3,
+Future,R40-1-F,R,40,1,4/15/2022,8,no,no,6,( 1 maybe not A. thal)
+Future,R40-2-F,R,40,2,4/16/2022,9,no,no,4,
+Future,R40-3-F,R,40,3,4/16/2022,9,no,no,4,
+Future,R40-4-F,R,40,4,4/16/2022,8,no,no,2,
+Future,R47-1-F,R,47,1,4/16/2022,8,no,no,1,
+Future,R47-2-F,R,47,2,4/14/2022,8,no,no,5,
+Future,R47-3-F,R,47,3,4/16/2022,8,no,no,2,
+Future,R47-4-F,R,47,4,4/18/2022,4,no,no,2,"kept both, 1 as of 6/6/22"
+TEST,B1-X-TEST,B,1,X,4/15/2022,12,no,no,4,thinned on 5/10
+TEST,B3-X-TEST,B,3,X,4/15/2022,13,no,no,2,thinned on 5/10
+TEST,B8-X-TEST,B,8,X,4/15/2022,12,no,no,5,thinned on 5/10
+TEST,B15-X-TEST,B,15,X,4/16/2022,10,no,no,4,thinned on 5/10
+TEST,R8-X-TEST,R,8,X,4/15/2022,12,no,no,2,thinned on 5/10
+TEST,R21-X-TEST,R,21,X,4/14/2022,16,no,no,2,"thinned on 5/10; looks weird! Like 2 places leaves grow from, should have kept the other one but OK because this is for root extraction. "
+TEST,R35-X-TEST,R,35,X,4/15/2022,10,no,no,1,thinned on 5/10
+TEST,R47-X-TEST,R,47,X,4/15/2022,10,no,no,5,thinned on 5/10

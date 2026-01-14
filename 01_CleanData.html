@@ -11,7 +11,7 @@
 
 <meta name="author" content="Sophie Buysse" />
 
-<meta name="date" content="2025-10-17" />
+<meta name="date" content="2026-01-14" />
 
 <title>01_CleanData</title>
 
@@ -1481,21 +1481,19 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">01_CleanData</h1>
 <h4 class="author">Sophie Buysse</h4>
-<h4 class="date">2025-10-17</h4>
+<h4 class="date">2026-01-14</h4>
 
 </div>
 
 
 <div id="description" class="section level1">
 <h1>description</h1>
-<p>This code reads in the raw data and writes out cleaned data files.
-The raw data is not in the github repo, but all of the cleaned data
-files are saved to the data subfolder. A Two Treatment version was saved
-on 7/21/2025 so all histograms were done with only the data being used
-for analysis in this manuscript. (the third treatment, where plants were
-in the Current treatment before vernalization but the Future treatment
-after was completed and is present in the raw data but was not included
-in analyses.)</p>
+<p>This code reads in the raw data and writes out cleaned data files. A
+Two Treatment version was saved on 7/21/2025 so all histograms were done
+with only the data being used for analysis in this manuscript. (the
+third treatment, where plants were in the Current treatment before
+vernalization but the Future treatment after was completed and is
+present in the raw data but was not included in analyses.)</p>
 </div>
 <div id="set-basic-info-for-all-code" class="section level1">
 <h1>Set basic info for all code</h1>
@@ -1548,12 +1546,12 @@ conf_int &lt;- function(x, conf.interval = 0.95){
 <div id="load-in-data" class="section level2">
 <h2>Load in Data</h2>
 <p>Raw Data files not on github.</p>
-<pre class="r"><code>SingleLeaf &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv&quot;)
-Harv_blue &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv&quot;)
-Harv_pink &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv&quot;)
-LeafNum &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv&quot;)
-Phenology &lt;-read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv&quot;)
-PlantingDay &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv&quot;)</code></pre>
+<pre class="r"><code>SingleLeaf &lt;- read.csv(&quot;data/2021_raw/SingleLeaf_green.csv&quot;)
+Harv_blue &lt;- read.csv(&quot;data/2021_raw/Harvest_blue.csv&quot;)
+Harv_pink &lt;- read.csv(&quot;data/2021_raw/Harvest_pink_ImageJ.csv&quot;)
+LeafNum &lt;- read.csv(&quot;data/2021_raw/Leaf Number_yellow.csv&quot;)
+Phenology &lt;-read.csv(&quot;data/2021_raw/Phenology.csv&quot;)
+PlantingDay &lt;- read.csv(&quot;data/2021_raw/PlantingDay.csv&quot;)</code></pre>
 </div>
 <div id="clean-up-data" class="section level2">
 <h2>Clean up data</h2>
@@ -1625,8 +1623,8 @@ removed.</p>
 clicker used to count fruits was skipping 10 or even 100 sometimes. Went
 back to images and recounted fruits in ImageJ, but some of these seem
 very different (196 initially and then 973 from ImageJ) so concerned
-about accuracy of that value as well. Had Basia recount fruit number
-from images a third time and used those values in the manuscript.</p>
+about accuracy of that value as well. Had fruit number recounted from
+images a third time and used those values in the manuscript.</p>
 <p>Leaf number is also variable with some counted at bolting and some at
 flowering so may need to toss that trait.</p>
 <p>B4-1-CF has a new emergent on 8/31/2024 but it was dead by bolting so
@@ -2474,18 +2472,18 @@ CleanData_2021$l10_R_to_R &lt;- log10(CleanData_2021$Repro_to_Ros)</code></pre>
 ## W = 0.88581, p-value = 3.218e-06</code></pre>
 <p>Fruit Number</p>
 <p>I have 3 fruit numbers - the one when harvested, the imageJ round one
-from many people, and the imageJ round two where Basia counted them all.
-How correlated are each of these? (Note Basia doesn’t have CF in the
-dataset, that’s why it has more NA values, so looking only at Currents
-and Futures)</p>
+from many people, and the imageJ round two where the same person counted
+them all. How correlated are each of these? (Note the final count
+doesn’t have CF in the dataset, that’s why it has more NA values, so
+looking only at Currents and Futures)</p>
 <pre class="r"><code>fruit_comp&lt;- CleanData_2021[CleanData_2021$Treatment %in% c(&quot;Current&quot;, &quot;Future&quot;), c(&quot;TotFruit&quot;, &quot;IJ_FruitCount&quot;, &quot;FruitCount_BL&quot;)]
 
-# want to remove rows that are fully NAs - these only happen when Basia&#39;s count is NA
+# want to remove rows that are fully NAs - these only happen when BL&#39;s count is NA
 fruit_comp &lt;- fruit_comp[!(is.na(fruit_comp$FruitCount_BL)), ]
 
 pairs(fruit_comp)</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<pre class="r"><code># Basia&#39;s counts almost seem better correlated with total fruit than from the initial imageJ counts
+<pre class="r"><code># BL&#39;s counts almost seem better correlated with total fruit than from the initial imageJ counts
 cor(fruit_comp$TotFruit, fruit_comp$IJ_FruitCount, use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.9653283</code></pre>
 <pre class="r"><code>#0.948158
@@ -2495,12 +2493,12 @@ cor(fruit_comp$TotFruit, fruit_comp$FruitCount_BL, use = &quot;pairwise.complete
 cor(fruit_comp$IJ_FruitCount, fruit_comp$FruitCount_BL, use = &quot;pairwise.complete.obs&quot;)</code></pre>
 <pre><code>## [1] 0.9693973</code></pre>
 <pre class="r"><code>#0.9605816</code></pre>
-<p>This tells me that everything is still rather highly correlated.
-Basia’s counts are more highly correlated with the total fruit count
-than with the other imageJ count or than the other count is with the
-total count. I do want to use Basia’s info going forward because they
-had the most consistent counting technique since they were all counted
-by the same person.</p>
+<p>This tells me that everything is still rather highly correlated. BL’s
+counts are more highly correlated with the total fruit count than with
+the other imageJ count or than the other count is with the total count.
+I do want to use BL’s info going forward because they had the most
+consistent counting technique since they were all counted by the same
+person.</p>
 <pre class="r"><code># Counts at Harvest
   print(shapiro.test(CleanData_2021$TotFruit))</code></pre>
 <pre><code>## 
@@ -2553,7 +2551,7 @@ print(shapiro.test(CleanData_2021$IJ_FruitCount))</code></pre>
 ## W = 0.94284, p-value = 0.0004919</code></pre>
 <pre class="r"><code>#CleanData_2021$l10_IJ_Fruits &lt;- log10(CleanData_2021$IJ_FruitCount)
 
-# Basia recounts
+# BL recounts
 print(shapiro.test(CleanData_2021$FruitCount_BL))</code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
@@ -2743,7 +2741,7 @@ explore_trans(CleanData_2021$AvgSeedNum)</code></pre>
 ## data:  sqrt(trait)
 ## W = 0.97041, p-value = 0.06614</code></pre>
 <pre class="r"><code>CleanData_2021$l10_AvgSeedNum &lt;- log10(CleanData_2021$AvgSeedNum)</code></pre>
-<p>Fitness - calculated with Basia’s fruit counts</p>
+<p>Fitness - calculated with BL’s fruit counts</p>
 <pre class="r"><code>CleanData_2021$fitness &lt;- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
 # if fruit count is a 0, need to also make total fitness a 0 (and not an NA)
 CleanData_2021[(CleanData_2021$FruitCount_BL == 0 &amp; !is.na(CleanData_2021$FruitCount_BL)), c(&quot;fitness&quot;) ] &lt;- 0
@@ -2914,13 +2912,13 @@ explore_trans(CleanData_2021$EmergeToFlwr)</code></pre>
 <h2>Load in Data</h2>
 <p>Raw data files not saved in github. All intermediate files are in the
 data subfolder.</p>
-<pre class="r"><code>Dat1 &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv&quot;, header = TRUE) 
-Dat2 &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv&quot;, header = TRUE)
-Dat3 &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv&quot;, header = TRUE)
-Dat4 &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv&quot;, header = TRUE)
+<pre class="r"><code>Dat1 &lt;- read.csv(&quot;data/2022_raw/DataEntry.csv&quot;, header = TRUE) 
+Dat2 &lt;- read.csv(&quot;data/2022_raw/LeafCountPlantWeights.csv&quot;, header = TRUE)
+Dat3 &lt;- read.csv(&quot;data/2022_raw/Resultsleafarea.csv&quot;, header = TRUE)
+Dat4 &lt;- read.csv(&quot;data/2022_raw/Phenology_Sum2022.csv&quot;, header = TRUE)
 
-# this file already has averages calcuated. Tori did it in excel. To get a file without averages, read in KBS_Stomata_Count.csv
-Stomata &lt;- read.csv(&quot;C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv&quot;, header = TRUE)</code></pre>
+# this file already has averages calculated from excel. To get a file without averages, read in KBS_Stomata_Count.csv
+Stomata &lt;- read.csv(&quot;data/2022_raw/KBS_Stomata_Count_AVG.csv&quot;, header = TRUE)</code></pre>
 </div>
 <div id="clean-up-data-1" class="section level2">
 <h2>Clean up data</h2>

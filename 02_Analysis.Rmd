@@ -493,7 +493,7 @@ height_pairs_21$trait <- "Height (cm)"
 
 ### Fitness
 
-Fruit Count: (9/20/2024) using Basia's fruit counts
+Fruit Count: (9/20/2024) using BL's fruit counts
 
 ```{r}
 # number fruits on plant
@@ -705,7 +705,7 @@ write.csv(PostHocResults_2021, file = "data/PostHocResults_2021.csv", row.names 
 
 ## Sample size information
 
-The goal here is to know how many lines and how many replicates per line for this experiment. The number of observations that wre not NA comes from earlier in the "summarize" section.
+Identify know how many lines and how many replicates per line for this experiment. The number of observations that were not NA comes from earlier in the "summarize" section.
 
 ```{r}
 # sample size of 2021 total
@@ -793,7 +793,7 @@ For root harvesting traits: trait ~ Treatment * Population + (1|BoltingToRootWas
 
 Chamber nested within treatment was changed to a fixed effect because models struggle to fit a variance with few groups. The Bolting to harvest and bolting to root washing variables were also removed because they are continuous but being treated like categorical as a random effect. These two variables did explain some variation and removing sometimes increased and sometimes decreased both effect sizes and p values. 
 
-There is a population bias where only italian lines were transplanted. 17 plants from 6 genotypes were transplanted. They became 10 current plants and 7 future plants. **However, when included, the transplanting effect sometimes explains 0 variance** Because this is such a small number (17 plants of 127 plants), the transplanting effect was removed from the model. All models were run with and without transplanting as  a fixed effect, but only small changes were seen in 3 traits (see data/ModelResults_InitalModels.xlsx for notes.)
+There is a population bias where only Italian lines were transplanted. 17 plants from 6 genotypes were transplanted. They became 10 current plants and 7 future plants. **However, when included, the transplanting effect sometimes explains 0 variance** Because this is such a small number (17 plants of 127 plants), the transplanting effect was removed from the model. All models were run with and without transplanting as a fixed effect, but only small changes were seen in 3 traits (see data/ModelResults_InitalModels.xlsx for notes.)
 
 Final model: trait ~ Treatment * Population + Treatment:Chamber + (1|Population:Line)
 
@@ -1128,7 +1128,7 @@ write.csv(PostHoc_2022, file = "data/PostHoc_2022.csv", row.names = TRUE)
 
 ## Sample size information
 
-The goal here is to know how many lines and how many replicates per line for this experiment.
+Identify how many lines and how many replicates per line for this experiment.
 
 ```{r}
 # sample size of 2022 total
@@ -1166,7 +1166,7 @@ The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and
 These tables were not ultimately used
 
 ## Main Text Tables - auto formatted options
-```{r}
+```{r eval = FALSE}
 sjPlot::tab_model(eTof_lm_21, RWC_lm_21, rwc_lm_22, sto_den_lm_22, SLA_lm_21, sla_lm_22, RS_lm_22 ,  fitness_lm_21, 
                    collapse.ci = TRUE, 
                   dv.labels = c("Emergence To Flower 21", "RWC 21", "RWC 22", "Stomatal Density 22","SLA 21", "SLA 22",  "Root-to-Shoot 22", "Fitness 21"), 
@@ -1181,7 +1181,7 @@ sjPlot::tab_model(eTof_lm_21, RWC_lm_21, rwc_lm_22, sto_den_lm_22, SLA_lm_21, sl
 ```
 
 ## Supplemental Tables
-```{r}
+```{r eval = FALSE}
 
 drought_extra <- sjPlot::tab_model(fresh_lm_21, fresh_lm_22, sat_lm_21, hyd_lm_22, dry_lm_21, dry_lm_22, area_lm_21, area_lm_22, per_lm_21, per_lm_22, LDMC_lm_21, ldmc_lm_22,
                                    collapse.ci = TRUE, 
@@ -1423,4 +1423,4 @@ summary(sg_it_fut) # nothing significant
 
 ```
 
-        
+End of code.

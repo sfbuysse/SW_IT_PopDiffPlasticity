@@ -1,0 +1,130 @@
+Population,Line,Replicate,Treatment,Pot.ID,ImageJ_FruitCount,ImageJ_Counter,"bolting stalk (bent, broken, leaning, straight(",num lateral branches from main stalk,num primary stalks from rosette (main included),height main stalk (cm),total fruit num,num fruits collected,fruit collected location,done flowering,number flowers left,Notes,All Fruit Collected Weight (mg),seeds only weight,scanner position,scanned photo name,ImageJ_seed count,SeedCounter,BasiaFruitCount,Notes2
+BELM,1,1,Current,B1-1-C,797,TM,broken,6,9,54.5,878,10,"15,17,21,23,25,27,29,32,2 on sides",n,13,broken branch is not drying; 3 additional primary stalks had no flowers and were not counted,19.58,12.83,9,4,504,,833,KB assumed
+BELM,1,2,Current,B1-2-C,550,TM,leaning,6,8,57.5,584,10,"11,13,15,17,19,21,23,25,27,29",y,0,,21.33,13.2,10,4,523,,567,KB assumed
+BELM,1,3,Current,B1-3-C,807,TM,broken,6,14,54,940,10,"5,7,11,13,15,17,19,21,23,25",n,23,broken branch is drying,15.4,8.45,3,5,378,CC,887,
+BELM,1,4,Current,B1-4-C,853,TM,broken,6,11,59,966,10,"14,15,17,19,22,24,26,28,32,34",n,14,broken branch is drying,21.04,12.95,2,5,531,CC,969,
+BELM,1,5,Current,B1-5-C,1007,TM,bent,6,10,59.5,1094,10,"8,14,17,19,20,21,23,25,26 + 2 on sides",n,49,5 additional primary stalks with no flowers,21.23,13.28,3,3,524,CH,1039,
+BELM,1,6,Current,B1-6-C,888,TM,bent,10,11,61,944,10,"5,8,10,12,14,15,17,20,22,24",n,43,3 additional primary stalks with no flowers,16,9.5,4,5,419,CC,883,
+BELM,2,1,Current,B2-1-C,494,TM,leaning,6,10,50,552,10,"5,7,9,11,13,15,17,19,21,24",y,0,,19.75,12.8,2,8,597,EA,501,
+BELM,3,1,Current,B3-1-C,1009,SB,bent,7,13,57.5,1135,11,"10,12,14,17,19,22,24,26,29,31,33",n,48,"2 of the primary stalks were noted as tiny, there were 2 additional primary stalks with no flowers that are not counted in the 13",21.01,14.17,5,5,561,CC,928,SB recounted 1009 fruits on 8/15/2024. that is a big difference from the initial 829 (TX). Changed to my value
+BELM,3,2,Current,B3-2-C,1033,TM,bent,7,13,66.5,1136,10,"13,15,17,19,21,23,25,29,31,33",n,26,,19.49,12.73,8,6,599,CC,1049,
+BELM,4,2,Current,B4-2-C,166,TM,leaning,3,11,36.5,189,10,"6,8,10,12,14,16,18,20, + 2 on sides",n,4,6 of the primary stalks were noted as tiny,14.71,8.8,1,7,501,CC,167,
+BELM,8,1,Current,B8-1-C,1023,TM,bent,7,17,63,1093,10,"10,12,14,16,19,21,23,25,27,29",n,116,side branch is broken,21.41,12.4,10,6,544,CC,1061,
+BELM,8,2,Current,B8-2-C,665,TM,bent,8,16,61.5,885,10,"8,11,15,17,21,23,25,28,30,32",n,110,,25.87,15.72,11,4,543,SB,741,
+BELM,12,1,Current,B12-1-C,455,TM,bent,6,9,54,640,10,"12,17,19,22,24,26,28,30,32,34",n,6,2 of the primary stalks were noted as tiny,14.49,8.06,6,5,271,CC,464,SB recounted 279 in 8/2024
+BELM,12,2,Current,B12-2-C,345,TX,leaning,6,8,52.5,698,10,"10,12,15,17,19,21,23,25,27,29",n,4,2 of the primary stalks were noted as tiny,20.63,13.48,6,3,496,CH,410,
+BELM,13,1,Current,B13-1-C,220,TM,bent,6,13,59,696,10,"13,15,18,21,23,25,27,29,31,33",n,14,2 of the primary stalks were noted as tiny,16.4,10.64,1,8,474,EA,511,
+BELM,13,2,Current,B13-2-C,824,TM,bent,10,10,66,932,10,"12,14,16,18,20,22,24,26,28,30",n,6,1 of the 10 was noted as tiny and 1 additional primary stalk was not counted because noted as no flowers,15.66,9.71,8,5,418,CC,855,
+BELM,15,1,Current,B15-1-C,948,TX,bent,9,13,66,1201,10,"24,27,29,31,33,35,37,39,41,43",n,1,1 primary stalk was noted as tiny,18.88,11.87,12,6,531,CC,994,
+BELM,15,2,Current,B15-2-C,1069,TM,bent,11,18,63.5,1195,10,"14,16,18,20,22,24,26,28,30,32",n,3,3 primarystalks were noted as tiny,16.36,11.01,1,5,475,CC,806,
+RODA,2,1,Current,R2-1-C,574,TM,bent,8,9,62,701,10,"5,7,9,11,13,15,17,18,21,23",n,91,and leaning,26.09,17.37,10,2,751,,567,
+RODA,2,2,Current,R2-2-C,730,CC,bent,9,11,74.5,779,10,"4,7,9,11,13,15,17,19,21,24",n,73,has some buds; 3 primary stalks were noted as tiny,28.92,20,12,4,738,SB,702,
+RODA,5,1,Current,R5-1-C,366,TX,leaning,7,7,59.5,467,10,"4,6,8,10,12,14,16,18,20,22",n,79,,24.68,16.96,8,2,667,,376,
+RODA,8,1,Current,R8-1-C,599,TX,bent,9,11,70,819,10,"6,8,10,12,14,16,18,20,22,24",n,179,could keep going but is dehiscing,29.75,20.35,1,1,722,,647,
+RODA,8,2,Current,R8-2-C,645,TX,broken,10,13,63.5,906,10,"2,4,6,8,13,15,20,22,24,26",n,134,1 pirmary stalk is noted as tiny,27.94,18.75,2,1,727,,739,
+RODA,9,1,Current,R9-1-C,514,TX,bent,10,12,75,1108,10,"3,6,8,10,14,16,18,20,22,24",n,64,"could keep going a little, 1 open; 1 not counted primary stalk with no flowers",28.59,19.12,9,6,707,CC,974,
+RODA,9,2,Current,R9-2-C,807,CC,bent,10,9,77,889,10,"5,7,9,11,13,18,20,22,24,26",n,52,"could keep going, 0 open",28.03,19.24,7,5,701,CC,707,
+RODA,11,1,Current,R11-1-C,1192,EA,bent,11,14,73,1322,10,"3,5,8,11,13,18,20,22,24,26",n,111,"could keep going, 2 open",28.18,19.15,7,6,658,EA,1206,
+RODA,11,2,Current,R11-2-C,748,CC,bent,11,10,65,835,10,"3,5,7,9,11,14,16,18,20,22",n,66,"could keep going, 1 open; 1 primary stalk counted as tiny",27.58,17.99,5,3,669,CH,742,
+RODA,15,1,Current,R15-1-C,401,CC,bent,11,12,49,827,10,"3,4,8,10,13,15,17,19,21,22",n,108,has buds; 2 additional primary stalks noted as no flower,25.25,17.65,9,2,632,,702,
+RODA,15,2,Current,R15-2-C,580,SB,bent,7,14,52.5,611,10,"5,10,12,14,16,19,21,24,26,28",n,20,and leaning; 5 primary stalks counted as tiny,26.6,16.84,3,1,586,,555,SB recounted 580 fruit on 8/15/2024; old was TX count of 935 from ImageJ
+RODA,21,1,Current,R21-1-C,646,CC,bent,9,14,72,701,10,"6,8,10,12,14,16,18,20,22,24",n,89,2 primary stalks noted as tiny,29.31,19.4,12,2,739,,633,
+RODA,21,2,Current,R21-2-C,485,TX,bent,10,8,64.5,738,10,"3,5,8,10,12,14,16,18,20,22",n,107,,28.87,20.32,11,2,718,,552,
+RODA,26,1,Current,R26-1-C,627,CC,bent,9,10,70.5,658,10,"2,4,7,9,11,13,15,17,19,22",n,107,has buds; 1 primary stalk noted as tiny and an additional not counted stalk with no flowers. Labelled as R26-1-F - see raw datasheet last page for SB initial notes on choosing to put here,27.94,19.04,2,2,469,,560,
+RODA,26,2,Current,R26-2-C,,EA,bent,10,13,75.5,880,10,"2,4,6,8,10,13,15,17,19,21",n,121,has buds; 5 primary stalks noted as tiny,,,,,,,777,Image not found in folder for counting
+RODA,29,1,Current,R29-1-C,504,TM,bent,9,11,56,639,10,"4,6,9,13,18,20,22,24,26,29",n,70,,21.75,13.9,6,2,649,SB,547,
+RODA,29,2,Current,R29-2-C,569,,bent,10,10,74,676,10,"4,6,9,12,14,16,18,20,22,26",n,52,2 primary stalks noted as tiny; 1 additional with no flowers was not counted; was statickly and lost some seeds during counting,34.08,22.67,4,1,558,,638,
+RODA,33,2,Current,R33-2-C,567,TM,broken,12,12,61,901,10,"9,11,13,15,17,19,21,23,25,27",n,76,,23.76,14.54,2,7,628,CC,767,
+RODA,35,1,Current,R35-1-C,513,CC,bent,9,12,70,636,10,"4,6,8,10.12.14.16.18.20,22",n,73,could keep going,31.11,20.86,11,6,686,CC,732,
+RODA,35,2,Current,R35-2-C,550,CC,leaning,3,9,57,620,10,"1,6,9,11,14,16,18,20,22,25",n,43,no main stalk; has buds,24.77,17.11,5,2,639,SB,517,
+RODA,40,1,Current,R40-1-C,474,TM,bent,10,12,69,679,10,"5,7,9,12,14,16,19,21,23,25",n,67,1 pirmary stalk is noted as tiny,30.28,20.4,9,5,711,CC,480,
+RODA,40,2,Current,R40-2-C,555,TX,bent,9,11,71.5,627,10,"3,5,7,9,12,15,17,29,21,23",n,66,1 primary stalk was noted as tiny,27.54,18.56,5,1,714,,548,
+RODA,47,1,Current,R47-1-C,498,CC,bent,8,9,62,565,10,"3,6,8,10,12,14,16,18,20,22",n,79,3 primarystalks were noted as tiny,25.71,17.41,7,2,697,,446,
+RODA,47,2,Current,R47-2-C,425,CC,bent,9,9,71,714,10,"3,8,11,13,15,17,19,21,23,25",n,135,,29.87,20.15,TEST,TEST,554,SB,642,722 in IMG_001
+RODA,47,3,Current,R47-3-C,558,TX,bent,10,12,70,715,10,"5,8,13,15,18,22,25,27,34,40",n,98,,28.12,18.83,8,4,707,,559,KB assumed
+RODA,47,4,Current,R47-4-C,,,,,,,no fruits,,,,,harvested at flower,,,,,,,,
+RODA,47,5,Current,R47-5-C,,,,,,,,,,,,harvested at flower,,,,,,,,
+RODA,47,6,Current,R47-6-C,680,CC,bent,9,12,56,767,10,"2,19,22,24,26,28,30,32,34,36",n,120,,24.22,15.96,2,6,725,CH,635,
+BELM,1,1,Current/Future,B1-1-CF,110,TM,leaning,7,7,21.5,124,10,"2 on sides,6,21,22,30,32,35,37,39",y,0,all small fruits; 4 branches are just started; 6 primary stalks noted as tiny,11.02,4.42,1,6,266,CH,NA,
+BELM,1,2,Current/Future,B1-2-CF,58,TM,bent,5,3,,61,10,"1,3,10,11,12,13,18,21,24,33",n,-,and leaning,13.63,7.86,1,10,364,SB,NA,
+BELM,1,3,Current/Future,B1-3-CF,127,TM,bent,5,1,23,144,10,"22,26,12,13,14,2,6,8,16,17",y,0,siliques moldy,19.78,13.55,11,9,510,SB,NA,overestimate with all the dark/flat seeds: 538
+BELM,1,4,Current/Future,B1-4-CF,101,TM,bent,4,1,25.3,138,10,"7,10,11,13,18,25,28,34,38,52",y,0,6 'tiny tiny' primary stalks were not counted; silique moldy,21.12,14.2,8,9,458,SB,NA,overestimate with all the dark/flat seeds: 490
+BELM,1,5,Current/Future,B1-5-CF,118,TM,bent,7,8,24,128,10,"4,7,9,11,15,19,21,3 from side",n,-,5 tiny primar stalks were included,17.41,11.43,6,10,412,SB,NA,with coutnign small darker ones: 470
+BELM,1,6,Current/Future,B1-6-CF,281,TM,straight,8,11,20,319,10,"11,13,14,15,17,19,22,24,26,28",y,0,"some branches are bent; 3 primary stalks were noted as tiny, 1 with no flowers was not counted",15.96,10.57,3,10,416,SB,NA,did not count small darker ones that I think were flat seeds…471 when counting those
+BELM,3,1,Current/Future,B3-1-CF,168,TM,leaning,6,4,20.3,196,10,"10,11,12,14,15,16,18,21,24,26",y,0,,15.26,9.95,7,10,418,SB,NA,
+BELM,3,2,Current/Future,B3-2-CF,140,TM,leaning,8,2,26,163,10,"11,12,13,14,15,17,19,21,24,26",y,0,1 primary stalk was noted as tiny,16.39,10.4,8,10,402,SB,NA,old count (no initials) was 415
+BELM,4,2,Current/Future,B4-2-CF,141,TM,leaning,5,1,29.7,149,10,"11,19,22,24,26+5 on sides",y,0,,8.27,4.25,4,8,328,EA,NA,
+BELM,8,1,Current/Future,B8-1-CF,208,TM,straight,6,12,15.5,200,9,"10,11,12,13,16,19,22,2 from sides",y,0,6 primary stalks noted as tiny; siliques moldy,16.09,10.55,9,9,425,SB,NA,
+BELM,8,2,Current/Future,B8-2-CF,144,TM,straight,9,5,17,177,9,"5,7,10,11,12,,14,16,18,20",n,1,some branches are bent; 1 primary stalk noted as tiny,14.61,9.55,4,10,418,SB,NA,old count (no initials) was 362
+BELM,12,1,Current/Future,B12-1-CF,96,TM,bent,6,10,25.5,122,10,"7,9,12,15,17,19,21,22,23,? In 10-15 range",y,0,7 primary stalks noted as tiny; has black seeds,19.11,12.35,10,5,418,CC,NA,
+BELM,13,2,Current/Future,B13-2-CF,259,TM,bent,8,2,42,260,9,"11,13,15,17,19,29,45,2 on sides",n,-,1 primary stalk was noted as tiny; siliques modly,14.71,9.99,12,9,410,SB,NA,overestimate with all the dark/flat seeds: 427
+BELM,15,1,Current/Future,B15-1-CF,224,TM,bent,8,7,25,238,8,mostly all from sides. Not counted,y,0,4 primary stalks noted as tiny; 1 not counted was noted as no flower; siliques moldy,12.27,8.33,10,10,269,SB,NA,
+BELM,15,2,Current/Future,B15-2-CF,231,TM,bent,10,4,17,257,9,"13,14,15,19,21,20,2 on sides",y,0,,14.8,10.07,10,9,348,SB,NA,
+RODA,2,1,Current/Future,R2-1-CF,251,CC,leaning,7,5,21.5,398,10,"2,4,6,7,9,11,13,15,17,19",y,0,3 primary stalks noted as tiny; 1 noted as no flwr was not counted,19.76,11.8,6,1,341,,NA,
+RODA,2,2,Current/Future,R2-2-CF,105,TM,leaning,9,1,32.5,120,10,"2,4,6,8,10,12,14,16,18,20,22",y,0,,19.16,12.06,4,6,491,CH,NA,
+RODA,5,1,Current/Future,R5-1-CF,67,TX,straight,6,6,29.5,101,10,"3,5,7,9,11,13,15,17,19,21",n,3,2 came off pedicel with number 17; 2 additional branches with no flowers; 5 primary stalks noted as tiny,19.08,12.02,3,7,408,CC,NA,
+RODA,8,1,Current/Future,R8-1-CF,68,TM,straight,8,1,26.5,90,10,"3,5,8,10,12,14,16,18,20,22",y,0,,18.13,11.58,3,6,699,CH,NA,
+RODA,8,2,Current/Future,R8-2-CF,58,TX,,8,3,24.5,114,10,"2,4,6,8,10,12,15,17,19,22",n,25,; 2 additional branches with no flowers; 2 primary stalks noted as tiny,21.29,13.26,3,9,446,SB,NA,
+RODA,9,1,Current/Future,R9-1-CF,73,TX,bent,8,9,30.5,88,10,"2,4,6,8,10,12,14,16,18,20",n,10,8 primary stalks noted as tiny,20.32,13.24,4,2,512,SB,NA,
+RODA,9,2,Current/Future,R9-2-CF,69,TX,bent,8,7,29.5,95,10,"1,3,4,6,8,10,12,14,16,19",n,6,6 primary stalks noted as tiny,19.95,12.53,7,1,442,,NA,
+RODA,11,1,Current/Future,R11-1-CF,102,TM,straight,9,1,25,138,10,"6,8,10,12,4,14,16,18,20,22",y,0,one additional primary stalk noted as no flwr; 1 additional branch with no flowers,18.71,11.8,4,4,484,,NA,KB assumed
+RODA,11,2,Current/Future,R11-2-CF,101,TM,leaning,9,1,29.5,130,10,"7,9,11,13,15,18,20,22,24,26",y,0,,20.01,12.85,3,8,515,EA,NA,
+RODA,15,1,Current/Future,R15-1-CF,103,CC,straight,7,9,2,124,10,all small from multiple branches,y,0,"main stalk is not the tallest stalk because it didn't really grow. Main stalk is 2cm, longest stalk is 10.5 cm. Going to use an 2 because that is the main stalk but should be removed as an outlier; 4 primary stalks noted as tiny",5.74,1.01,8,1,277,,NA,
+RODA,15,2,Current/Future,R15-2-CF,124,TX,straight,9,9,28.5,146,10,"4,6,8,10,12,14,16,18,20,22",y,0,8 primary stalks noted as tiny; 1 additional branch with no flowers,18.36,10.8,3,2,353,SB,NA,
+RODA,21,1,Current/Future,R21-1-CF,32,TX,straight,7,8,23.5,83,10,"2,4,6,8,10,12,14,16,25,26",n,23,7 primary stalks noted as tiny; 2 additional branches with no flowers,19.75,12.08,4,3,389,CH,NA,
+RODA,21,2,Current/Future,R21-2-CF,75,TX,straight,7,5,34,115,10,"3,5,7,9,11,13,15,17,19,22",n,7,4 primary stalks noted as tiny; 3 additional branches with no flowers,22.07,14.64,5,4,566,,NA,KB assumed
+RODA,26,1,Current/Future,R26-1-CF,70,TX,leaning,8,9,30.5,99,10,"3,5,7,9,11,13,15,17,19,21",y,0,8 primary stalks noted as tiny,22.62,14.76,6,4,406,,NA,KB assumed
+RODA,26,2,Current/Future,R26-2-CF,171,,bent,9,5,24.5,183,10,"1,3,5,7,9,11,12,13,15,18",y,0,and leaning; 1 additional branch with no flowers; 3 primary stalks noted as tiny,20.73,12.68,7,4,461,,NA,KB assumed
+RODA,29,1,Current/Future,R29-1-CF,247,TX/CC,leaning,8,6,28.5,267,10,"2,4,6,8,10,12,14,16,18,20",y,0,2 primary stalks noted as tiny; 1 additional with no flowers was not counted,21.15,13.48,9,1,465,,NA,
+RODA,29,2,Current/Future,R29-2-CF,59,TX,straight,7,5,29.5,106,10,"4,6,8,10,12,14,16,18,20,22",n,6,4 pirmary stalks noted as tiny; 2 additional branches with no flowers,21.53,13.91,5,9,495,SB,NA,
+RODA,33,1,Current/Future,R33-1-CF,170,TM,bent,11,9,33.5,213,10,"3,10,13,15,17,19,20,22,2 on side",y,0,8 primary stalks noted as tiny,20.8,13.22,4,7,517,CC,NA,
+RODA,33,2,Current/Future,R33-2-CF,149,TM,leaning,11,8,31,185,10,"8,10,12,14,16,18,20,22,24,26",y,0,one branch is only just started; 7 primary stalks noted as tiny,17.01,10.12,5,8,491,EA,NA,
+RODA,35,1,Current/Future,R35-1-CF,73,TX,straight,7,6,26.5,109,10,"5,7,9,11,13,15,17,19,21,23",y,0,5 pirmary stalks noted as tiny; 3 additional branches with no flowers,16.12,10.22,12,5,325,CC,NA,
+RODA,35,2,Current/Future,R35-2-CF,63,TX,straight,8,5,27,132,10,"4,6,8,10,12,14,16,18,20,22",n,21,4 primary stalks noted as tiny,20.01,12.85,5,7,437,CC,NA,
+RODA,40,1,Current/Future,R40-1-CF,31,TX,straight,7,8,25,45,10,"3,5,7,10,13,16,18,20,22,24",y,0,7 primary stalks noted as tiny; 1 additional branch with no flowers,19.49,13.12,11,5,511,CC,NA,
+RODA,40,2,Current/Future,R40-2-CF,59,TX,straight,7,7,30.5,81,10,"2,4,6,8,10,12,14,16,19,21",n,31,6 primary stalks noted as tiny; 1 additional branch with no flowers,21.96,14.53,4,9,551,SB,NA,
+RODA,47,1,Current/Future,R47-1-CF,145,TX,straight,8,6,31,177,10,"4,7,10,11,13,15,18,28,30,32",n,105,5 primary stalks noted as tiny,18.66,11,6,7,431,EA,NA,
+RODA,47,2,Current/Future,R47-2-CF,111,TM,bent,7,1,32,139,11,"10,12,14,16,20,22,24,26,28,30,32",n,16,,19.89,11.59,6,8,490,EA,NA,
+RODA,47,3,Current/Future,R47-3-CF,,,,,,,no fruits,,,,,harvested at flower,,,,,,,NA,
+RODA,47,4,Current/Future,R47-4-CF,,,,,,,some fruits,,,,,harvested at flower,,,,,,,NA,
+RODA,47,5,Current/Future,R47-5-CF,42,TX,straight,6,8,21.5,61,10,"2,4,6,8,10,12,17,19,21,23",n,18,7 primary stalks noted as tiny; 2 additional branches with no flowers,19.85,12.78,7,7,435,EA,NA,
+BELM,1,1,Future,B1-1-F,144,TM,bent,8,5,30,151,10,"11,14,16,18,19,15,22,24,26,29",y,0,4 pirmary stalks noted as tiny; 3 noted as no flower and not counted,19.44,13.49,12,10,538,SB,150,552 was old count (no initials) - weird that this and 10-11 are identical but I double checked it
+BELM,1,2,Future,B1-2-F,209,TM,leaning,8,9,20.5,223,10,"1 on side, 8,10,13,15,17,19,31,33,37",y,0,8 primary stalks noted as tiny; 1 noted as no flower and not counted,16.56,10.58,3,4,420,,210,KB assumed
+BELM,1,3,Future,B1-3-F,141,TM,bent,8,9,23,157,10,"6,8,10,12,14,16,18,20,22,24",y,0,2 branches are only just started; 8 tiny primary stalks counted,19.33,12.77,8,7,432,CC,144,
+BELM,1,4,Future,B1-4-F,235,TM,bent,8,8,27,249,10,"1,4,7,10,13,16,29,32,35,1 from side",y,0,apicle clipped. See notes. I no longer know what this means and did not find a note on the harvest date in my notebook. 7 primary stalks noted as tiny + 2 noted as no flower not counted,14.65,8.63,9,10,363,SB,236,
+BELM,1,5,Future,B1-5-F,166,TM,leaning,8,9,21,195,10,"9,11,13,15,17,19,21,23,25,28",y,0,8 primary stalks counted as tiny,20.84,14.06,11,10,538,SB,197,
+BELM,1,6,Future,B1-6-F,196,TM,bent,12,11,26,233,10,"6,8,10,12,14,16,18,20,22,24",y,0,8 primary stalks counted as tiny,15.18,9.15,6,9,479,SB,213,
+BELM,2,1,Future,B2-1-F,195,TM,bent,8,5,36,223,9,"16,24,26,28,30,34 from sides",y,0,"4 primary stalks counted as inty, one not counted noted as no flower",12.68,7.88,1,3,401,CH,199,
+BELM,2,2,Future,B2-2-F,165,TM,bent,8,6,32.5,174,10,"7,13,15,18,21,25,27,29,2 on sides",y,0,5 primary stalks noted as tiny; 1 additional branch with no flowers,12.78,7.74,5,6,423,EA,170,
+BELM,3,1,Future,B3-1-F,172,TM,leaning,10,7,27,185,10,"10,15,17,19,21,23,25,27,29,31",y,0,6 primary stalks noted as tiny,14.58,8.63,5,10,375,SB,178,SB recounted 374 seeds in 8/2024
+BELM,3,2,Future,B3-2-F,185,TM,straight,10,10,12.5,199,9,"7,10,13,15,17,19,22,27,35",n,7,6 primary stalks noted as tiny,18.44,11.18,2,3,521,CH,193,SB recounted 510 in 8/2024
+BELM,8,1,Future,B8-1-F,300,TM,straight,11,13,17.5,335,10,"7,9,15,17,19,21,23,25,27,29",y,0,branches bent; 4 primary stalks noted as tiny; siliques moldy,15.46,10.17,2,9,419,SB,320,
+BELM,8,2,Future,B8-2-F,104,TM,leaning,7,9,22.5,127,10,"3,5,7,9,11,13,15,17,19,21",n,4,a small lean; 8 primary stalks noted as tiny; siliques moldy (really just one),17.96,11.86,7,9,521,SB,117,
+BELM,12,2,Future,B12-2-F,161,SB,broken,8,10,23.5,173,9,"7,8,9,12,16,18,19,21,23,25",n,16,break is near the top; 9 primary stalks noted as tiny,20.14,13.88,1,11,494,SB,188,SB recounted seeds 8/15 and got 494; old was 508. SB recounted fruits 8/15/2024 and got 161. Trevor's (TM) old count was 185 but switching to mine b/c lots of small that did not make fruit that I did not count that he likely did
+BELM,15,1,Future,B15-1-F,212,TM,bent,11,11,25.5,238,9,"10,12,14,17,19,23,26,2 on side",n,-,8 primary stalks ntoed as tiny,13.16,7.96,6,6,318,EA,234,
+BELM,15,2,Future,B15-2-F,321,TM,straight,11,8,,,9,"10,14,17,22,24,4 from sides",n,2,fruit count of 274 was last recorded but that was not full count b/c error. Maybe 356 fruits? Value for toal fruits will need to be removed because not certain. 7 primary stalks noted as tiny,18.32,11.5,2,11,413,SB,324,
+RODA,2,1,Future,R2-1-F,92,TX,straight,11,9,29,114,10,"2,4,6,8,10,12,14,16,18,20",y,0,8 primary stalks ntoed as tiny,22.04,14.39,10,1,563,,100,
+RODA,2,2,Future,R2-2-F,55,SB,straight,9,8,24,62,10,"1,4,7,9,11,13,16,18,20,22",n,25,7primary stalks noted as tiny,22.66,14.89,9,7,528,CC,61,SB recounted fruint 8/15/24 and got 55. There are lots of small nonfruits/ open flowers so using my count rather than the initial 85 (TX)
+RODA,8,1,Future,R8-1-F,62,,leaning,10,1,22,102,10,all over.,y,0,,11.96,6.97,7,8,386,EA,56,
+RODA,8,2,Future,R8-2-F,49,TX,straight,10,8,22.5,88,10,"2,4,6,8,10,12,14,16,18,1 on side",y,0,7 primary stalks ntoed as tiny,18.91,12.23,8,8,461,EA,68,
+RODA,9,2,Future,R9-2-F,77,TX,straight,12,7,24.5,100,10,"4,6,8,10,12,14,16,18,20,23",n,9,6 primary stalks noted as tiny,20.96,14.38,10,8,487,EA,87,
+RODA,11,1,Future,R11-1-F,79,TM,straight,9,1,26,115,10,"7,9,10,12,14,16,18,20,22,24",y,0,; 1 additional branch with no flowers,16.51,10.3,1,9,469,SB,69,
+RODA,11,2,Future,R11-2-F,109,TX,straight,10,5,28.5,172,10,"3,5,7,9,11,13,15,17,19,21",y,0,4 primary stalks noted as tiny,22.28,15.09,2,4,532,,133,KB assumed
+RODA,15,1,Future,R15-1-F,71,TX,straight,11,11,17.5,110,10,"1,3,5,7,9,11,13,15,17,1 from side",y,0,10 primary stalks noted as tiny + 1 not counted noted as no flower,15.49,9.62,9,8,350,EA,89,
+RODA,15,2,Future,R15-2-F,,,straight,11,9,20,120,10,"2,5,7,9,11,13,15,17,2 on sides",y,0,8 primary stalks noted as tiny; 1 additional branch with no flowers,14.52,8.84,1,2,528,,97,no picture taken to count fruit
+RODA,21,1,Future,R21-1-F,75,TX,bent,8,1,32.5,178,10,"7,9,12,14,16,18,20,22,24,26",n,19,; 1 additional branch with no flowers,,,,,,,98,
+RODA,21,2,Future,R21-2-F,254,TX,straight,8,7,33.5,294,10,"3,5,7,9,11,13,15,17,20,21",n,9,6 primary stlaks noted as tiny; 1 additional branch with no flowers,21.95,13.55,1,4,385,KB,228,
+RODA,26,2,Future,R26-2-F,,,straight,8,6,33,196,10,"4,7,9,11,13,15,17,20,22,24",y,0,5 primary stalks ntoed as tiny; 2 additional branches with no flowers,,,,,,,170,no count because can't distinguish this from other R26 in scan due to labelling error during harvest. For this reason also removing the 973 (CC) initially in the imageJ fruit count column
+RODA,29,1,Future,R29-1-F,62,EA,straight,9,7,28,116,10,"2,4,6,10,12,14,16,17,20,22",y,0,6 primary stalks ntoed as tiny,23.32,14.82,7,3,536,CH,95,
+RODA,29,2,Future,R29-2-F,87,TX,straight,7,8,26,117,10,"2,4,6,8,10,12,14,16,18,20",y,0,7 primary stalks noted as tiny; 2 additional branches with no flowers,23.09,14.87,8,3,586,CH,106,
+RODA,33,1,Future,R33-1-F,119,TM,leaning,13,1,27,157,10,"4,6,8,10,12,14,15,17,19,21",y,0,3 branches are only just started,17.96,11.2,2,10,500,SB,132,old count ( no initials) was 529; with counting small darker ones: 527
+RODA,33,2,Future,R33-2-F,84,TX,bent,10,4,26.5,125,10,"4,6,8,10,12,15,17,20,5,1 on side",y,0,and leaning; 2 additional branches with no flowers; 3 primary stalks noted as tiny,18.16,11.32,10,7,505,CC,100,counted small dark seeds
+RODA,35,1,Future,R35-1-F,117,TX,straight,8,7,26.5,222,10,"2,4,7,9,11,13,18,25,2 from sides",n,29,6 primary stalks noted as tiny,21.17,13.78,10,3,448,CH,150,
+RODA,35,2,Future,R35-2-F,78,TX,straight,9,8,30.5,103,10,"3,5,7,9,11,13,15,17,19,21",n,2,7 primary stalks noted as tiny,22.24,14.43,12,3,511,CH,89,
+RODA,40,1,Future,R40-1-F,73,TX,straight,8,9,24,88,10,"4,6,8,10,12,14,16,18,20,22",y,0,8 primary stalks ntoed as tiny,21.81,14.42,11,8,524,EA,88,SB recounted 526 in 8/2024
+RODA,40,2,Future,R40-2-F,179,TM,bent,7,7,25,222,7,"9,12,14,16,17,22,34",n,22,and leaning; 1 additional branch with no flowers; 6 primary stalks ntoed as tiny,12.4,7.36,11,7,229,CC,182,SB recounted 232 in 8/2024
+RODA,47,1,Future,R47-1-F,95,TX,straight,7,6,28.5,108,10,"2,4,6,8,10,12,14,16,22,24",n,38,5 primary stalks noted as tiny,18.54,11.94,11,3,408,CH,80,
+RODA,47,2,Future,R47-2-F,81,TM,leaning,8,1,29,89,10,"6,8,10,12,14,16,18,20,22,24",n,4,,17.51,9.61,9,3,500,CH,73,
+RODA,47,3,Future,R47-3-F,,,,,,,some fruits,,,,,harvested at flower,,,,,,,,
+RODA,47,4,Future,R47-4-F,,,,,,,some fruits,,,,,harvested at flower,,,,,,,,
+RODA,47,5,Future,R47-5-F,77,TX,bent,8,6,23.5,114,10,"6,13,17,19,21,23,25,27, 2 from sides",n,6,5 primary stalks ntoed as tiny; 1 additional branch with no flowers,19.76,12.31,12,8,425,EA,98,

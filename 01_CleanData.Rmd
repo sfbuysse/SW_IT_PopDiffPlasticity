@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # description
 
-This code reads in the raw data and writes out cleaned data files. The raw data is not in the github repo, but all of the cleaned data files are saved to the data subfolder. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript. (the third treatment, where plants were in the Current treatment before vernalization but the Future treatment after was completed and is present in the raw data but was not included in analyses.)
+This code reads in the raw data and writes out cleaned data files. A Two Treatment version was saved on 7/21/2025 so all histograms were done with only the data being used for analysis in this manuscript. (the third treatment, where plants were in the Current treatment before vernalization but the Future treatment after was completed and is present in the raw data but was not included in analyses.)
 
 # Set basic info for all code
 
@@ -76,12 +76,12 @@ conf_int <- function(x, conf.interval = 0.95){
 Raw Data files not on github.
 
 ```{r data}
-SingleLeaf <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/SingleLeaf_green.csv")
-Harv_blue <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_blue.csv")
-Harv_pink <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Harvest_pink_ImageJ.csv")
-LeafNum <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Leaf Number_yellow.csv")
-Phenology <-read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/Phenology.csv")
-PlantingDay <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Pilot/RawData/PlantingDay.csv")
+SingleLeaf <- read.csv("data/2021_raw/SingleLeaf_green.csv")
+Harv_blue <- read.csv("data/2021_raw/Harvest_blue.csv")
+Harv_pink <- read.csv("data/2021_raw/Harvest_pink_ImageJ.csv")
+LeafNum <- read.csv("data/2021_raw/Leaf Number_yellow.csv")
+Phenology <-read.csv("data/2021_raw/Phenology.csv")
+PlantingDay <- read.csv("data/2021_raw/PlantingDay.csv")
 ```
 
 ## Clean up data
@@ -145,7 +145,7 @@ SingleLeaf$RWC = (SingleLeaf$FreshWt_g - SingleLeaf$DriedWt_g) / (SingleLeaf$Sat
 
 At this point, sorted each dataframe by values to identify any high or low outliers. Did not find anything that was attributed to data entry errors. Also went through the notes columns to see if anything should be removed. 
 
-Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had Basia recount fruit number from images a third time and used those values in the manuscript.
+Fruit counts seem inconsistent. Near end of harvesting realized that clicker used to count fruits was skipping 10 or even 100 sometimes. Went back to images and recounted fruits in ImageJ, but some of these seem very different (196 initially and then 973 from ImageJ) so concerned about accuracy of that value as well. Had fruit number recounted from images a third time and used those values in the manuscript.
 
 Leaf number is also variable with some counted at bolting and some at flowering so may need to toss that trait.
 
@@ -442,15 +442,15 @@ explore_trans(CleanData_2021$Height_cm)
 ```
 Fruit Number
 
-I have 3 fruit numbers - the one when harvested, the imageJ round one from many people, and the imageJ round two where Basia counted them all. How correlated are each of these? (Note Basia doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
+I have 3 fruit numbers - the one when harvested, the imageJ round one from many people, and the imageJ round two where the same person counted them all. How correlated are each of these? (Note the final count doesn't have CF in the dataset, that's why it has more NA values, so looking only at Currents and Futures)
 ```{r}
 fruit_comp<- CleanData_2021[CleanData_2021$Treatment %in% c("Current", "Future"), c("TotFruit", "IJ_FruitCount", "FruitCount_BL")]
 
-# want to remove rows that are fully NAs - these only happen when Basia's count is NA
+# want to remove rows that are fully NAs - these only happen when BL's count is NA
 fruit_comp <- fruit_comp[!(is.na(fruit_comp$FruitCount_BL)), ]
 
 pairs(fruit_comp)
-# Basia's counts almost seem better correlated with total fruit than from the initial imageJ counts
+# BL's counts almost seem better correlated with total fruit than from the initial imageJ counts
 cor(fruit_comp$TotFruit, fruit_comp$IJ_FruitCount, use = "pairwise.complete.obs")
 #0.948158
 cor(fruit_comp$TotFruit, fruit_comp$FruitCount_BL, use = "pairwise.complete.obs")
@@ -460,7 +460,7 @@ cor(fruit_comp$IJ_FruitCount, fruit_comp$FruitCount_BL, use = "pairwise.complete
 
 ```
 
-This tells me that everything is still rather highly correlated. Basia's counts are more highly correlated with the total fruit count than with the other imageJ count or than the other count is with the total count. I do want to use Basia's info going forward because they had the most consistent counting technique since they were all counted by the same person.
+This tells me that everything is still rather highly correlated. BL's counts are more highly correlated with the total fruit count than with the other imageJ count or than the other count is with the total count. I do want to use BL's info going forward because they had the most consistent counting technique since they were all counted by the same person.
 
 ```{r}
 # Counts at Harvest
@@ -476,7 +476,7 @@ print(shapiro.test(exp(CleanData_2021$IJ_FruitCount)))
 print(shapiro.test(sqrt(CleanData_2021$IJ_FruitCount)))
 #CleanData_2021$l10_IJ_Fruits <- log10(CleanData_2021$IJ_FruitCount)
 
-# Basia recounts
+# BL recounts
 print(shapiro.test(CleanData_2021$FruitCount_BL))
 print(shapiro.test(log10(CleanData_2021$FruitCount_BL)))
 print(shapiro.test(exp(CleanData_2021$FruitCount_BL)))
@@ -527,7 +527,7 @@ explore_trans(CleanData_2021$AvgSeedNum)
 CleanData_2021$l10_AvgSeedNum <- log10(CleanData_2021$AvgSeedNum)
 ```
 
-Fitness - calculated with Basia's fruit counts
+Fitness - calculated with BL's fruit counts
 ```{r}
 CleanData_2021$fitness <- (CleanData_2021$AvgSeedNum) * CleanData_2021$FruitCount_BL
 # if fruit count is a 0, need to also make total fitness a 0 (and not an NA)
@@ -582,13 +582,13 @@ write.csv(CleanData_2021, file = "data/CleanData_2021.csv", row.names = FALSE)
 Raw data files not saved in github. All intermediate files are in the data subfolder.
 
 ```{r load}
-Dat1 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/DataEntry.csv", header = TRUE) 
-Dat2 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/LeafCountPlantWeights.csv", header = TRUE)
-Dat3 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Resultsleafarea.csv", header = TRUE)
-Dat4 <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/Phenology_Sum2022.csv", header = TRUE)
+Dat1 <- read.csv("data/2022_raw/DataEntry.csv", header = TRUE) 
+Dat2 <- read.csv("data/2022_raw/LeafCountPlantWeights.csv", header = TRUE)
+Dat3 <- read.csv("data/2022_raw/Resultsleafarea.csv", header = TRUE)
+Dat4 <- read.csv("data/2022_raw/Phenology_Sum2022.csv", header = TRUE)
 
-# this file already has averages calcuated. Tori did it in excel. To get a file without averages, read in KBS_Stomata_Count.csv
-Stomata <- read.csv("C:/Users/Sophie/OneDrive - Michigan State University/Arabidopsis/Swe_Italy/Summer2022/DataSheets/KBS_Stomata_Count_AVG.csv", header = TRUE)
+# this file already has averages calculated from excel. To get a file without averages, read in KBS_Stomata_Count.csv
+Stomata <- read.csv("data/2022_raw/KBS_Stomata_Count_AVG.csv", header = TRUE)
 ```
 
 ## Clean up data

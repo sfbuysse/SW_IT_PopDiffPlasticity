@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2025-10-21"
+date: "2026-01-14"
 output: 
   html_document:
     toc: true
@@ -317,7 +317,7 @@ Height_cm (of main stalk)
 
 ## fitness + fitness related
 
-FruitCount - Basia
+FruitCount - BL
 
 ![](03_Figures_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
@@ -689,19 +689,19 @@ legend_fig
 
 ``` r
 # trait figs
-ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 300)
-ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 300)
+ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 600)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 600)
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 300)
+ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 600)
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 300)
+ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 600)
 
 #figs1
-ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 300)
+ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 600)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 300)
+ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 600)
 ```
 
