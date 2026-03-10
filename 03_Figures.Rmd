@@ -670,6 +670,22 @@ rs
 
 # old fraction label: expression(paste(frac("Root", "Shoot"), "   Biomass"))
 ```
+Total Biomass
+
+```{r, echo = FALSE}
+totbio <- ggplot(data = Means_2022[["TotBio_means_22"]], aes(x = Treatment, y = Mean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
+  geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
+  geom_line(aes(group = Population, col = Population), size = 1, linetype = "dotted", position = position_dodge(width = 0.3))+ 
+  labs(y="Total Biomass (g)", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("IT", "SW"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+totbio
+```
+
 
 ## Stomata
 Stomata Density
@@ -985,9 +1001,9 @@ fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
 #vjust = 00
 fig1
 
-fig2 <- ggarrange(rs, ros_2022, bg,
-                  labels = c("A", "B", "C"),
-                  ncol = 3, nrow = 1,
+fig2 <- ggarrange(rs, totbio, ros_2022, bg,
+                  labels = c("A", "B", "C", "D"),
+                  ncol = 2, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
                   align = "hv")
@@ -1073,7 +1089,7 @@ legend_fig
 
 # trait figs
 ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 600)
-ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 600)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 600)
 
 # fitness fig
 ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 600)

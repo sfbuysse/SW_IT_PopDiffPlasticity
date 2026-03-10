@@ -1057,7 +1057,7 @@ BG_pairs_22$trait <- "Below Ground Biomass"
 #BG_anov_22SQR$trait <- "SQR_Below Ground Biomass"
 ```
 
-Root to shoot ration (below ground / above ground)
+Root to shoot ratio (below ground / above ground)
 ```{r}
 # Root to Shoot ratio
 RS_lm_22 <- do_lmer2(Dat_2022$l10_Root_to_Shoot)
@@ -1067,6 +1067,18 @@ RS_emmeans_22 <- get_table_bt(RS_lm_22)
 RS_means_22 <- as.data.frame(RS_emmeans_22)
 RS_pairs_22 <- as.data.frame(pairs(RS_emmeans_22))
 RS_pairs_22$trait <- "l10_Root to Shoot Ratio"
+```
+
+Total biomass
+```{r}
+# total biomass
+TotBio_lm_22 <- do_lmer2(Dat_2022$TotalBiomass) # residuals pretty normal, don't worry about sqrt transformation
+TotBio_anov_22 <- do_anov2(TotBio_lm_22) # these output stats are more different than I would expect...
+TotBio_anov_22$trait <- "Total Biomass"
+TotBio_emmeans_22 <- get_table(TotBio_lm_22)
+TotBio_means_22 <- as.data.frame(TotBio_emmeans_22)
+TotBio_pairs_22 <- as.data.frame(pairs(TotBio_emmeans_22))
+TotBio_pairs_22$trait <- "Total Biomass"
 ```
 
 
@@ -1090,7 +1102,7 @@ do_anov2(do_lmer2(Dat_2022$l10_Stomata_avg))
 1) results table
 
 ```{r}
-AnovaResults_2022 <- rbind(emergence_anov_22, bolting_anov_22, fresh_anov_22, hyd_anov_22, dry_anov_22, area_anov_22, per_anov_22, sla_anov_22, ldmc_anov_22, rwc_anov_22, LN_PreVern_anov_22, LN_Jun6_anov_22, LN_Jun13_anov_22, LN_bolt_anov_22, AG_anov_22, BG_anov_22, RS_anov_22, sto_den_anov_22 )
+AnovaResults_2022 <- rbind(emergence_anov_22, bolting_anov_22, fresh_anov_22, hyd_anov_22, dry_anov_22, area_anov_22, per_anov_22, sla_anov_22, ldmc_anov_22, rwc_anov_22, LN_PreVern_anov_22, LN_Jun6_anov_22, LN_Jun13_anov_22, LN_bolt_anov_22, AG_anov_22, BG_anov_22, RS_anov_22, TotBio_anov_22, sto_den_anov_22 )
 
 write.csv(AnovaResults_2022, file = "data/AnovaResults_2022.csv", row.names = TRUE)
 ```
@@ -1099,7 +1111,7 @@ write.csv(AnovaResults_2022, file = "data/AnovaResults_2022.csv", row.names = TR
 
 ```{r}
 # change column names
-dfs3 <- c("bolting_means_22", "dry_means_22", "area_means_22", "per_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "BG_means_22", "emergence_means_22", "fresh_means_22", "hyd_means_22", "sla_means_22", "ldmc_means_22", "LN_bolt_means_22", "AG_means_22", "RS_means_22", "sto_den_means_22")
+dfs3 <- c("bolting_means_22", "dry_means_22", "area_means_22", "per_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "BG_means_22", "emergence_means_22", "fresh_means_22", "hyd_means_22", "sla_means_22", "ldmc_means_22", "LN_bolt_means_22", "AG_means_22", "RS_means_22", "TotBio_means_22", "sto_den_means_22")
 
 for (i in dfs3) {
   x=get(i)
@@ -1109,10 +1121,10 @@ for (i in dfs3) {
 
 
 # create list of data frames
-Means_2022 <- list(emergence_means_22, bolting_means_22, fresh_means_22, hyd_means_22, dry_means_22, area_means_22, per_means_22, sla_means_22, ldmc_means_22, rwc_means_22, LN_PreVern_means_22, LN_Jun6_means_22, LN_Jun13_means_22, LN_bolt_means_22, AG_means_22, BG_means_22, RS_means_22, sto_den_means_22)
+Means_2022 <- list(emergence_means_22, bolting_means_22, fresh_means_22, hyd_means_22, dry_means_22, area_means_22, per_means_22, sla_means_22, ldmc_means_22, rwc_means_22, LN_PreVern_means_22, LN_Jun6_means_22, LN_Jun13_means_22, LN_bolt_means_22, AG_means_22, BG_means_22, RS_means_22, TotBio_means_22, sto_den_means_22)
 
 # name that list
-names(Means_2022) <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "LN_bolt_means_22", "AG_means_22", "BG_means_22", "RS_means_22", "sto_den_means_22")
+names(Means_2022) <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22", "LN_Jun6_means_22", "LN_Jun13_means_22", "LN_bolt_means_22", "AG_means_22", "BG_means_22", "RS_means_22", "TotBio_means_22", "sto_den_means_22")
 
 # save named list
 save(Means_2022, file = "data/ModelMeans_2022.robj")
@@ -1121,7 +1133,7 @@ save(Means_2022, file = "data/ModelMeans_2022.robj")
 
 3) Post hoc test results
 ```{r}
-PostHoc_2022 <- rbind(bolting_pairs_22, fresh_pairs_22, hyd_pairs_22, dry_pairs_22, area_pairs_22, per_pairs_22, sla_pairs_22, ldmc_pairs_22, rwc_pairs_22, LN_bolt_pairs_22, AG_pairs_22, BG_pairs_22, RS_pairs_22, sto_den_pairs_22 )
+PostHoc_2022 <- rbind(bolting_pairs_22, fresh_pairs_22, hyd_pairs_22, dry_pairs_22, area_pairs_22, per_pairs_22, sla_pairs_22, ldmc_pairs_22, rwc_pairs_22, LN_bolt_pairs_22, AG_pairs_22, BG_pairs_22, RS_pairs_22, TotBio_pairs_22, sto_den_pairs_22 )
 
 write.csv(PostHoc_2022, file = "data/PostHoc_2022.csv", row.names = TRUE)
 ```
@@ -1157,7 +1169,7 @@ n_2022 %>%
 ```
 
 # Notes
-The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis. This was repeated on 7/22/2025 to update with the emmeans package outputs.
+The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis. This was repeated on 7/22/2025 to update with the emmeans package outputs. It was also updated 3/10/2026 with adding total biomass as a trait.
 
 The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. There is a post hoc results spreadsheet as well which is included in the tables for the manuscript.
 

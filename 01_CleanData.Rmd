@@ -780,6 +780,11 @@ CleanData_2022$SQR_BG_DryBiomass <- sqrt(CleanData_2022$BG_DryBiomass)
 
 explore_trans(CleanData_2022$Root_to_Shoot)
 CleanData_2022$l10_Root_to_Shoot <- log10(CleanData_2022$Root_to_Shoot)
+
+# added later, total biomass
+CleanData_2022$TotalBiomass <- CleanData_2022$AG_DryBiomass + CleanData_2022$BG_DryBiomass
+explore_trans(CleanData_2022$TotalBiomass)
+CleanData_2022$SQR_TotalBiomass <- sqrt(CleanData_2022$TotalBiomass)
 ```
 
 Stomata
