@@ -171,6 +171,18 @@ get_table_bt <- function(model){
   return(tab)
 }
 
+# genotype level emmeans for looking at within population variation
+Dat_2021_TwoTrt$Geno_ID <- as.factor(paste0(Dat_2021_TwoTrt$Population, Dat_2021_TwoTrt$Line))
+get_geno_table <- function (trait, data = Dat_2021_TwoTrt){
+  tab2 <- emmeans(lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum)), c("Treatment", "Geno_ID"), type = "reponse")
+  return(tab2)
+}
+
+get_geno_table_bt <- function(trait, data = Dat_2021_TwoTrt){
+  mod <- lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum))
+  tab2 <- emmeans(update(ref_grid(mod), tran = "log10"), c("Treatment", "Geno_ID"), type = "response") #
+  return(tab2)
+}
 ```
 
 The modelling function runs a mixed model where each trait is predicted by population, treatment, and their interaction while accounting for random effects of line nested within population and soil mix batch number -> and just line in the final model.
@@ -188,6 +200,9 @@ emergence_emmeans_21 <- get_table(emergence_lm_21)
 emergence_means_21 <- as.data.frame(emergence_emmeans_21)
 emergence_pairs_21 <- as.data.frame(pairs(emergence_emmeans_21))
 emergence_pairs_21$trait <- "Emergence"
+
+
+#get_geno_table(Dat_2021_TwoTrt$Emergence)
 ```
 
 Days between emergence and bolting (note: not included in fina manuscript)
@@ -221,6 +236,9 @@ eTof_emmeans_21 <- get_table(eTof_lm_21)
 eTof_means_21 <- as.data.frame(eTof_emmeans_21)
 eTof_pairs_21 <- as.data.frame(pairs(eTof_emmeans_21))
 eTof_pairs_21$trait <- "Emergence To Flowering"
+
+geno_eTof <- as.data.frame(get_geno_table(Dat_2021_TwoTrt$EmergeToFlwr))
+geno_eTof$trait <- "Emergence To Flowering"
 ```
 
 ### Single Leaf Collected At Flowering
@@ -306,6 +324,9 @@ SLA_emmeans_21 <- get_table_bt(SLA_lm_21)
 SLA_means_21 <- as.data.frame(SLA_emmeans_21)
 SLA_pairs_21 <- as.data.frame(pairs(SLA_emmeans_21))
 SLA_pairs_21$trait <- "l10_SLA"
+
+geno_sla_21 <- as.data.frame(get_geno_table_bt(Dat_2021_TwoTrt$l10_SLA))
+geno_sla_21$trait <- "l10_SLA"
 ```
 
 
@@ -333,6 +354,9 @@ RWC_emmeans_21 <- get_table(RWC_lm_21)
 RWC_means_21 <- as.data.frame(RWC_emmeans_21)
 RWC_pairs_21 <- as.data.frame(pairs(RWC_emmeans_21))
 RWC_pairs_21$trait <- "RWC"
+
+geno_rwc_21 <- as.data.frame(get_geno_table(Dat_2021_TwoTrt$RWC))
+geno_rwc_21$trait <- "RWC"
 ```
 
 ### Leaf Number
@@ -505,6 +529,9 @@ fruit_means_21 <- as.data.frame(fruit_emmeans_21)
 fruit_pairs_21 <- as.data.frame(pairs(fruit_emmeans_21))
 fruit_pairs_21$trait <- "FruitNum"
 
+geno_fruits <- as.data.frame(get_geno_table(Dat_2021_TwoTrt$FruitCount_BL))
+geno_fruits$trait <- "FruitNum"
+
 ```
 
 Code to see if a hurdle model changes results since there is a pattern of zero inflation. Not evaluated because not used in the final manuscript.
@@ -602,6 +629,9 @@ seeds_pairs_21 <- as.data.frame(pairs(seeds_emmeans_21))
 seeds_pairs_21$trait <- "l10_Average Seeds per Fruit"
 # why are residuals so odd? because population explains 0 variance.
 
+geno_seeds <- as.data.frame(get_geno_table_bt(Dat_2021_TwoTrt$l10_AvgSeedNum))
+geno_seeds$trait <- "l10_seeds per fruit"
+
 ## test if SeedCounter matters
 #seeds_lm <- lmer(l10_AvgSeedNum ~ Treatment * Population + (1|Population:Line) + (1|SeedCounter), data = Dat_2021_TwoTrt, #contrasts = list(Treatment=contr.sum, Population = contr.sum))
 #plot(fitted(seeds_lm), residuals(seeds_lm, type = "pearson", scaled = TRUE),
@@ -660,6 +690,9 @@ fitness_emmeans_21 <- get_table(fitness_lm_21)
 fitness_means_21 <- as.data.frame(fitness_emmeans_21)
 fitness_pairs_21 <- as.data.frame(pairs(fitness_emmeans_21))
 fitness_pairs_21$trait <- "Total Fitness"
+
+geno_fitness <- as.data.frame(get_geno_table(Dat_2021_TwoTrt$fitness))
+geno_fitness$trait <- "TotalFitness"
 ```
 
 ###Outputs
@@ -700,6 +733,12 @@ Save a .csv with the posthoc results
 PostHocResults_2021 <- rbind(emergence_pairs_21, eTof_pairs_21, fresh_pairs_21, sat_pairs_21, dry_pairs_21, area_pairs_21, per_pairs_21, SLA_pairs_21, LDMC_pairs_21, RWC_pairs_21, LN_harv_pairs_21, Ros_pairs_21, Repro_pairs_21, RR_pairs_21, LatBranch_pairs_21, PrimStalks_pairs_21, height_pairs_21, fruit_pairs_21, AvSeedWt_pairs_21, seeds_pairs_21, fitness_pairs_21)
 
 write.csv(PostHocResults_2021, file = "data/PostHocResults_2021.csv", row.names = TRUE)
+```
+
+genotype level information
+```{r}
+GenotypeMeans_2021 <- rbind(geno_rwc_21, geno_sla_21, geno_eTof, geno_fruits, geno_seeds, geno_fitness)
+GenotypeMeans_2021$year <- "2021"
 ```
 
 
@@ -833,6 +872,20 @@ do_anov2 <- function(model){
 }
 
 # get table functions are the same as from 2021
+
+# geno get table functions need to be updated
+# genotype level emmeans for looking at within population variation
+Dat_2022$Geno_ID <- as.factor(paste0(Dat_2022$Population, Dat_2022$Line))
+get_geno_table22 <- function (trait, data = Dat_2022){
+  tab2 <- emmeans(lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum)), c("Treatment", "Geno_ID"), type = "reponse")
+  return(tab2)
+}
+
+get_geno_table_bt22 <- function(trait, data = Dat_2022){
+  mod <- lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum))
+  tab2 <- emmeans(update(ref_grid(mod), tran = "log10"), c("Treatment", "Geno_ID"), type = "response") #
+  return(tab2)
+}
   
 ```
 
@@ -953,6 +1006,9 @@ sla_emmeans_22 <- get_table_bt(sla_lm_22)
 sla_means_22 <- as.data.frame(sla_emmeans_22)
 sla_pairs_22 <- as.data.frame(pairs(sla_emmeans_22))
 sla_pairs_22$trait <- "l10_SLA"
+
+geno_sla_22 <- as.data.frame(get_geno_table_bt22(Dat_2022$l10_SLA))
+geno_sla_22$trait <- "l10_SLA"
 ```
 
 leaf dry matter content
@@ -978,6 +1034,10 @@ rwc_emmeans_22 <- get_table(rwc_lm_22)
 rwc_means_22 <- as.data.frame(rwc_emmeans_22)
 rwc_pairs_22 <- as.data.frame(pairs(rwc_emmeans_22))
 rwc_pairs_22$trait <- "RWC"
+
+
+geno_rwc_22 <- as.data.frame(get_geno_table22(Dat_2022$RWC))
+geno_rwc_22$trait <- "RWC"
 ```
 
 ### Leaf Number
@@ -1039,6 +1099,9 @@ AG_pairs_22$trait <- "l10_Above Ground Biomass"
 #AG_lm_22SQR <- do_lmer2(Dat_2022$SQR_AG_DryBiomass)
 #AG_anov_22SQR <- do_anov2(AG_lm_22SQR)
 #AG_anov_22SQR$trait <- "SQR_Above Ground Biomass"
+
+geno_ag_22 <- as.data.frame(get_geno_table_bt22(Dat_2022$l10_AG_DryBiomass))
+geno_ag_22$trait <- "l10_AG"
 ```
 
 below ground biomass
@@ -1055,6 +1118,9 @@ BG_pairs_22$trait <- "Below Ground Biomass"
 #BG_lm_22SQR <- do_lmer2(Dat_2022$SQR_BG_DryBiomass)
 #BG_anov_22SQR <- do_anov2(BG_lm_22SQR)
 #BG_anov_22SQR$trait <- "SQR_Below Ground Biomass"
+
+geno_bg_22 <- as.data.frame(get_geno_table22(Dat_2022$BG_DryBiomass))
+geno_bg_22$trait <- "BG_DryBiomass"
 ```
 
 Root to shoot ratio (below ground / above ground)
@@ -1067,6 +1133,9 @@ RS_emmeans_22 <- get_table_bt(RS_lm_22)
 RS_means_22 <- as.data.frame(RS_emmeans_22)
 RS_pairs_22 <- as.data.frame(pairs(RS_emmeans_22))
 RS_pairs_22$trait <- "l10_Root to Shoot Ratio"
+
+geno_rs_22 <- as.data.frame(get_geno_table_bt22(Dat_2022$l10_Root_to_Shoot))
+geno_rs_22$trait <- "l10_Root_to_Shoot"
 ```
 
 Total biomass
@@ -1079,6 +1148,9 @@ TotBio_emmeans_22 <- get_table(TotBio_lm_22)
 TotBio_means_22 <- as.data.frame(TotBio_emmeans_22)
 TotBio_pairs_22 <- as.data.frame(pairs(TotBio_emmeans_22))
 TotBio_pairs_22$trait <- "Total Biomass"
+
+geno_TotBio_22 <- as.data.frame(get_geno_table22(Dat_2022$TotalBiomass))
+geno_TotBio_22$trait <- "TotalBiomass"
 ```
 
 
@@ -1095,6 +1167,11 @@ sto_den_pairs_22$trait <- "l10_Stomatal Density"
 
 # check results don't change if using stomatal average
 do_anov2(do_lmer2(Dat_2022$l10_Stomata_avg))
+
+
+geno_stoden_22 <- as.data.frame(get_geno_table_bt22(Dat_2022$l10_Stomata_density))
+geno_stoden_22$trait <- "l10_Stomata_density"
+
 ```
 
 ### Outputs
@@ -1136,6 +1213,15 @@ save(Means_2022, file = "data/ModelMeans_2022.robj")
 PostHoc_2022 <- rbind(bolting_pairs_22, fresh_pairs_22, hyd_pairs_22, dry_pairs_22, area_pairs_22, per_pairs_22, sla_pairs_22, ldmc_pairs_22, rwc_pairs_22, LN_bolt_pairs_22, AG_pairs_22, BG_pairs_22, RS_pairs_22, TotBio_pairs_22, sto_den_pairs_22 )
 
 write.csv(PostHoc_2022, file = "data/PostHoc_2022.csv", row.names = TRUE)
+```
+
+genotype level information
+```{r}
+GenotypeMeans_2022 <- rbind(geno_rwc_22, geno_sla_22, geno_stoden_22, geno_rs_22, geno_ag_22, geno_bg_22, geno_TotBio_22)
+GenotypeMeans_2022$year <- "2022"
+
+GenotypeMeans <- rbind(GenotypeMeans_2021, GenotypeMeans_2022)
+write.csv(GenotypeMeans, file = "data/GenotypeMeans.csv", row.names = FALSE)
 ```
 
 ## Sample size information

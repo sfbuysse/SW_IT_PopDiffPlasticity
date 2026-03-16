@@ -1,0 +1,252 @@
+---
+title: "04_GenotypeFigures"
+author: "Sophie Buysse"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(ggpubr)
+```
+
+
+## Read in data
+Read in the data needed for all plotting.
+```{r}
+# 2021
+Dat<- read.csv("data/GenotypeMeans.csv")
+# set factors
+Dat <- Dat %>% dplyr::mutate(
+  Treatment = as.factor(Treatment),
+  Geno_ID = as.factor(Geno_ID),
+  year = as.factor(year),
+  trait = as.factor(trait)
+)
+
+Dat$Population <- "Sweden"
+Dat[substr(Dat$Geno_ID, start = 1, stop = 1) == "B", "Population"] <- "Italy"
+```
+
+Set theme for plots
+```{r}
+theme_set(theme_classic())
+theme_update(legend.title = element_text(family = "serif", color = "black", size = 14),
+    legend.text = element_text(family = "serif", color = "black", size = 14),
+    axis.title = element_text(family = "serif", color = "black", size = 14),
+    axis.text = element_text(family = "serif", color = "black", size = 14),
+    axis.line = element_line(colour = 'black', linewidth = 1),
+    axis.ticks = element_line(color = 'black', linewidth = 1),
+    axis.ticks.length=unit(.15, "cm"),
+    legend.spacing.y = unit(0.03, "cm"),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    #plot.margin = margin(t=1, r=0.075, b=0.075, l=0.05, unit = "in") # his was to  leave room for stats at the top of each figure
+    )
+
+# If I want to add back in that the y axis should always start at 0:
+#  expand_limits(y=0)
+
+# what font is serif?
+windowsFonts()$serif
+    
+```
+
+# 2021 only plots
+```{r}
+fruits <- ggplot(data = Dat[Dat$trait == "FruitNum", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Fruit Count", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+fruits
+```
+
+```{r}
+seeds <- ggplot(data = Dat[Dat$trait == "l10_seeds per fruit", ], aes(x = Treatment, y = response)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Seeds Per Fruit", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+seeds
+```
+
+```{r}
+fitness <- ggplot(data = Dat[Dat$trait == "TotalFitness", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Total Fitness", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+fitness
+```
+
+```{r}
+flowering <- ggplot(data = Dat[Dat$trait == "Emergence To Flowering", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Days To Flowering", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+flowering
+```
+
+# 2022 only plots
+
+```{r}
+stoden <- ggplot(data = Dat[Dat$trait == "l10_Stomata_density", ], aes(x = Treatment, y = response)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Stomatal Density", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+stoden
+```
+
+
+```{r}
+ag <- ggplot(data = Dat[Dat$trait == "l10_AG", ], aes(x = Treatment, y = response)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Above Ground Biomass", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+ag
+```
+
+```{r}
+bg <- ggplot(data = Dat[Dat$trait == "BG_DryBiomass", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Below Ground Biomass", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+bg
+```
+
+```{r}
+rs <- ggplot(data = Dat[Dat$trait == "l10_Root_to_Shoot", ], aes(x = Treatment, y = response)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Root-to-shoot", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+rs
+```
+
+```{r}
+totbio <- ggplot(data = Dat[Dat$trait == "TotalBiomass", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE) +
+  geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  geom_line(aes(group = Geno_ID, col = Population), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5)+ 
+  labs(y="Total Biomass", 
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_x_discrete(expand = c(0.6,0))
+
+totbio
+```
+
+# traits with both
+```{r}
+sla <- ggplot(data = Dat[Dat$trait == "l10_SLA", ], aes(x = Treatment, y = response)) +
+  geom_point(aes(group = year:Geno_ID, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = FALSE) +
+  geom_errorbar(aes(group = year:Geno_ID, ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = FALSE)+
+  geom_line(aes(group = year:Geno_ID, col = Population, linetype = year), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  labs(y=expression(paste("Specific Leaf Area ", (cm^2 / g))),
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_linetype_manual(name = "Experiment",
+                        labels = c("2021", "2022"),
+                        values = c("solid", "dotted"))+
+  scale_x_discrete(expand = c(0.6,0))
+sla
+```
+
+
+```{r}
+rwc <- ggplot(data = Dat[Dat$trait == "RWC", ], aes(x = Treatment, y = emmean)) +
+  geom_point(aes(group = year:Geno_ID, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = FALSE) +
+  geom_errorbar(aes(group = year:Geno_ID, ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = FALSE)+
+  geom_line(aes(group = year:Geno_ID, col = Population, linetype = year), linewidth = 1, position = position_dodge(width = 0.3), alpha = 0.5, show.legend = TRUE)+
+  labs(y=expression(paste("Relative Water Content")),
+      x="Treatment")+
+  scale_color_manual(name = "Population",
+                     labels = c("Italy", "Sweden"),
+                     values = c("#CC79A7", "#009E73"))+
+  scale_linetype_manual(name = "Experiment",
+                        labels = c("2021", "2022"),
+                        values = c("solid", "dotted"))+
+  scale_x_discrete(expand = c(0.6,0))
+rwc
+```
+
+
+## make big figure
+```{r}
+fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), flowering, stoden, rs, totbio, ag, bg, fruits, seeds, fitness,#
+                  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"),
+                  ncol = 2, nrow = 6,
+                  common.legend = TRUE, # created based on the first plot
+                  legend = "none",
+                  align = "hv"
+)
+#label.x = c(0, -0.1, -0.1, -0.1, -0.1, 0)
+#vjust = 00
+fig1
+ggsave(fig1, filename = "figures/GenotypeRxnNorms.jpg", width = 12, height = 20, units = "in", dpi = 600)
+```
+
