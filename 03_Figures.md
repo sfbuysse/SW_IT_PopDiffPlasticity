@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2026-01-14"
+date: "2026-03-18"
 output: 
   html_document:
     toc: true
@@ -140,44 +140,9 @@ Graphs showing general phenology trends. The goal of these is a quick comparison
 
 2021
 
-```
-## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
-```
-## Warning: Removed 6 rows containing non-finite outside the scale range
-## (`stat_density()`).
-```
-
-```
-## Warning: Removed 14 rows containing non-finite outside the scale range
-## (`stat_density()`).
-```
-
-```
-## Warning: Removed 15 rows containing non-finite outside the scale range
-## (`stat_density()`).
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 2022 - note: plants that died or were transplanted are not shown here because they may have an emergence date and no bolting date (if died) or a bolting date and no emergence date (if transplanted)
 
-```
-## Warning: Removed 14 rows containing non-finite outside the scale range
-## (`stat_density()`).
-```
-
-```
-## Warning: Removed 15 rows containing non-finite outside the scale range
-## (`stat_density()`).
-```
-
-![](03_Figures_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 
 Takeaways: phenology is quicker for both populations in the 2022 experiment. In 2022, Italy bolts around 70 days post planting but it is closer to 85 days in 2021. Similarly, in 2021 Sweden takes over 100 days to bolt but it bolted at about 90 days in 2022. There were some experimental differences (like light and the chambers used and the conditions/timing through vernalization) that could contribute to this difference. 
@@ -207,26 +172,35 @@ Reaction norms to make here: \
 
 Days Emergence to bolting
 
-![](03_Figures_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
 
 
 DaysBoltingToFlwr
 
 
-![](03_Figures_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 
 
 Days Emergence to Flower
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
 ![](03_Figures_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ## Leaf Number
 LeafNum_duringvern 
 
-![](03_Figures_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 
 LeafNum_Oct4 
 
-![](03_Figures_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 
 RosetteLeafNum_harvest
 
@@ -241,14 +215,6 @@ tmp_mean_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
   summarize(across(.col = c(LeafNum_.07222021, LeafNum_08262021, RosetteLeafNum_10042021, RosetteLeafNum), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"))))
-```
-
-```
-## `summarise()` has grouped output by 'Population'. You can override using the
-## `.groups` argument.
-```
-
-``` r
 # pivot
 tmp_mean_21 <- pivot_longer(tmp_mean_21, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "mean")
 tmp_mean_21$Time <- factor(rep(c("Week5", "Week10", "Week14", "Harvest"), times = 4), levels = c("Week5", "Week10", "Week14", "Harvest"))
@@ -257,14 +223,7 @@ tmp_ci_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
   summarize(across(.col = c(LeafNum_.07222021, LeafNum_08262021, RosetteLeafNum_10042021, RosetteLeafNum), .fns = list(ci_95 = ~conf_int(.x))))
-```
 
-```
-## `summarise()` has grouped output by 'Population'. You can override using the
-## `.groups` argument.
-```
-
-``` r
 # pivot
 tmp_ci_21 <- pivot_longer(tmp_ci_21, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "ci")
 tmp_ci_21$Time <- factor(rep(c("Week5", "Week10", "Week14", "Harvest"), times = 4), levels = c("Week5", "Week10", "Week14", "Harvest"))
@@ -284,8 +243,6 @@ ggplot(data = forplot3_2021, aes(x = Time, y = mean)) +
   scale_x_discrete(expand = c(0.2,0))
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
-
 ## Plant Structure
 RosetteDry_harvest
 
@@ -297,7 +254,7 @@ DryReproG
 
 AG_biomass (Ros+Repro)
 
-![](03_Figures_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
 
 Repro_to_Ros
 
@@ -305,15 +262,15 @@ Repro_to_Ros
 
 LatBranches
 
-![](03_Figures_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+
 
 PrimaryStalks - how many stalks are coming out of the top of the rosette?
 
-![](03_Figures_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
 
 Height_cm (of main stalk)
 
-![](03_Figures_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+
 
 ## fitness + fitness related
 
@@ -350,10 +307,10 @@ Note: skipping days from emergence to bolting because most of that time is the s
 ## Leaf Number
 LeafNum_Jun6 
 
-![](03_Figures_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
 
 LeafNum_Jun13 
-![](03_Figures_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
 
 LeafNum_bolt
 
@@ -368,14 +325,6 @@ tmp_mean <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
   summarize(across(.col = c(LeafNumber_PreVern:LeafNumber_Jun13, LeafNumber_Total), .fns = list(mean = ~mean(.x, na.rm = TRUE, .group = "keep"))))
-```
-
-```
-## `summarise()` has grouped output by 'Population'. You can override using the
-## `.groups` argument.
-```
-
-``` r
 # pivot
 tmp_mean <- pivot_longer(tmp_mean, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "mean")
 tmp_mean$Time <- factor(rep(c("Week5", "Week9", "Week10", "Bolting"), times = 4), levels = c("Week5", "Week9", "Week10", "Bolting"))
@@ -384,14 +333,7 @@ tmp_ci <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
   dplyr::group_by(Treatment, .add = TRUE) %>%
   summarize(across(.col = c(LeafNumber_PreVern:LeafNumber_Jun13, LeafNumber_Total), .fns = list(ci_95 = ~conf_int(.x))))
-```
 
-```
-## `summarise()` has grouped output by 'Population'. You can override using the
-## `.groups` argument.
-```
-
-``` r
 # pivot
 tmp_ci <- pivot_longer(tmp_ci, cols = !(c(Population, Treatment)), names_to = "Time", values_to = "ci")
 tmp_ci$Time <- factor(rep(c("Week5", "Week9", "Week10", "Bolting"), times = 4), levels = c("Week5", "Week9", "Week10", "Bolting"))
@@ -410,8 +352,6 @@ ggplot(data = forplot3_2022, aes(x = Time, y = mean)) +
                      values = c("#CC79A7", "#009E73"))+
   scale_x_discrete(expand = c(0.2,0))
 ```
-
-![](03_Figures_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 
 ## Biomass
@@ -442,11 +382,15 @@ BG_Dry_bolt
 Root_to_Shoot
 
 ![](03_Figures_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+Total Biomass
+
+![](03_Figures_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+
 
 ## Stomata
 Stomata Density
 
-![](03_Figures_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 # both
 Steps to be completed here.
@@ -468,12 +412,12 @@ Reaction Norms to create here: \
 
 ``` r
 # subset 2021 dataset
-both_exp <- c("emergence_means_21", "bolting_means_21", "fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "RWC_means_21", "LN_PreVern_means_21")
+both_exp <- c("fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21","SLA_means_21", "LDMC_means_21", "RWC_means_21")
 both_2021 <- Means_2021[both_exp]
 both_2021 <- lapply(both_2021, cbind, Exp = as.factor(c("2021")))
 
 # subset 2022 dataset
-both_exp2 <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22")
+both_exp2 <- c("fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22")
 both_2022 <- Means_2022[both_exp2]
 # change B and R to Belm and Roda
 for (i in 1:length(both_2022)){
@@ -486,7 +430,7 @@ both_2022 <- lapply(both_2022, cbind, Exp = as.factor(c("2022")))
 
 
 # merge - do this within a loop
-mylist.names <- c("emergence", "bolting", "fresh", "hyd", "dry", "area", "per", "sla", "ldmc", "rwc", "LN")
+mylist.names <- c("fresh", "hyd", "dry", "area", "sla", "ldmc", "rwc")
 both_dfs <-  vector("list", length(mylist.names))
 names(both_dfs) <- mylist.names
 
@@ -500,12 +444,12 @@ for (i in 1:length(both_dfs)){
 
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
-![](03_Figures_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+
 
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable because in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait and is not included in the manuscript.
 
-![](03_Figures_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+
 
 
 ## Single Leaf Individual Traits
@@ -538,7 +482,7 @@ LeafPerimeter
 ## Single Leaf Calculated Traits
 Specific Leaf Area
 
-![](03_Figures_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
 
 ```
 ## Saving 7 x 5 in image
@@ -547,17 +491,17 @@ Specific Leaf Area
 
 Leaf Dry Matter Content
 
-![](03_Figures_files/figure-html/unnamed-chunk-42-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
 
 Relative Water Content
 
-![](03_Figures_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
 
 ## Leaf Number
 LeafNum_4weeks
 
-![](03_Figures_files/figure-html/unnamed-chunk-44-1.png)<!-- -->
+
 
 # Manuscript Figures
 creating multipanel figures for the manuscript. 
@@ -579,19 +523,19 @@ fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
 fig1
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-45-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 ``` r
-fig2 <- ggarrange(rs, ros_2022, bg,
-                  labels = c("A", "B", "C"),
-                  ncol = 3, nrow = 1,
+fig2 <- ggarrange(rs, totbio, ros_2022, bg,
+                  labels = c("A", "B", "C", "D"),
+                  ncol = 2, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
                   align = "hv")
 fig2
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-45-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-46-2.png)<!-- -->
 
 ``` r
 fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
@@ -604,7 +548,7 @@ fitness_fig <- ggarrange(fruits, seed_per_fruit, fitness,
 fitness_fig
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-45-3.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-46-3.png)<!-- -->
 
 
 # supplemental figures
@@ -612,8 +556,8 @@ fitness_fig
 Figure s1 - single leaf traits \
 
 ``` r
-figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xlab"), freshwt, hydwt, drywt, 
-                  labels = c("A", "B", "C", "D", "E", "F"),
+figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), drywt+rremove("xlab"), freshwt, hydwt, 
+                  labels = c("A", "B", "C", "D", "E"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
@@ -622,22 +566,22 @@ figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xla
 figs1
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
 
-Figure s2 - biomass + fitness \
+Figure s3 - biomass + fitness \
 
 ``` r
-figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
+figs3 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
                   align = "h"
                   )
-figs2
+figs3
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-47-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
 
 
 Create Legend for main figures
@@ -661,7 +605,7 @@ ggplot()+
   theme_void()
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-48-1.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
 
 ``` r
   #theme(plot.margin = margin(t = 0, r = 0.5, b = 0.075, l=0, unit = "in"))
@@ -681,7 +625,7 @@ legend_fig <- ggplot()+
 legend_fig
 ```
 
-![](03_Figures_files/figure-html/unnamed-chunk-48-2.png)<!-- -->
+![](03_Figures_files/figure-html/unnamed-chunk-49-2.png)<!-- -->
 
 
 
@@ -690,7 +634,7 @@ legend_fig
 ``` r
 # trait figs
 ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 600)
-ggsave(fig2, filename = "figures/fig2.jpg", width = 9, height = 4, units = "in", dpi = 600)
+ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 600)
 
 # fitness fig
 ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 600)
@@ -702,6 +646,6 @@ ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5,
 ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 600)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 600)
+ggsave(figs3, filename = "figures/figs3.jpg", width = 9, height = 8, units = "in", dpi = 600)
 ```
 

@@ -119,7 +119,7 @@ load("data/SampleSizes_2022.robj")
 Graphs showing general phenology trends. The goal of these is a quick comparison.
 
 2021
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Dat_2021)+
   geom_density(aes(Emergence, col = Population, linetype = Treatment), size = 1.25)+
   geom_density(aes((Emergence + DayToBolt), col = Population, linetype = Treatment), size = 1.25)+
@@ -143,7 +143,7 @@ ggplot(data = Dat_2021)+
 ```
 
 2022 - note: plants that died or were transplanted are not shown here because they may have an emergence date and no bolting date (if died) or a bolting date and no emergence date (if transplanted)
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Dat_2022)+
   geom_density(aes(DaysToEmergence, col = Population, linetype = Treatment), size = 1.25)+
   geom_density(aes((DaysToEmergence + EmergenceToBolting), col = Population, linetype = Treatment), size = 1.25)+
@@ -193,7 +193,7 @@ Reaction norms to make here: \
 
 Days Emergence to bolting
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["bolting_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -210,7 +210,7 @@ ggplot(data = Means_2021[["bolting_means_21"]], aes(x = Treatment, y = Mean)) +
 DaysBoltingToFlwr
 
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["flowering_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -242,7 +242,7 @@ detf
 ## Leaf Number
 LeafNum_duringvern 
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["LN_Vern_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -257,7 +257,7 @@ ggplot(data = Means_2021[["LN_Vern_means_21"]], aes(x = Treatment, y = Mean)) +
 
 LeafNum_Oct4 
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["LN_PostVern_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -288,7 +288,7 @@ ln_harv
 
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values with the y axis being leaf number.
 
-```{r}
+```{r, eval = FALSE}
 # format a dataframe
 tmp_mean_21 <- Dat_2021 %>%
   dplyr::group_by(Population) %>%
@@ -360,7 +360,7 @@ repro
 
 AG_biomass (Ros+Repro)
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["AG_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -394,7 +394,7 @@ rr
 
 LatBranches
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["LatBranch_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -409,7 +409,7 @@ ggplot(data = Means_2021[["LatBranch_means_21"]], aes(x = Treatment, y = Mean)) 
 
 PrimaryStalks - how many stalks are coming out of the top of the rosette?
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["PrimStalks_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -424,7 +424,7 @@ ggplot(data = Means_2021[["PrimStalks_means_21"]], aes(x = Treatment, y = Mean))
 
 Height_cm (of main stalk)
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2021[["height_means_21"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -524,7 +524,7 @@ Note: skipping days from emergence to bolting because most of that time is the s
 ## Leaf Number
 LeafNum_Jun6 
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2022[["LN_Jun6_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -538,7 +538,7 @@ ggplot(data = Means_2022[["LN_Jun6_means_22"]], aes(x = Treatment, y = Mean)) +
 ```
 
 LeafNum_Jun13 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = Means_2022[["LN_Jun13_means_22"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = TRUE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = TRUE)+
@@ -570,7 +570,7 @@ ln_bolt
 
 Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
 
-```{r}
+```{r, eval = FALSE}
 # format a dataframe
 tmp_mean <- Dat_2022 %>%
   dplyr::group_by(Population) %>%
@@ -724,12 +724,12 @@ Reaction Norms to create here: \
 
 ```{r}
 # subset 2021 dataset
-both_exp <- c("emergence_means_21", "bolting_means_21", "fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21", "per_means_21", "SLA_means_21", "LDMC_means_21", "RWC_means_21", "LN_PreVern_means_21")
+both_exp <- c("fresh_means_21", "sat_means_21", "dry_means_21", "area_means_21","SLA_means_21", "LDMC_means_21", "RWC_means_21")
 both_2021 <- Means_2021[both_exp]
 both_2021 <- lapply(both_2021, cbind, Exp = as.factor(c("2021")))
 
 # subset 2022 dataset
-both_exp2 <- c("emergence_means_22", "bolting_means_22", "fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "per_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22", "LN_PreVern_means_22")
+both_exp2 <- c("fresh_means_22", "hyd_means_22", "dry_means_22", "area_means_22", "sla_means_22", "ldmc_means_22", "rwc_means_22")
 both_2022 <- Means_2022[both_exp2]
 # change B and R to Belm and Roda
 for (i in 1:length(both_2022)){
@@ -742,7 +742,7 @@ both_2022 <- lapply(both_2022, cbind, Exp = as.factor(c("2022")))
 
 
 # merge - do this within a loop
-mylist.names <- c("emergence", "bolting", "fresh", "hyd", "dry", "area", "per", "sla", "ldmc", "rwc", "LN")
+mylist.names <- c("fresh", "hyd", "dry", "area", "sla", "ldmc", "rwc")
 both_dfs <-  vector("list", length(mylist.names))
 names(both_dfs) <- mylist.names
 
@@ -756,7 +756,7 @@ for (i in 1:length(both_dfs)){
 
 Emergence. days to emergence is shown for both but should be interpreted with caution. In the 2022 experiment, all plants were put in the same conditions so there may be genetic differences but treatment differences would be due to chamber placement not due to temperature or water availability.
 
-```{r, echo = FALSE}
+```{r, eval = FALSE, echo = FALSE}
 ggplot(data = both_dfs[["emergence"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
@@ -776,7 +776,7 @@ ggplot(data = both_dfs[["emergence"]], aes(x = Treatment, y = Mean)) +
 
 EmergenceToBolting. While this was measured in both experiments, it is not comparable because in 2022 the conditions were the same for all plants for the first 9 weeks, which is more of the time until the plants start to bolt. Emergence to bolting was moved to an only 2021 trait and is not included in the manuscript.
 
-```{r, echo = FALSE, eval = TRUE}
+```{r, echo = FALSE, eval = FALSE}
 detb <- ggplot(data = both_dfs[["bolting"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge2(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(ymin=LL_95, ymax = UL_95,group = Exp:Population, col = Population), width = 0.3, size = 0.8, position = position_dodge2(width = 0.3), show.legend = FALSE)+
@@ -873,7 +873,7 @@ area <- ggplot(data = both_dfs[["area"]], aes(x = Treatment, y = Mean)) +
 
 LeafPerimeter
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = FALSE}
 perim <- ggplot(data = both_dfs[["per"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
@@ -967,7 +967,7 @@ rwc
 ## Leaf Number
 LeafNum_4weeks
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = FALSE}
 ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
   geom_point(aes(group = Exp:Population, col=Population, shape = Population), size = 3, position = position_dodge(width = 0.3), show.legend = FALSE) +
   geom_errorbar(aes(group = Exp:Population, ymin=LL_95, ymax = UL_95, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.3), show.legend = FALSE)+
@@ -1024,8 +1024,8 @@ fitness_fig
 
 Figure s1 - single leaf traits \
 ```{r}
-figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xlab"), freshwt, hydwt, drywt, 
-                  labels = c("A", "B", "C", "D", "E", "F"),
+figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), drywt+rremove("xlab"), freshwt, hydwt, 
+                  labels = c("A", "B", "C", "D", "E"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
@@ -1034,16 +1034,16 @@ figs1 <- ggarrange(ldmc+rremove("xlab"),area+rremove("xlab"), perim+rremove("xla
 figs1
 ```
 
-Figure s2 - biomass + fitness \
+Figure s3 - biomass + fitness \
 ```{r}
-figs2 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
+figs3 <- ggarrange(ros_2021+rremove("xlab"), repro+rremove("xlab"), ln_harv+rremove("xlab"),  ln_bolt, rr, seed_wt,
                   labels = c("A", "B", "C", "D", "E", "F"),
                   ncol = 3, nrow = 2,
                   common.legend = TRUE,
                   legend = "none",
                   align = "h"
                   )
-figs2
+figs3
 ```
 
 
@@ -1101,7 +1101,7 @@ ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5,
 ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 600)
 
 #figs2
-ggsave(figs2, filename = "figures/figs2.jpg", width = 9, height = 8, units = "in", dpi = 600)
+ggsave(figs3, filename = "figures/figs3.jpg", width = 9, height = 8, units = "in", dpi = 600)
 
 
 ```

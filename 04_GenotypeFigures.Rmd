@@ -143,7 +143,7 @@ ag <- ggplot(data = Dat[Dat$trait == "l10_AG", ], aes(x = Treatment, y = respons
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.5), alpha = 0.5, show.legend = TRUE) +
   geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.5), alpha = 0.5, show.legend = TRUE)+
   geom_line(aes(col = Population),linetype = "dotted", linewidth = 1, position = position_dodge(width = 0.5), alpha = 0.5)+ 
-  labs(y="Above Ground Biomass", 
+  labs(y="Shoot Biomass", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("Italy", "Sweden"),
@@ -158,7 +158,7 @@ bg <- ggplot(data = Dat[Dat$trait == "BG_DryBiomass", ], aes(x = Treatment, y = 
   geom_point(aes(col=Population, shape = Population), size = 3, position = position_dodge(width = 0.5), alpha = 0.5, show.legend = TRUE) +
   geom_errorbar(aes(ymin=lower.CL, ymax = upper.CL, col = Population), width = 0.3, size = 0.8, position = position_dodge(width = 0.5), alpha = 0.5, show.legend = TRUE)+
   geom_line(aes(col = Population),linetype = "dotted", linewidth = 1, position = position_dodge(width = 0.5), alpha = 0.5)+ 
-  labs(y="Below Ground Biomass", 
+  labs(y="Root Biomass", 
       x="Treatment")+
   scale_color_manual(name = "Population",
                      labels = c("Italy", "Sweden"),
