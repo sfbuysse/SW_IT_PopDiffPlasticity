@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2026-03-18"
+date: "2026-03-19"
 output: 
   html_document:
     toc: true
@@ -526,7 +526,7 @@ fig1
 ![](03_Figures_files/figure-html/unnamed-chunk-46-1.png)<!-- -->
 
 ``` r
-fig2 <- ggarrange(rs, totbio, ros_2022, bg,
+fig2 <- ggarrange(rs, totbio, bg, ros_2022, 
                   labels = c("A", "B", "C", "D"),
                   ncol = 2, nrow = 2,
                   common.legend = TRUE,

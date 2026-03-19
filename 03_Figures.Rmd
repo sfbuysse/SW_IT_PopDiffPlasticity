@@ -1001,7 +1001,7 @@ fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
 #vjust = 00
 fig1
 
-fig2 <- ggarrange(rs, totbio, ros_2022, bg,
+fig2 <- ggarrange(rs, totbio, bg, ros_2022, 
                   labels = c("A", "B", "C", "D"),
                   ncol = 2, nrow = 2,
                   common.legend = TRUE,

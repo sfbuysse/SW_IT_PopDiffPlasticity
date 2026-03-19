@@ -110,7 +110,7 @@ write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
 ```
 subset to traits in the manuscript
 ```{r}
-Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R", "FruitCount_BL", "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "fitness")]
+Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R", "FruitCount_BL", "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "fitness", "SLA", "LDMC")]
 
 # need to make subsets so only genotypes represented in both treatments are present. this is difficult because it differs between traits.
 
@@ -118,10 +118,10 @@ Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Rep
 Dat_2021_fitness <- Dat_2021_TwoTrt[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x","FruitCount_BL", "fitness")]
 
 #one that removes B4, R5, and B13 from all traits left. this will be the starting point for the final two dataframes.
-Dat_2021_most <- Dat_2021_TwoTrt[!((Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Line %in% c(4, 13)) | (Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Line == 5)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R",  "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum")]
+Dat_2021_most <- Dat_2021_TwoTrt[!((Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Line %in% c(4, 13)) | (Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Line == 5)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R",  "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "SLA", "LDMC")]
 
 # need to remove Belm 1 from leaf area and SLA because no leaf area
-Dat_2021_la <- Dat_2021_most[!((Dat_2021_most$Population == "BELM" & Dat_2021_most$Line == 1)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_LeafArea", "l10_SLA")]
+Dat_2021_la <- Dat_2021_most[!((Dat_2021_most$Population == "BELM" & Dat_2021_most$Line == 1)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_LeafArea", "l10_SLA", "l10_LDMC", "SLA", "LDMC")]
 
 # need to remove Roda 26 from rosette biomass, repro ros, seed weight and seed number because of labeling error
 Dat_2021_RosSeed <- Dat_2021_most[!((Dat_2021_most$Population == "RODA" & Dat_2021_most$Line == 26)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_DryRosG", "l10_R_to_R",  "AvgSeedWt", "l10_AvgSeedNum", "AvgSeedNum")]
@@ -786,6 +786,12 @@ n_2021 %>%
   group_by(Population, .add = TRUE) %>%
   summarize(min = min(n), mean = mean(n), median = median(n), max = max(n))
 
+
+# want to know sample sizes for fitness and such
+Dat_2021_fitness %>% count(Treatment, Population)
+Dat_2021_RosSeed %>% count(Treatment, Population)
+Dat_2021_most %>% count(Treatment, Population)
+Dat_2021_la %>% count(Treatment, Population)
 ```
 
 
@@ -842,10 +848,13 @@ write.csv(ByTrt_Pop_22,"data/PopMeansByTreatment_2022.csv", row.names = TRUE )
 
 subset to the trait that are in the manuscript
 ```{r}
-Dat_2022c <- Dat_2022[,c("PotID", "Treatment", "Population", "Line", "Geno_ID", "Replicate", "Chamber", "Flat", "Transplanted", "l10_SL_FreshWt", "l10_SL_HydWt", "SL_DryWt", "SL_Area", "l10_SLA", "l10_LDMC", "RWC", "l10_LeafNumber_Total", "l10_AG_DryBiomass", "BG_DryBiomass", "l10_Root_to_Shoot", "TotalBiomass", "l10_Stomata_density") ]
+Dat_2022c <- Dat_2022[,c("PotID", "Treatment", "Population", "Line", "Geno_ID", "Replicate", "Chamber", "Flat", "Transplanted", "l10_SL_FreshWt", "l10_SL_HydWt", "SL_DryWt", "SL_Area", "l10_SLA", "l10_LDMC", "RWC", "l10_LeafNumber_Total", "l10_AG_DryBiomass", "BG_DryBiomass", "l10_Root_to_Shoot", "TotalBiomass", "l10_Stomata_density", "SLA", "LDMC") ]
 
 # remove B4 Fut because there is no matching B4 current
 Dat_2022c <- Dat_2022c[!(Dat_2022c$PotID %in% c("B4-2-F")), ]
+
+# to check for outliers, remove Roda-11 which is a high outlier in the biomass traits 
+Dat_2022c_outliers <- Dat_2022c[!(Dat_2022c$Geno_ID %in% c("R11")), ]
 ```
 
 
@@ -876,9 +885,9 @@ do_lmer2 <- function(trait, data = Dat_2022c){
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
   # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
-  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-       col = c("red", "blue")[as.numeric(Dat_2022c$Population)[complete.cases(trait)]],
-       pch = c(16, 17)[as.numeric(Dat_2022c$Treatment)[complete.cases(trait)]])
+  #plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
+  #     col = c("red", "blue")[as.numeric(Dat_2022c$Population)[complete.cases(trait)]],
+  #     pch = c(16, 17)[as.numeric(Dat_2022c$Treatment)[complete.cases(trait)]])
   #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
   #legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   #plotting sanity check
@@ -1130,6 +1139,10 @@ AG_pairs_22$trait <- "l10_Above Ground Biomass"
 
 geno_ag_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_AG_DryBiomass))
 geno_ag_22$trait <- "l10_AG"
+
+# check outliers. can't trust colored figures in this output
+AG_outliers <- do_lmer2(Dat_2022c_outliers$l10_AG_DryBiomass, data = Dat_2022c_outliers)
+do_anov2(AG_outliers)
 ```
 
 below ground biomass
@@ -1149,6 +1162,10 @@ BG_pairs_22$trait <- "Below Ground Biomass"
 
 geno_bg_22 <- as.data.frame(get_geno_table22(Dat_2022c$BG_DryBiomass))
 geno_bg_22$trait <- "BG_DryBiomass"
+
+# check outliers
+BG_outliers <- do_lmer2(Dat_2022c_outliers$BG_DryBiomass, data = Dat_2022c_outliers)
+do_anov2(BG_outliers)
 ```
 
 Root to shoot ratio (below ground / above ground)
@@ -1164,6 +1181,11 @@ RS_pairs_22$trait <- "l10_Root to Shoot Ratio"
 
 geno_rs_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_Root_to_Shoot))
 geno_rs_22$trait <- "l10_Root_to_Shoot"
+
+# check outliers
+RS_outliers <- do_lmer2(Dat_2022c_outliers$l10_Root_to_Shoot, data = Dat_2022c_outliers)
+do_anov2(RS_outliers)
+get_table_bt(RS_outliers)
 ```
 
 Total biomass
@@ -1179,6 +1201,10 @@ TotBio_pairs_22$trait <- "Total Biomass"
 
 geno_TotBio_22 <- as.data.frame(get_geno_table22(Dat_2022c$TotalBiomass))
 geno_TotBio_22$trait <- "TotalBiomass"
+
+# check outliers
+totbio_outliers <- do_lmer2(Dat_2022c_outliers$TotalBiomass, data = Dat_2022c_outliers)
+do_anov2(totbio_outliers)
 ```
 
 
@@ -1328,27 +1354,30 @@ fitness_extra <- sjPlot::tab_model(seeds_lm_21, PrimStalks_lm_21, LatBranch_lm_2
 # Problem Solve
 ## SLA and LDMC correlation
 Choosing to only include SLA and move LDMC to the supplemental so I want correlation information for the two traits.
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 # 2021
-# overall
-cor.test(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
-plot(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
+# overall -usng the most dataframe. this does include one genotype for sla that is only in one treatment but the other option is to not include one genotype for ldmc. check with la dataframe to make sure no major differences. 
+cor.test(Dat_2021_most$SLA, Dat_2021_most$LDMC)
+plot(Dat_2021_most$SLA, Dat_2021_most$LDMC)
+
+cor.test(Dat_2021_la$SLA, Dat_2021_la$LDMC)
+# slight difference but not meaningful interpretation wise -> round to same thing to the hundreths place
 
 # just in SW
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
+cor.test(Dat_2021_most[Dat_2021_most$Population == "RODA", ]$SLA, Dat_2021_most[Dat_2021_most$Population == "RODA", ]$LDMC)
+plot(Dat_2021_most[Dat_2021_most$Population == "RODA", ]$SLA, Dat_2021_most[Dat_2021_most$Population == "RODA", ]$LDMC)
 
 # just in IT
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Population == "BELM", ]$SLA, Dat_2021_la[Dat_2021_la$Population == "BELM", ]$LDMC)
+plot(Dat_2021_la[Dat_2021_la$Population == "BELM", ]$SLA, Dat_2021_la[Dat_2021_la$Population == "BELM", ]$LDMC)
 
 # just cur?
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$LDMC)
+plot(Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$LDMC)
 
 # just fut?
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$LDMC)
+plot(Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$LDMC)
 
 # 2022
 # overall
