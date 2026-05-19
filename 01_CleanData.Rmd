@@ -505,7 +505,7 @@ explore_trans(CleanData_2021$AvgSeedWt)
 
 ```{r}
 #explore_trans(CleanData_2021$IJ_SeedCount)
-# did by hand becuase exp transformation is too big to show in r -> values become infinity
+# did by hand because exp transformation is too big to show in r -> values become infinity
 
 plotNormalHistogram(CleanData_2021$IJ_SeedCount)
 plotNormalHistogram(log10(CleanData_2021$IJ_SeedCount))

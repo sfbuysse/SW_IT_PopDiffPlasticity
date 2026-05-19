@@ -130,8 +130,6 @@ Dat_2021_RosSeed <- Dat_2021_most[!((Dat_2021_most$Population == "RODA" & Dat_20
 
 ## Two Treatment Anovas
 
-This experiment included a Current/Future treatment where plants were in the current treatment before vernalization and the future treatment after vernalization to see if early heat and drought was important. We are not analyzing this third treatment here and it was removed during the data cleaning step.
-
 The initial model is was follows:
 trait ~ Treatment * Population + (1|Population:Line) + (1|Soil.Mix.Batch.Number.x)
 
@@ -143,31 +141,22 @@ When removing the soil mix random effect, most p values and effect sizes were no
 
 In general these model changes were slight and soil mix explained very little variance - the exceptions are relative water content (soil mix explained half as much variance as genotype), number of fruits, and number of primary stalks (soil mix explained more variance than genotype but over half the variance is still residual). Thus, soil mix was removed as a random variable from the analysis.
 
-To make plotting easier, I have one function that runs the model and the model accuracy tests, then outputs the model object. I then create a data_table with predict means and run an anova with the model output object. The data table and the anova are saved to go into a summary table later or to be used for plotting.
-
 ```{r stats}
-# things I want to use as random variables: Line, soil mix batch number
+# random variables: Line, soil mix batch number
 # for single leaf traits also include leaf_Collected
-# for traits at harvest I can use DoneFlwr
+# for traits at harvest: DoneFlwr
 
 # function to run models on 2021 data:
 do_lmer <- function(trait, data = Dat_2021_most){
   lm <- lmer(trait ~ Treatment * Population + (1|Population:Line) , data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
-  ## need to comment this plot out with dataframe changing now. doesn't work with my nomenclature.
-  #plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-  #     col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(trait)]],
-  #     pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(trait)]])
-  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-  #legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   # plotting sanity check
   print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
   qqnorm(resid(lm))
   qqline(resid(lm))
   print(summary(lm))
   print(confint(lm))
-  #sample.size <- data %>% group_by(Treatment) %>% group_by(Treatment, .add = TRUE) %>% summarize(across(.cols = trait, .fns= ~sum(!is.na(.x))))
   return(lm)
 }
 # do the anova
@@ -179,7 +168,7 @@ do_anov <- function(model){
   return(df)
 }
 
-# get the means table, no backtransforming - can add pairwise to do comparisons within treatment or within population, but not both at the same time.
+# get the means table, no backtransforming
 get_table <- function(model){
   tab <- emmeans(model, c("Treatment", "Population"), type = "response")
   return(tab)
@@ -206,42 +195,6 @@ get_geno_table_bt <- function(trait, data = Dat_2021_most){
 The modelling function runs a mixed model where each trait is predicted by population, treatment, and their interaction while accounting for random effects of line nested within population and soil mix batch number -> and just line in the final model.
 
 ### Phenology
-
-Days to Emergence
-
-```{r, eval = FALSE}
-# Emergence
-emergence_lm_21 <- do_lmer(Dat_2021_TwoTrt$Emergence)
-emergence_anov_21 <- do_anov(emergence_lm_21)
-emergence_anov_21$trait <- "Emergence"
-emergence_emmeans_21 <- get_table(emergence_lm_21)
-emergence_means_21 <- as.data.frame(emergence_emmeans_21)
-emergence_pairs_21 <- as.data.frame(pairs(emergence_emmeans_21))
-emergence_pairs_21$trait <- "Emergence"
-
-
-#get_geno_table(Dat_2021_TwoTrt$Emergence)
-```
-
-Days between emergence and bolting (note: not included in final manuscript)
-
-```{r, eval = FALSE}
-# days emergence to bolting
-bolting_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToBolt)
-bolting_anov_21 <- do_anov(bolting_lm_21)
-bolting_anov_21$trait <- "Bolting"
-bolting_means_21 <- as.data.frame(get_table(bolting_lm_21))
-```
-
-Days between bolting and flowering (note: not included in manuscript)
-
-```{r, eval = FALSE}
-# days bolting to flowering
-flowering_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToFlwr)
-flowering_anov_21 <- do_anov(flowering_lm_21)
-flowering_anov_21$trait <- "Bolting To Flowering"
-flowering_means_21 <- as.data.frame(get_table(flowering_lm_21))
-```
 
 Days between Emergence and flowering
 
@@ -318,19 +271,6 @@ area_pairs_21$trait <- "l10_area"
 ```
 
 
-leaf perimeter
-
-```{r, eval = FALSE}
-per_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_LeafPer)
-per_anov_21 <- do_anov(per_lm_21)
-per_anov_21$trait <- "l10_Perimeter"
-per_emmeans_21 <- get_table_bt(per_lm_21)
-per_means_21 <- as.data.frame(per_emmeans_21)
-per_pairs_21 <- as.data.frame(pairs(per_emmeans_21))
-per_pairs_21$trait <- "l10_Perimeter"
-```
-
-
 specific leaf area
 
 ```{r}
@@ -378,47 +318,6 @@ geno_rwc_21$trait <- "RWC"
 ```
 
 ### Leaf Number
-leaf num at 4 weeks (note: not included in manuscript)
-```{r, eval = FALSE}
-# Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
-LN_PreVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
-LN_PreVern_anov_21 <- do_anov(LN_PreVern_lm_21)
-LN_PreVern_anov_21$trait <- "LeafNum_4wks"
-LN_PreVern_means_21 <- as.data.frame(get_table(LN_PreVern_lm_21))
-# diagonal lines in residual plot are artifact of discrete trait. none in left corner is indicative of zeros.
-# double check that residual lines all have same value
-lm <- lmer(LeafNum_.07222021 ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
-
-plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)],
-       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)])
-legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
-text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = Dat_2021_TwoTrt$LeafNum_.07222021, cex = 0.7)
-
-```
-
-Leaf num 5 weeks into vernalization (note: not included in manuscript)
-```{r, eval = FALSE}
-# LeafNumber from 08262021 - 5 weeks into vernalization
-LN_Vern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
-LN_Vern_anov_21 <- do_anov(LN_Vern_lm_21)
-LN_Vern_anov_21$trait <- "LeafNum_9wks"
-LN_Vern_means_21 <- as.data.frame(get_table(LN_Vern_lm_21))
-```
-
-Leaf num about when bolting started (note: not included in manuscript because not a constant developmental stage)
-```{r, eval = FALSE}
-# Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
-LN_PostVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
-LN_PostVern_anov_21 <- do_anov(LN_PostVern_lm_21)
-LN_PostVern_anov_21$trait <- "LeafNum_14wks"
-LN_PostVern_means_21 <- as.data.frame(get_table(LN_PostVern_lm_21))
-```
-
-
-Leaf number at bolting and flower were only done on some plants, not all (bolting only for SW plants and flowering only for 16 plants), so there are no models or figures for these traits.
-
 
 Leaf number at harvest
 ```{r}
@@ -467,19 +366,6 @@ Repro_pairs_21 <- as.data.frame(pairs(Repro_emmeans_21))
 Repro_pairs_21$trait <- "l10_DryReproG"
 ```
 
-
-Above ground biomass (rosette + reproductive) (note: not included in final paper because so similar to reproductive)
-
-```{r, eval = FALSE}
-# dry above ground biomass (ros + repro)
-AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
-AG_anov_21 <- do_anov(AG_lm_21)
-AG_anov_21$trait <- "l10_AG_biomass"
-AG_means_21 <- as.data.frame(get_table_bt(AG_lm_21))
-```
-
-Skipping dry root biomass because only have for a few plants. Also skipping root to shoot for the same reason.
-
 Above ground biomass allocation (repro/ros)
 ```{r}
 # reproductive biomass divided by rosette biomass (i.e., above ground biomass allocation)
@@ -491,47 +377,6 @@ RR_means_21 <- as.data.frame(RR_emmeans_21)
 RR_pairs_21 <- as.data.frame(pairs(RR_emmeans_21))
 RR_pairs_21$trait <- "l10_Repro_to_Ros"
 ```
-
-
-### Plant Structure
-branches and height. Branch structure is about damage and was skipped.
-
-Num lateral branches
-```{r, eval = FALSE}
-# number of lateral branches
-LatBranch_lm_21 <- do_lmer(Dat_2021_TwoTrt$LatBranches)
-LatBranch_anov_21 <- do_anov(LatBranch_lm_21)
-LatBranch_anov_21$trait <- "Lateral Branches"
-LatBranch_emmeans_21 <- get_table(LatBranch_lm_21)
-LatBranch_means_21 <- as.data.frame(LatBranch_emmeans_21)
-LatBranch_pairs_21 <- as.data.frame(pairs(LatBranch_emmeans_21))
-LatBranch_pairs_21$trait <- "Lateral Branches"
-```
-
-Num primary stalks
-```{r, eval = FALSE}
-# number of primary stalks
-PrimStalks_lm_21 <- do_lmer(Dat_2021_TwoTrt$PrimaryStalks)
-PrimStalks_anov_21 <- do_anov(PrimStalks_lm_21)
-PrimStalks_anov_21$trait <- "Primary Stalks"
-PrimStalks_emmeans_21 <- get_table(PrimStalks_lm_21)
-PrimStalks_means_21 <- as.data.frame(PrimStalks_emmeans_21)
-PrimStalks_pairs_21 <- as.data.frame(pairs(PrimStalks_emmeans_21))
-PrimStalks_pairs_21$trait <- "Primary Stalks"
-```
-
-Height main stalk
-```{r, eval = FALSE}
-# height of main stalk (cm)
-height_lm_21 <- do_lmer(Dat_2021_TwoTrt$Height_cm)
-height_anov_21 <- do_anov(height_lm_21)
-height_anov_21$trait <- "Height (cm)"
-height_emmeans_21 <- get_table(height_lm_21)
-height_means_21 <- as.data.frame(height_emmeans_21)
-height_pairs_21 <- as.data.frame(pairs(height_emmeans_21))
-height_pairs_21$trait <- "Height (cm)"
-```
-
 
 ### Fitness
 
@@ -676,7 +521,7 @@ geno_seeds$trait <- "l10_seeds per fruit"
 
 Bonus question about a trade off - are seed weight and seeds per fruit negatively correlated?
 ```{r}
-# this includes unqual genotype representation because 
+# this includes unequal genotype representation because 
 # overall
 cor.test(Dat_2021_RosSeed$AvgSeedNum, Dat_2021_RosSeed$AvgSeedWt)
 plot(Dat_2021_RosSeed$AvgSeedNum, Dat_2021_RosSeed$AvgSeedWt)
@@ -715,7 +560,6 @@ geno_fitness$trait <- "TotalFitness"
 ```
 
 ###Outputs
-Updated 3/18/2026 so only traits included in the manuscript
 
 1) Results table
 
@@ -884,12 +728,6 @@ do_lmer2 <- function(trait, data = Dat_2022c){
   lm<- lmer(trait ~ Treatment * Population + Treatment/Chamber + (1|Population:Line), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
-  # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
-  #plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-  #     col = c("red", "blue")[as.numeric(Dat_2022c$Population)[complete.cases(trait)]],
-  #     pch = c(16, 17)[as.numeric(Dat_2022c$Treatment)[complete.cases(trait)]])
-  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-  #legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   #plotting sanity check
   print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
   # make qq plot
@@ -911,8 +749,6 @@ do_anov2 <- function(model){
 # get table functions are the same as from 2021
 
 # geno get table functions need to be updated
-# genotype level emmeans for looking at within population variation
-
 get_geno_table22 <- function (trait, data = Dat_2022c){
   tab2 <- emmeans(lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum)), c("Treatment", "Geno_ID"), type = "reponse")
   return(tab2)
@@ -927,32 +763,6 @@ get_geno_table_bt22 <- function(trait, data = Dat_2022c){
 ```
 
 Run the models
-### Phenology
-
-Days to emergence - log10 transformed this time!
-```{r, eval = FALSE}
-# days to emergence
-emergence_lm_22 <- do_lmer2(Dat_2022c$l10_DaysToEmergence)
-emergence_anov_22 <- do_anov2(emergence_lm_22)
-emergence_anov_22$trait <- "Emergence"
-emergence_means_22 <- as.data.frame(get_table_bt(emergence_lm_22))
-```
-
-Days between emergence and bolting
-```{r, eval= FALSE}
-# days emergence to bolting
-bolting_lm_22 <- do_lmer2(Dat_2022c$EmergenceToBolting)
-bolting_anov_22 <- do_anov2(bolting_lm_22)
-bolting_anov_22$trait <- "Bolting"
-bolting_emmeans_22 <- get_table(bolting_lm_22)
-bolting_means_22 <- as.data.frame(bolting_emmeans_22)
-bolting_pairs_22 <- as.data.frame(pairs(bolting_emmeans_22))
-bolting_pairs_22$trait <- "Bolting"
-```
-
-Not analyzing bolting to root washing or bolting to harvest. Those could be included as random effects, but most were close together.
- 
-Not looking an number emerged because it doesn't have a 2021 comparison for emergence success.
 
 ### Single Leaf Traits: bolting
 
@@ -1079,33 +889,6 @@ geno_rwc_22$trait <- "RWC"
 
 ### Leaf Number
 
-leaf num at 4 weeks (note: not included in manuscript)
-```{r, eval = FALSE}
-# pre vern leaf number
-LN_PreVern_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_PreVern)
-LN_PreVern_anov_22 <- do_anov2(LN_PreVern_lm_22)
-LN_PreVern_anov_22$trait <- "LeafNum_5wks"
-LN_PreVern_means_22 <- as.data.frame(get_table(LN_PreVern_lm_22))
-```
-
-leaf num first week post vern (note: not in final manuscript)
-```{r, eval = FALSE}
-# june 6 leaf number
-LN_Jun6_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_Jun6)
-LN_Jun6_anov_22 <- do_anov2(LN_Jun6_lm_22)
-LN_Jun6_anov_22$trait <- "LeafNum_9wks"
-LN_Jun6_means_22 <- as.data.frame(get_table(LN_Jun6_lm_22))
-```
-
-leaf num second week post vern (not in final manuscript)
-```{r, eval = FALSE}
-# june 14 leaf number
-LN_Jun13_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_Jun13)
-LN_Jun13_anov_22 <- do_anov2(LN_Jun13_lm_22)
-LN_Jun13_anov_22$trait <- "LeafNum_10wks"
-LN_Jun13_means_22 <- as.data.frame(get_table(LN_Jun13_lm_22))
-```
-
 leaf num at bolting
 ```{r}
 # total leaf number counted at bolting when plants were harvested
@@ -1117,8 +900,6 @@ LN_bolt_means_22<- as.data.frame(LN_bolt_emmeans_22)
 LN_bolt_pairs_22 <- as.data.frame(pairs(LN_bolt_emmeans_22))
 LN_bolt_pairs_22$trait <- "l10_LeafNumb_bolting"
 ```
-
-Not analyzing rosette leaf number or under leaves because this split was started partway through the experiment.
 
 ### Biomass
 
@@ -1140,7 +921,7 @@ AG_pairs_22$trait <- "l10_Above Ground Biomass"
 geno_ag_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_AG_DryBiomass))
 geno_ag_22$trait <- "l10_AG"
 
-# check outliers. can't trust colored figures in this output
+# check outliers.
 AG_outliers <- do_lmer2(Dat_2022c_outliers$l10_AG_DryBiomass, data = Dat_2022c_outliers)
 do_anov2(AG_outliers)
 ```
@@ -1222,7 +1003,6 @@ sto_den_pairs_22$trait <- "l10_Stomatal Density"
 # check results don't change if using stomatal average - they didn't change, commented out with update
 #do_anov2(do_lmer2(Dat_2022c$l10_Stomata_avg))
 
-
 geno_stoden_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_Stomata_density))
 geno_stoden_22$trait <- "l10_Stomata_density"
 
@@ -1249,7 +1029,6 @@ for (i in dfs3) {
   colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95")
   assign(i,x)
 }
-
 
 # create list of data frames
 Means_2022 <- list(fresh_means_22, hyd_means_22, dry_means_22, area_means_22, sla_means_22, ldmc_means_22, rwc_means_22, LN_bolt_means_22, AG_means_22, BG_means_22, RS_means_22, TotBio_means_22, sto_den_means_22)
@@ -1309,47 +1088,7 @@ n_2022 %>%
 ```
 
 # Notes
-The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis. This was repeated on 7/22/2025 to update with the emmeans package outputs. It was also updated 3/10/2026 with adding total biomass as a trait.
-
-The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. There is a post hoc results spreadsheet as well which is included in the tables for the manuscript.
-
-
-# Results Tables
-These tables were not ultimately used
-
-## Main Text Tables - auto formatted options
-```{r eval = FALSE}
-sjPlot::tab_model(eTof_lm_21, RWC_lm_21, rwc_lm_22, sto_den_lm_22, SLA_lm_21, sla_lm_22, RS_lm_22 ,  fitness_lm_21, 
-                   collapse.ci = TRUE, 
-                  dv.labels = c("Emergence To Flower 21", "RWC 21", "RWC 22", "Stomatal Density 22","SLA 21", "SLA 22",  "Root-to-Shoot 22", "Fitness 21"), 
-                 pred.labels = c("(Intercept)", "Treatment", "Population", "Trt x Pop Interaction", "Current Trt x Chamber", "Future Trt x Chamber")
-                 
-        )
-
-#show.reflvl = TRUE 
-#p.style = "stars" or "scientific"
-#digits.p=
-# I think I can use css code from this tutorial to remove the intercept row if I want?? https://strengejacke.github.io/sjPlot/articles/table_css.html
-```
-
-## Supplemental Tables
-```{r eval = FALSE}
-
-drought_extra <- sjPlot::tab_model(fresh_lm_21, fresh_lm_22, sat_lm_21, hyd_lm_22, dry_lm_21, dry_lm_22, area_lm_21, area_lm_22, per_lm_21, per_lm_22, LDMC_lm_21, ldmc_lm_22,
-                                   collapse.ci = TRUE, 
-                                   dv.labels = c("Fresh 21", "Fresh 22", "Sat 21", "Sat 22", "Dry 21", "Dry 22", "area 21", "area 22", "perimeter 21", "perimeter 22", "LDMC 21", "LDMC 22")
-                                   )
-growth_extra <- sjPlot::tab_model(emergence_lm_21, emergence_lm_22, bolting_lm_21, bolting_lm_22, Ros_lm_21, AG_lm_22, RR_lm_21, Repro_lm_21, AG_lm_21, LN_Vern_lm_21, LN_PreVern_lm_21, LN_PreVern_lm_22, LN_PostVern_lm_21, LN_Jun6_lm_22, LN_Jun13_lm_22, LN_harv_lm_21, LN_bolt_lm_22, BG_lm_22, AvSeedWt_lm_21,
-                                  collapse.ci = TRUE, 
-                                  dv.labels = c("Emergence 21", "Emergence 22", "Bolting 21", "Bolting 22", "Ros Biomass 21", "Ros Biomass 22", "Ros:Repro 21", "Repro 21", "AG 21", "LN Vern 21", "LN Prevern 21", "Ln Prevern 22", "LN Postvern 21", "LN June 6 22", "LN June 13 22", "LN harvest 21", "Ln bolt 22", "BG 22", "Avg. Seed Wt 21"))
-fitness_extra <- sjPlot::tab_model(seeds_lm_21, PrimStalks_lm_21, LatBranch_lm_21, height_lm_21, fruit_lm_21,
-                                   collapse.ci = TRUE,
-                                   dv.labels = c("SeedsPerFruit", "Primary Stalks", "Lateral Branches", "Height", "Fruit Number"))
-
-#flowering_lm_21 vs eTof_lm_21??
- 
-                                                    
-```
+The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx  to make formatting changes and color code for easier comparison and analysis.
 
 # Problem Solve
 ## SLA and LDMC correlation
@@ -1397,17 +1136,17 @@ cor.test(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$
 plot(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
 
 # just fut?
-cor.test(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
-plot(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
+cor.test(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
+plot(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
 ```
 ## Dry weight difference in signficance
 For dry weight, there is a huge difference in significance between 2021 (p value below 0.001) and 2022 (p value above 0.95). Quickly looking at the spreadsheets I can not tell a difference and the values are of similar magnitudes. I then did untransformed models and square root transformed models because those were reported as having the most normal residuals in the previous code. None of the models had differences in p values due to transformation that changed the interpretation of the results. I also excluded the "days between bolting and harvest" random effect for the 2022 data but did not find a major difference in the models but the denominator degrees of freedom for treatment did change a lot. As a final check for if there is a potential mistake, I am going to look at some data distributions.
 
-```{r, eval = FALSE}
-ggplot(dat = Dat_2021_TwoTrt)+
+```{r, eval = F}
+ggplot(dat = Dat_2021_most)+
   geom_histogram(aes(x = DriedWt_g, fill = Population), alpha = 0.5, position = "identity")+
   theme_classic()
-ggplot(dat = Dat_2021_TwoTrt)+
+ggplot(dat = Dat_2021_RosSeed)+
   geom_histogram(aes(x = DriedWt_g, fill = Treatment), alpha = 0.5, position = "identity")+
   theme_classic()
 
@@ -1420,7 +1159,7 @@ ggplot(dat = Dat_2022c)+
   theme_classic()
 ```
 
-Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference. Scales of both are comparable. 
+Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference. Scales of both are comparable. A log 10 transformation was chosen to be used and these hsitograms are commented out.
 
 ## 2021 Avg Seed per fruit
 Concerned that line does not explain any variance. Is it true that all the variation is within lines and not between lines? to check this: 1) make histogram of all the values (not line means) - done in CleanData but repeat here
@@ -1490,32 +1229,6 @@ ps_plot <- ggplot(Dat_2021_TwoTrt)+
   theme_classic()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ggplotly(ps_plot)
-
-```
-
-
-Compare that to a plot of a trait that does have a genotype effect (just the first plot)
-```{r, eval = FALSE, echo = FALSE}
-ps_plot2 <- ggplot(Dat_2021_TwoTrt)+
-  geom_point(aes(x = Line.ID.T, y = IJ_FruitCount, col = Population, shape = Treatment, text = Pot.ID))+
-  scale_color_manual(values = c("red", "blue"))+
-  theme_classic()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-ggplotly(ps_plot2)
-
-ps_plot3 <- ggplot(Dat_2021_TwoTrt)+
-  geom_point(aes(x = Line.ID.T, y = DayToBolt, col = Population, shape = Treatment, text = Pot.ID))+
-  scale_color_manual(values = c("red", "blue"))+
-  theme_classic()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-ggplotly(ps_plot3)
-
-ps_plot4 <- ggplot(Dat_2021_TwoTrt)+
-  geom_point(aes(x = Line.ID.T, y = LeafPerimeter, col = Population, shape = Treatment, text = Pot.ID))+
-  scale_color_manual(values = c("red", "blue"))+
-  theme_classic()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-ggplotly(ps_plot4)
 
 ```
 

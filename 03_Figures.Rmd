@@ -38,6 +38,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(ggpubr)
+#remove.packages("ragg")
 
 # functions used for growth curves
 std_mean <- function(x){
@@ -55,11 +56,12 @@ conf_int <- function(x, conf.interval = 0.95){
 
 Set theme for plots
 ```{r}
+windowsFonts(Times=windowsFont("TT Times New Roman")) 
 theme_set(theme_classic())
-theme_update(legend.title = element_text(family = "serif", color = "black", size = 14),
-    legend.text = element_text(family = "serif", color = "black", size = 14),
-    axis.title = element_text(family = "serif", color = "black", size = 14),
-    axis.text = element_text(family = "serif", color = "black", size = 14),
+theme_update(legend.title = element_text(family = "Times", color = "black", size = 14),
+    legend.text = element_text(family = "Times", color = "black", size = 14),
+    axis.title = element_text(family = "Times", color = "black", size = 14),
+    axis.text = element_text(family = "Times", color = "black", size = 14),
     axis.line = element_line(colour = 'black', linewidth = 1),
     axis.ticks = element_line(color = 'black', linewidth = 1),
     axis.ticks.length=unit(.15, "cm"),
@@ -69,16 +71,7 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
     panel.grid.minor.x = element_blank(),
     plot.margin = margin(t=1, r=0.075, b=0.075, l=0.05, unit = "in")
     )
-
-# If I want to add back in that the y axis should always start at 0:
-#  expand_limits(y=0)
-
-# what font is serif?
-windowsFonts()$serif
-    
 ```
-
-
 
 # read in data
 
@@ -286,8 +279,7 @@ ln_harv <- ggplot(data = Means_2021[["LN_harv_means_21"]], aes(x = Treatment, y 
 ln_harv
 ```
 
-Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values with the y axis being leaf number.
-
+Create an extra figure to look at growth curves during this time. 
 ```{r, eval = FALSE}
 # format a dataframe
 tmp_mean_21 <- Dat_2021 %>%
@@ -568,7 +560,7 @@ ln_bolt <- ggplot(data = Means_2022[["LN_bolt_means_22"]], aes(x = Treatment, y 
 ln_bolt
 ```
 
-Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
+Create an extra figure to look at growth curves during this time.
 
 ```{r, eval = FALSE}
 # format a dataframe
@@ -706,8 +698,6 @@ stoden
 ```
 
 # both
-Steps to be completed here.
-Subset 2021 dataset. add 2021 column. Subset 2022 dataset. add 2022 column. merge - rbind for each trait. format. plot.
 
 Reaction Norms to create here: \
 - Emergence \
@@ -985,9 +975,7 @@ ggplot(data = both_dfs[["LN"]], aes(x = Treatment, y = Mean)) +
 
 # Manuscript Figures
 creating multipanel figures for the manuscript. 
-Misc updates to restructure and change figure numbers made 4/17/2025, 5/1/2025, and 7/1/2025. \
-Draft 2 figures updated 7/3/2025 \
-Draft 3 figures updated 7/30/2025 \
+
 
 ```{r}
 fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), detf, stoden,
@@ -1073,7 +1061,7 @@ legend_fig <- ggplot()+
   geom_point(data = legend_points2, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
   geom_segment(aes(x = 2.2, y = 1, xend = 2.7, yend = 1), linetype = "solid", linewidth = 1.25)+
   geom_segment(aes(x = 3.2, y = 1, xend = 3.7, yend = 1), linetype = "dotted", linewidth = 1.25)+
-  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")), family = "Times")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
@@ -1085,17 +1073,17 @@ legend_fig
 
 
 ##Save figures
-```{r}
+```{r,eval = F}
 
 # trait figs
-ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 600)
-ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 600)
+ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 1000, device = "jpeg")
+ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 1000)
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 600)
+ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 1000)
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 600)
+ggsave(legend_fig, filename = "figures/legend_fig3.jpg", width = 6, height = 0.5, units = "in", dpi = 1000)
 
 #figs1
 ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 600)
@@ -1106,3 +1094,22 @@ ggsave(figs3, filename = "figures/figs3.jpg", width = 9, height = 8, units = "in
 
 ```
 
+figs in vector format; need to have no 'ragg' package to actually be saved with times new roman font.
+```{r}
+
+# trait figs
+ggsave(fig1, filename = "figures/fig1_times.svg", width = 6, height = 8, units = "in", dpi = 3000, device = "svg")
+ggsave(fig2, filename = "figures/fig2_times.svg", width = 6, height = 8, units = "in", dpi = 3000)
+
+# fitness fig
+ggsave(fitness_fig, filename = "figures/fig3_times.svg", width = 9, height = 4, units = "in", dpi = 3000)
+
+# legend_fig
+ggsave(legend_fig, filename = "figures/legend_fig_times.svg", width = 6, height = 0.5, units = "in", dpi = 3000)
+
+#figs1
+ggsave(figs1, filename = "figures/figs1_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+
+#figs2
+ggsave(figs3, filename = "figures/figs3_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+```

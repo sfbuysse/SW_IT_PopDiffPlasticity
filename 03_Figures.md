@@ -1,7 +1,7 @@
 ---
 title: "03_Figures"
 author: "Sophie Buysse"
-date: "2026-03-19"
+date: "2026-05-19"
 output: 
   html_document:
     toc: true
@@ -54,6 +54,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(ggpubr)
+#remove.packages("ragg")
 
 # functions used for growth curves
 std_mean <- function(x){
@@ -71,11 +72,12 @@ conf_int <- function(x, conf.interval = 0.95){
 Set theme for plots
 
 ``` r
+windowsFonts(Times=windowsFont("TT Times New Roman")) 
 theme_set(theme_classic())
-theme_update(legend.title = element_text(family = "serif", color = "black", size = 14),
-    legend.text = element_text(family = "serif", color = "black", size = 14),
-    axis.title = element_text(family = "serif", color = "black", size = 14),
-    axis.text = element_text(family = "serif", color = "black", size = 14),
+theme_update(legend.title = element_text(family = "Times", color = "black", size = 14),
+    legend.text = element_text(family = "Times", color = "black", size = 14),
+    axis.title = element_text(family = "Times", color = "black", size = 14),
+    axis.text = element_text(family = "Times", color = "black", size = 14),
     axis.line = element_line(colour = 'black', linewidth = 1),
     axis.ticks = element_line(color = 'black', linewidth = 1),
     axis.ticks.length=unit(.15, "cm"),
@@ -85,19 +87,7 @@ theme_update(legend.title = element_text(family = "serif", color = "black", size
     panel.grid.minor.x = element_blank(),
     plot.margin = margin(t=1, r=0.075, b=0.075, l=0.05, unit = "in")
     )
-
-# If I want to add back in that the y axis should always start at 0:
-#  expand_limits(y=0)
-
-# what font is serif?
-windowsFonts()$serif
 ```
-
-```
-## [1] "TT Times New Roman"
-```
-
-
 
 # read in data
 
@@ -186,7 +176,7 @@ Days Emergence to Flower
 ```
 ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
+## This warning is displayed once per session.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 ## generated.
 ```
@@ -206,8 +196,7 @@ RosetteLeafNum_harvest
 
 ![](03_Figures_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
-Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values with the y axis being leaf number.
-
+Create an extra figure to look at growth curves during this time. 
 
 ``` r
 # format a dataframe
@@ -316,7 +305,7 @@ LeafNum_bolt
 
 ![](03_Figures_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
-Create an extra figure to look at growth curves during this time. I want one line per population and 4 x axis values (4 weeks, post vern, 2 weeks post vern) with the y axis being leaf number.
+Create an extra figure to look at growth curves during this time.
 
 
 ``` r
@@ -393,8 +382,6 @@ Stomata Density
 ![](03_Figures_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 # both
-Steps to be completed here.
-Subset 2021 dataset. add 2021 column. Subset 2022 dataset. add 2022 column. merge - rbind for each trait. format. plot.
 
 Reaction Norms to create here: \
 - Emergence \
@@ -505,9 +492,7 @@ LeafNum_4weeks
 
 # Manuscript Figures
 creating multipanel figures for the manuscript. 
-Misc updates to restructure and change figure numbers made 4/17/2025, 5/1/2025, and 7/1/2025. \
-Draft 2 figures updated 7/3/2025 \
-Draft 3 figures updated 7/30/2025 \
+
 
 
 ``` r
@@ -616,7 +601,7 @@ legend_fig <- ggplot()+
   geom_point(data = legend_points2, aes(x = xvals, y = yvals, col = Pop, shape = Pop), size = 4, show.legend = FALSE)+
   geom_segment(aes(x = 2.2, y = 1, xend = 2.7, yend = 1), linetype = "solid", linewidth = 1.25)+
   geom_segment(aes(x = 3.2, y = 1, xend = 3.7, yend = 1), linetype = "dotted", linewidth = 1.25)+
-  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")))+
+  geom_text(aes(x = c(1.2, 1.8, 2.9, 3.9), y = c(1, 1, 1, 1), label = c("Italy", "Sweden", "2021", "2022")), family = "Times")+
   scale_color_manual(name = "Population",
                      labels = c("IT", "SW"),
                      values = c("#CC79A7", "#009E73"))+
@@ -633,14 +618,14 @@ legend_fig
 
 ``` r
 # trait figs
-ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 600)
-ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 600)
+ggsave(fig1, filename = "figures/fig1.jpg", width = 6, height = 8, units = "in", dpi = 1000, device = "jpeg")
+ggsave(fig2, filename = "figures/fig2.jpg", width = 6, height = 8, units = "in", dpi = 1000)
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 600)
+ggsave(fitness_fig, filename = "figures/fig3.jpg", width = 9, height = 4, units = "in", dpi = 1000)
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig.jpg", width = 6, height = 0.5, units = "in", dpi = 600)
+ggsave(legend_fig, filename = "figures/legend_fig3.jpg", width = 6, height = 0.5, units = "in", dpi = 1000)
 
 #figs1
 ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in", dpi = 600)
@@ -649,3 +634,22 @@ ggsave(figs1, filename = "figures/figs1.jpg", width = 9, height = 8, units = "in
 ggsave(figs3, filename = "figures/figs3.jpg", width = 9, height = 8, units = "in", dpi = 600)
 ```
 
+figs in vector format; needs the remove package line at the top of the script to actually be saved with times new roman font.
+
+``` r
+# trait figs
+ggsave(fig1, filename = "figures/fig1_times.svg", width = 6, height = 8, units = "in", dpi = 3000, device = "svg")
+ggsave(fig2, filename = "figures/fig2_times.svg", width = 6, height = 8, units = "in", dpi = 3000)
+
+# fitness fig
+ggsave(fitness_fig, filename = "figures/fig3_times.svg", width = 9, height = 4, units = "in", dpi = 3000)
+
+# legend_fig
+ggsave(legend_fig, filename = "figures/legend_fig_times.svg", width = 6, height = 0.5, units = "in", dpi = 3000)
+
+#figs1
+ggsave(figs1, filename = "figures/figs1_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+
+#figs2
+ggsave(figs3, filename = "figures/figs3_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+```

@@ -1,7 +1,7 @@
 ---
 title: "02_Analysis"
 author: "Sophie Buysse"
-date: "2026-03-18"
+date: "2026-05-19"
 output: 
   html_document:
     toc: true
@@ -117,7 +117,7 @@ write.csv(ByTrt_Pop_21,"data/PopMeansByTreatment_2021.csv", row.names = TRUE )
 subset to traits in the manuscript
 
 ``` r
-Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R", "FruitCount_BL", "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "fitness")]
+Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R", "FruitCount_BL", "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "fitness", "SLA", "LDMC")]
 
 # need to make subsets so only genotypes represented in both treatments are present. this is difficult because it differs between traits.
 
@@ -125,10 +125,10 @@ Dat_2021_TwoTrt <- Dat_2021[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Rep
 Dat_2021_fitness <- Dat_2021_TwoTrt[ , c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x","FruitCount_BL", "fitness")]
 
 #one that removes B4, R5, and B13 from all traits left. this will be the starting point for the final two dataframes.
-Dat_2021_most <- Dat_2021_TwoTrt[!((Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Line %in% c(4, 13)) | (Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Line == 5)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R",  "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum")]
+Dat_2021_most <- Dat_2021_TwoTrt[!((Dat_2021_TwoTrt$Population == "BELM" & Dat_2021_TwoTrt$Line %in% c(4, 13)) | (Dat_2021_TwoTrt$Population == "RODA" & Dat_2021_TwoTrt$Line == 5)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "EmergeToFlwr", "l10_FreshWt", "l10_SatWt", "l10_DriedWt", "l10_LeafArea", "l10_SLA", "l10_LDMC", "RWC", "RosetteLeafNum", "l10_DryRosG", "l10_DryReproG", "l10_R_to_R",  "AvgSeedWt", "AvgSeedNum", "l10_AvgSeedNum", "SLA", "LDMC")]
 
 # need to remove Belm 1 from leaf area and SLA because no leaf area
-Dat_2021_la <- Dat_2021_most[!((Dat_2021_most$Population == "BELM" & Dat_2021_most$Line == 1)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_LeafArea", "l10_SLA")]
+Dat_2021_la <- Dat_2021_most[!((Dat_2021_most$Population == "BELM" & Dat_2021_most$Line == 1)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_LeafArea", "l10_SLA", "l10_LDMC", "SLA", "LDMC")]
 
 # need to remove Roda 26 from rosette biomass, repro ros, seed weight and seed number because of labeling error
 Dat_2021_RosSeed <- Dat_2021_most[!((Dat_2021_most$Population == "RODA" & Dat_2021_most$Line == 26)), c("Pot.ID", "Population", "Line", "Geno_ID", "Replicate", "Treatment", "Soil.Mix.Batch.Number.x", "l10_DryRosG", "l10_R_to_R",  "AvgSeedWt", "l10_AvgSeedNum", "AvgSeedNum")]
@@ -136,8 +136,6 @@ Dat_2021_RosSeed <- Dat_2021_most[!((Dat_2021_most$Population == "RODA" & Dat_20
 
 
 ## Two Treatment Anovas
-
-This experiment included a Current/Future treatment where plants were in the current treatment before vernalization and the future treatment after vernalization to see if early heat and drought was important. We are not analyzing this third treatment here and it was removed during the data cleaning step.
 
 The initial model is was follows:
 trait ~ Treatment * Population + (1|Population:Line) + (1|Soil.Mix.Batch.Number.x)
@@ -150,32 +148,23 @@ When removing the soil mix random effect, most p values and effect sizes were no
 
 In general these model changes were slight and soil mix explained very little variance - the exceptions are relative water content (soil mix explained half as much variance as genotype), number of fruits, and number of primary stalks (soil mix explained more variance than genotype but over half the variance is still residual). Thus, soil mix was removed as a random variable from the analysis.
 
-To make plotting easier, I have one function that runs the model and the model accuracy tests, then outputs the model object. I then create a data_table with predict means and run an anova with the model output object. The data table and the anova are saved to go into a summary table later or to be used for plotting.
-
 
 ``` r
-# things I want to use as random variables: Line, soil mix batch number
+# random variables: Line, soil mix batch number
 # for single leaf traits also include leaf_Collected
-# for traits at harvest I can use DoneFlwr
+# for traits at harvest: DoneFlwr
 
 # function to run models on 2021 data:
 do_lmer <- function(trait, data = Dat_2021_most){
   lm <- lmer(trait ~ Treatment * Population + (1|Population:Line) , data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
-  ## need to comment this plot out with dataframe changing now. doesn't work with my nomenclature.
-  #plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-  #     col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)[complete.cases(trait)]],
-  #     pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)[complete.cases(trait)]])
-  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-  #legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   # plotting sanity check
   print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
   qqnorm(resid(lm))
   qqline(resid(lm))
   print(summary(lm))
   print(confint(lm))
-  #sample.size <- data %>% group_by(Treatment) %>% group_by(Treatment, .add = TRUE) %>% summarize(across(.cols = trait, .fns= ~sum(!is.na(.x))))
   return(lm)
 }
 # do the anova
@@ -187,7 +176,7 @@ do_anov <- function(model){
   return(df)
 }
 
-# get the means table, no backtransforming - can add pairwise to do comparisons within treatment or within population, but not both at the same time.
+# get the means table, no backtransforming
 get_table <- function(model){
   tab <- emmeans(model, c("Treatment", "Population"), type = "response")
   return(tab)
@@ -215,45 +204,6 @@ The modelling function runs a mixed model where each trait is predicted by popul
 
 ### Phenology
 
-Days to Emergence
-
-
-``` r
-# Emergence
-emergence_lm_21 <- do_lmer(Dat_2021_TwoTrt$Emergence)
-emergence_anov_21 <- do_anov(emergence_lm_21)
-emergence_anov_21$trait <- "Emergence"
-emergence_emmeans_21 <- get_table(emergence_lm_21)
-emergence_means_21 <- as.data.frame(emergence_emmeans_21)
-emergence_pairs_21 <- as.data.frame(pairs(emergence_emmeans_21))
-emergence_pairs_21$trait <- "Emergence"
-
-
-#get_geno_table(Dat_2021_TwoTrt$Emergence)
-```
-
-Days between emergence and bolting (note: not included in final manuscript)
-
-
-``` r
-# days emergence to bolting
-bolting_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToBolt)
-bolting_anov_21 <- do_anov(bolting_lm_21)
-bolting_anov_21$trait <- "Bolting"
-bolting_means_21 <- as.data.frame(get_table(bolting_lm_21))
-```
-
-Days between bolting and flowering (note: not included in manuscript)
-
-
-``` r
-# days bolting to flowering
-flowering_lm_21 <- do_lmer(Dat_2021_TwoTrt$DayToFlwr)
-flowering_anov_21 <- do_anov(flowering_lm_21)
-flowering_anov_21$trait <- "Bolting To Flowering"
-flowering_means_21 <- as.data.frame(get_table(flowering_lm_21))
-```
-
 Days between Emergence and flowering
 
 
@@ -262,11 +212,13 @@ Days between Emergence and flowering
 eTof_lm_21 <- do_lmer(Dat_2021_most$EmergeToFlwr)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-4-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-4-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -305,8 +257,6 @@ eTof_lm_21 <- do_lmer(Dat_2021_most$EmergeToFlwr)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -352,11 +302,13 @@ fresh weight
 fresh_lm_21 <- do_lmer(Dat_2021_most$l10_FreshWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-5-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -395,8 +347,6 @@ fresh_lm_21 <- do_lmer(Dat_2021_most$l10_FreshWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -438,11 +388,13 @@ saturated/hydrated weight
 sat_lm_21 <- do_lmer(Dat_2021_most$l10_SatWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -481,8 +433,6 @@ sat_lm_21 <- do_lmer(Dat_2021_most$l10_SatWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -524,11 +474,13 @@ dried weight
 dry_lm_21 <- do_lmer(Dat_2021_most$l10_DriedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -567,8 +519,6 @@ dry_lm_21 <- do_lmer(Dat_2021_most$l10_DriedWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
 
 ```
 ##                               2.5 %      97.5 %
@@ -614,11 +564,13 @@ leaf area
 area_lm_21 <- do_lmer(Dat_2021_la$l10_LeafArea, data = Dat_2021_la)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 78"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -658,8 +610,6 @@ area_lm_21 <- do_lmer(Dat_2021_la$l10_LeafArea, data = Dat_2021_la)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
-
 ```
 ##                              2.5 %     97.5 %
 ## .sig01                  0.05065781 0.12828283
@@ -693,20 +643,6 @@ area_pairs_21$trait <- "l10_area"
 ```
 
 
-leaf perimeter
-
-
-``` r
-per_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_LeafPer)
-per_anov_21 <- do_anov(per_lm_21)
-per_anov_21$trait <- "l10_Perimeter"
-per_emmeans_21 <- get_table_bt(per_lm_21)
-per_means_21 <- as.data.frame(per_emmeans_21)
-per_pairs_21 <- as.data.frame(pairs(per_emmeans_21))
-per_pairs_21$trait <- "l10_Perimeter"
-```
-
-
 specific leaf area
 
 
@@ -715,11 +651,13 @@ specific leaf area
 SLA_lm_21 <- do_lmer(Dat_2021_la$l10_SLA, data = Dat_2021_la)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-13-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-13-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-9-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-9-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 78"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-9-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -758,8 +696,6 @@ SLA_lm_21 <- do_lmer(Dat_2021_la$l10_SLA, data = Dat_2021_la)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-13-3.png)<!-- -->
 
 ```
 ##                             2.5 %     97.5 %
@@ -805,11 +741,13 @@ leaf dry matter content
 LDMC_lm_21 <- do_lmer(Dat_2021_most$l10_LDMC)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-10-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-10-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -848,8 +786,6 @@ LDMC_lm_21 <- do_lmer(Dat_2021_most$l10_LDMC)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-14-3.png)<!-- -->
 
 ```
 ##                               2.5 %        97.5 %
@@ -891,11 +827,13 @@ relative water content
 RWC_lm_21 <- do_lmer(Dat_2021_most$RWC)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-11-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-11-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-11-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -935,8 +873,6 @@ RWC_lm_21 <- do_lmer(Dat_2021_most$RWC)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-15-3.png)<!-- -->
-
 ```
 ##                                2.5 %     97.5 %
 ## .sig01                  0.0000000000 0.02485499
@@ -973,49 +909,6 @@ geno_rwc_21$trait <- "RWC"
 ```
 
 ### Leaf Number
-leaf num at 4 weeks (note: not included in manuscript)
-
-``` r
-# Leaf Num 7/22/21 - a little under 5 weeks post planting on 6/19/2022 - 4 weeks post moving to the chambers on 6/24
-LN_PreVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_.07222021)
-LN_PreVern_anov_21 <- do_anov(LN_PreVern_lm_21)
-LN_PreVern_anov_21$trait <- "LeafNum_4wks"
-LN_PreVern_means_21 <- as.data.frame(get_table(LN_PreVern_lm_21))
-# diagonal lines in residual plot are artifact of discrete trait. none in left corner is indicative of zeros.
-# double check that residual lines all have same value
-lm <- lmer(LeafNum_.07222021 ~ Treatment * Population + (1|Population:Line) , data = Dat_2021_TwoTrt, contrasts = list(Treatment=contr.sum, Population = contr.sum))
-
-plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-       col = c("red", "blue")[as.numeric(Dat_2021_TwoTrt$Population)],
-       pch = c(16, 15, 17)[as.numeric(Dat_2021_TwoTrt$Treatment)])
-legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-legend("topright", legend = c("Current", "Future"), col = "black", pch = c(16,17))
-text(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE)-0.15, labels = Dat_2021_TwoTrt$LeafNum_.07222021, cex = 0.7)
-```
-
-Leaf num 5 weeks into vernalization (note: not included in manuscript)
-
-``` r
-# LeafNumber from 08262021 - 5 weeks into vernalization
-LN_Vern_lm_21 <- do_lmer(Dat_2021_TwoTrt$LeafNum_08262021)
-LN_Vern_anov_21 <- do_anov(LN_Vern_lm_21)
-LN_Vern_anov_21$trait <- "LeafNum_9wks"
-LN_Vern_means_21 <- as.data.frame(get_table(LN_Vern_lm_21))
-```
-
-Leaf num about when bolting started (note: not included in manuscript because not a constant developmental stage)
-
-``` r
-# Leaf Num October 4 - picked this day because was about when bolting started but some had already bolted by this day
-LN_PostVern_lm_21 <- do_lmer(Dat_2021_TwoTrt$RosetteLeafNum_10042021)
-LN_PostVern_anov_21 <- do_anov(LN_PostVern_lm_21)
-LN_PostVern_anov_21$trait <- "LeafNum_14wks"
-LN_PostVern_means_21 <- as.data.frame(get_table(LN_PostVern_lm_21))
-```
-
-
-Leaf number at bolting and flower were only done on some plants, not all (bolting only for SW plants and flowering only for 16 plants), so there are no models or figures for these traits.
-
 
 Leaf number at harvest
 
@@ -1024,11 +917,13 @@ Leaf number at harvest
 LN_harv_lm_21 <- do_lmer(Dat_2021_most$RosetteLeafNum)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 81"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-12-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1067,8 +962,6 @@ LN_harv_lm_21 <- do_lmer(Dat_2021_most$RosetteLeafNum)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-19-3.png)<!-- -->
 
 ```
 ##                            2.5 %    97.5 %
@@ -1111,11 +1004,13 @@ Rosette biomass
 Ros_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_DryRosG, data = Dat_2021_RosSeed)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-20-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-13-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-13-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 78"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-13-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1154,8 +1049,6 @@ Ros_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_DryRosG, data = Dat_2021_RosSeed)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-20-3.png)<!-- -->
 
 ```
 ##                              2.5 %       97.5 %
@@ -1204,11 +1097,13 @@ Reproductive biomass
 Repro_lm_21 <- do_lmer(Dat_2021_most$l10_DryReproG)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-21-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 79"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-14-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1248,8 +1143,6 @@ Repro_lm_21 <- do_lmer(Dat_2021_most$l10_DryReproG)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
-
 ```
 ##                              2.5 %      97.5 %
 ## .sig01                  0.04731759  0.16429751
@@ -1282,20 +1175,6 @@ Repro_pairs_21 <- as.data.frame(pairs(Repro_emmeans_21))
 Repro_pairs_21$trait <- "l10_DryReproG"
 ```
 
-
-Above ground biomass (rosette + reproductive) (note: not included in final paper because so similar to reproductive)
-
-
-``` r
-# dry above ground biomass (ros + repro)
-AG_lm_21 <- do_lmer(Dat_2021_TwoTrt$l10_AG_biomass)
-AG_anov_21 <- do_anov(AG_lm_21)
-AG_anov_21$trait <- "l10_AG_biomass"
-AG_means_21 <- as.data.frame(get_table_bt(AG_lm_21))
-```
-
-Skipping dry root biomass because only have for a few plants. Also skipping root to shoot for the same reason.
-
 Above ground biomass allocation (repro/ros)
 
 ``` r
@@ -1303,11 +1182,13 @@ Above ground biomass allocation (repro/ros)
 RR_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_R_to_R, data = Dat_2021_RosSeed)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-15-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-15-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 76"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-15-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1347,8 +1228,6 @@ RR_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_R_to_R, data = Dat_2021_RosSeed)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
-
 ```
 ##                              2.5 %     97.5 %
 ## .sig01                  0.05421645 0.18284179
@@ -1381,50 +1260,6 @@ RR_pairs_21 <- as.data.frame(pairs(RR_emmeans_21))
 RR_pairs_21$trait <- "l10_Repro_to_Ros"
 ```
 
-
-### Plant Structure
-branches and height. Branch structure is about damage and was skipped.
-
-Num lateral branches
-
-``` r
-# number of lateral branches
-LatBranch_lm_21 <- do_lmer(Dat_2021_TwoTrt$LatBranches)
-LatBranch_anov_21 <- do_anov(LatBranch_lm_21)
-LatBranch_anov_21$trait <- "Lateral Branches"
-LatBranch_emmeans_21 <- get_table(LatBranch_lm_21)
-LatBranch_means_21 <- as.data.frame(LatBranch_emmeans_21)
-LatBranch_pairs_21 <- as.data.frame(pairs(LatBranch_emmeans_21))
-LatBranch_pairs_21$trait <- "Lateral Branches"
-```
-
-Num primary stalks
-
-``` r
-# number of primary stalks
-PrimStalks_lm_21 <- do_lmer(Dat_2021_TwoTrt$PrimaryStalks)
-PrimStalks_anov_21 <- do_anov(PrimStalks_lm_21)
-PrimStalks_anov_21$trait <- "Primary Stalks"
-PrimStalks_emmeans_21 <- get_table(PrimStalks_lm_21)
-PrimStalks_means_21 <- as.data.frame(PrimStalks_emmeans_21)
-PrimStalks_pairs_21 <- as.data.frame(pairs(PrimStalks_emmeans_21))
-PrimStalks_pairs_21$trait <- "Primary Stalks"
-```
-
-Height main stalk
-
-``` r
-# height of main stalk (cm)
-height_lm_21 <- do_lmer(Dat_2021_TwoTrt$Height_cm)
-height_anov_21 <- do_anov(height_lm_21)
-height_anov_21$trait <- "Height (cm)"
-height_emmeans_21 <- get_table(height_lm_21)
-height_means_21 <- as.data.frame(height_emmeans_21)
-height_pairs_21 <- as.data.frame(pairs(height_emmeans_21))
-height_pairs_21$trait <- "Height (cm)"
-```
-
-
 ### Fitness
 
 Fruit Count: (9/20/2024) using BL's fruit counts
@@ -1435,11 +1270,13 @@ Fruit Count: (9/20/2024) using BL's fruit counts
 fruit_lm_21 <- do_lmer(Dat_2021_fitness$FruitCount_BL, data = Dat_2021_fitness)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-27-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 96"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-16-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1478,8 +1315,6 @@ fruit_lm_21 <- do_lmer(Dat_2021_fitness$FruitCount_BL, data = Dat_2021_fitness)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-27-3.png)<!-- -->
 
 ```
 ##                            2.5 %    97.5 %
@@ -1594,11 +1429,13 @@ Average weight of a seed (collected seed weight / count of collected seeds)
 AvSeedWt_lm_21 <- do_lmer(Dat_2021_RosSeed$AvgSeedWt, data = Dat_2021_RosSeed)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-29-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-29-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-18-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-18-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 73"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-18-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1637,8 +1474,6 @@ AvSeedWt_lm_21 <- do_lmer(Dat_2021_RosSeed$AvgSeedWt, data = Dat_2021_RosSeed)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-29-3.png)<!-- -->
 
 ```
 ##                                2.5 %        97.5 %
@@ -1683,11 +1518,13 @@ seeds_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_AvgSeedNum, data = Dat_2021_RosSeed)
 ## boundary (singular) fit: see help('isSingular')
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 73"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-19-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1728,8 +1565,6 @@ seeds_lm_21 <- do_lmer(Dat_2021_RosSeed$l10_AvgSeedNum, data = Dat_2021_RosSeed)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-30-3.png)<!-- -->
 
 ```
 ##                              2.5 %      97.5 %
@@ -1792,7 +1627,7 @@ geno_seeds$trait <- "l10_seeds per fruit"
 Bonus question about a trade off - are seed weight and seeds per fruit negatively correlated?
 
 ``` r
-# this includes unqual genotype representation because 
+# this includes unequal genotype representation because 
 # overall
 cor.test(Dat_2021_RosSeed$AvgSeedNum, Dat_2021_RosSeed$AvgSeedWt)
 ```
@@ -1815,7 +1650,7 @@ cor.test(Dat_2021_RosSeed$AvgSeedNum, Dat_2021_RosSeed$AvgSeedWt)
 plot(Dat_2021_RosSeed$AvgSeedNum, Dat_2021_RosSeed$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 # just in SW
@@ -1840,7 +1675,7 @@ cor.test(Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "RODA", ]$AvgSeedNum, D
 plot(Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "RODA", ]$AvgSeedNum, Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "RODA", ]$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-20-2.png)<!-- -->
 
 ``` r
 # just in IT
@@ -1865,7 +1700,7 @@ cor.test(Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "BELM", ]$AvgSeedNum, D
 plot(Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "BELM", ]$AvgSeedNum, Dat_2021_RosSeed[Dat_2021_RosSeed$Population == "BELM", ]$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-31-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-20-3.png)<!-- -->
 
 ``` r
 # just cur?
@@ -1890,7 +1725,7 @@ cor.test(Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Current", ]$AvgSeedNum,
 plot(Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Current", ]$AvgSeedNum, Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Current", ]$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-31-4.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-20-4.png)<!-- -->
 
 ``` r
 # just fut?
@@ -1915,7 +1750,7 @@ cor.test(Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Future", ]$AvgSeedNum, 
 plot(Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Future", ]$AvgSeedNum, Dat_2021_RosSeed[Dat_2021_RosSeed$Treatment == "Future", ]$AvgSeedWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-31-5.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-20-5.png)<!-- -->
 
 Total Fitness
 
@@ -1925,11 +1760,13 @@ Total Fitness
 fitness_lm_21 <- do_lmer(Dat_2021_fitness$fitness, data = Dat_2021_fitness)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-21-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-21-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 93"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-21-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -1969,8 +1806,6 @@ fitness_lm_21 <- do_lmer(Dat_2021_fitness$fitness, data = Dat_2021_fitness)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-32-3.png)<!-- -->
-
 ```
 ##                            2.5 %     97.5 %
 ## .sig01                     0.000  9834.9355
@@ -2007,7 +1842,6 @@ geno_fitness$trait <- "TotalFitness"
 ```
 
 ###Outputs
-Updated 3/18/2026 so only traits included in the manuscript
 
 1) Results table
 
@@ -2119,6 +1953,55 @@ n_2021 %>%
 ## 4 Future    RODA           2  2.31      2     6
 ```
 
+``` r
+# want to know sample sizes for fitness and such
+Dat_2021_fitness %>% count(Treatment, Population)
+```
+
+```
+##   Treatment Population  n
+## 1   Current       BELM 20
+## 2   Current       RODA 30
+## 3    Future       BELM 20
+## 4    Future       RODA 30
+```
+
+``` r
+Dat_2021_RosSeed %>% count(Treatment, Population)
+```
+
+```
+##   Treatment Population  n
+## 1   Current       BELM 16
+## 2   Current       RODA 26
+## 3    Future       BELM 16
+## 4    Future       RODA 26
+```
+
+``` r
+Dat_2021_most %>% count(Treatment, Population)
+```
+
+```
+##   Treatment Population  n
+## 1   Current       BELM 16
+## 2   Current       RODA 28
+## 3    Future       BELM 16
+## 4    Future       RODA 28
+```
+
+``` r
+Dat_2021_la %>% count(Treatment, Population)
+```
+
+```
+##   Treatment Population  n
+## 1   Current       BELM 15
+## 2   Current       RODA 28
+## 3    Future       BELM 15
+## 4    Future       RODA 28
+```
+
 
 # 2022
 
@@ -2183,10 +2066,13 @@ write.csv(ByTrt_Pop_22,"data/PopMeansByTreatment_2022.csv", row.names = TRUE )
 subset to the trait that are in the manuscript
 
 ``` r
-Dat_2022c <- Dat_2022[,c("PotID", "Treatment", "Population", "Line", "Geno_ID", "Replicate", "Chamber", "Flat", "Transplanted", "l10_SL_FreshWt", "l10_SL_HydWt", "SL_DryWt", "SL_Area", "l10_SLA", "l10_LDMC", "RWC", "l10_LeafNumber_Total", "l10_AG_DryBiomass", "BG_DryBiomass", "l10_Root_to_Shoot", "TotalBiomass", "l10_Stomata_density") ]
+Dat_2022c <- Dat_2022[,c("PotID", "Treatment", "Population", "Line", "Geno_ID", "Replicate", "Chamber", "Flat", "Transplanted", "l10_SL_FreshWt", "l10_SL_HydWt", "SL_DryWt", "SL_Area", "l10_SLA", "l10_LDMC", "RWC", "l10_LeafNumber_Total", "l10_AG_DryBiomass", "BG_DryBiomass", "l10_Root_to_Shoot", "TotalBiomass", "l10_Stomata_density", "SLA", "LDMC") ]
 
 # remove B4 Fut because there is no matching B4 current
 Dat_2022c <- Dat_2022c[!(Dat_2022c$PotID %in% c("B4-2-F")), ]
+
+# to check for outliers, remove Roda-11 which is a high outlier in the biomass traits 
+Dat_2022c_outliers <- Dat_2022c[!(Dat_2022c$Geno_ID %in% c("R11")), ]
 ```
 
 
@@ -2217,12 +2103,6 @@ do_lmer2 <- function(trait, data = Dat_2022c){
   lm<- lmer(trait ~ Treatment * Population + Treatment/Chamber + (1|Population:Line), data = data, contrasts = list(Treatment=contr.sum, Population = contr.sum))
   print(plot(lm))
   hist(residuals(lm), breaks = 15)
-  # in the residual plots, red is italy, blue is sweden; filled circle is current, filled triangle is future
-  plot(fitted(lm), residuals(lm, type = "pearson", scaled = TRUE),
-       col = c("red", "blue")[as.numeric(Dat_2022c$Population)[complete.cases(trait)]],
-       pch = c(16, 17)[as.numeric(Dat_2022c$Treatment)[complete.cases(trait)]])
-  #legend("topleft", legend = c("Italy", "Sweden"), col = c("red", "blue"), pch = 16)
-  #legend("bottomleft", legend = c("Current", "Future"), col = "black", pch = c(16,17))
   #plotting sanity check
   print(paste0("the number of complete cases is ", sum(complete.cases(trait))))
   # make qq plot
@@ -2244,8 +2124,6 @@ do_anov2 <- function(model){
 # get table functions are the same as from 2021
 
 # geno get table functions need to be updated
-# genotype level emmeans for looking at within population variation
-
 get_geno_table22 <- function (trait, data = Dat_2022c){
   tab2 <- emmeans(lm(trait ~ Treatment * Geno_ID, data = data, contrasts = list(Treatment=contr.sum, Geno_ID = contr.sum)), c("Treatment", "Geno_ID"), type = "reponse")
   return(tab2)
@@ -2259,34 +2137,6 @@ get_geno_table_bt22 <- function(trait, data = Dat_2022c){
 ```
 
 Run the models
-### Phenology
-
-Days to emergence - log10 transformed this time!
-
-``` r
-# days to emergence
-emergence_lm_22 <- do_lmer2(Dat_2022c$l10_DaysToEmergence)
-emergence_anov_22 <- do_anov2(emergence_lm_22)
-emergence_anov_22$trait <- "Emergence"
-emergence_means_22 <- as.data.frame(get_table_bt(emergence_lm_22))
-```
-
-Days between emergence and bolting
-
-``` r
-# days emergence to bolting
-bolting_lm_22 <- do_lmer2(Dat_2022c$EmergenceToBolting)
-bolting_anov_22 <- do_anov2(bolting_lm_22)
-bolting_anov_22$trait <- "Bolting"
-bolting_emmeans_22 <- get_table(bolting_lm_22)
-bolting_means_22 <- as.data.frame(bolting_emmeans_22)
-bolting_pairs_22 <- as.data.frame(pairs(bolting_emmeans_22))
-bolting_pairs_22$trait <- "Bolting"
-```
-
-Not analyzing bolting to root washing or bolting to harvest. Those could be included as random effects, but most were close together.
- 
-Not looking an number emerged because it doesn't have a 2021 comparison for emergence success.
 
 ### Single Leaf Traits: bolting
 
@@ -2297,11 +2147,13 @@ Fresh weight
 fresh_lm_22 <- do_lmer2(Dat_2022c$l10_SL_FreshWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-43-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-43-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-30-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-30-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-30-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2345,8 +2197,6 @@ fresh_lm_22 <- do_lmer2(Dat_2022c$l10_SL_FreshWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-43-4.png)<!-- -->
 
 ```
 ##                                 2.5 %        97.5 %
@@ -2398,11 +2248,13 @@ Saturated/Hydrated weight
 hyd_lm_22 <- do_lmer2(Dat_2022c$l10_SL_HydWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-44-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-44-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-31-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-31-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 125"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-31-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2446,8 +2298,6 @@ hyd_lm_22 <- do_lmer2(Dat_2022c$l10_SL_HydWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-44-4.png)<!-- -->
 
 ```
 ##                                 2.5 %      97.5 %
@@ -2504,11 +2354,13 @@ Dried weight
 dry_lm_22 <- do_lmer2(Dat_2022c$SL_DryWt)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-45-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-45-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-45-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-32-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-32-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-32-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2552,8 +2404,6 @@ dry_lm_22 <- do_lmer2(Dat_2022c$SL_DryWt)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-45-4.png)<!-- -->
 
 ```
 ##                                   2.5 %        97.5 %
@@ -2611,11 +2461,13 @@ leaf area
 area_lm_22 <- do_lmer2(Dat_2022c$SL_Area)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-46-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-46-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-46-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-33-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-33-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-33-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2659,8 +2511,6 @@ area_lm_22 <- do_lmer2(Dat_2022c$SL_Area)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-46-4.png)<!-- -->
 
 ```
 ##                                2.5 %      97.5 %
@@ -2731,11 +2581,13 @@ specific leaf area
 sla_lm_22 <- do_lmer2(Dat_2022c$l10_SLA)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-48-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-48-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-48-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-35-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-35-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-35-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2779,8 +2631,6 @@ sla_lm_22 <- do_lmer2(Dat_2022c$l10_SLA)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-48-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -2839,11 +2689,13 @@ ldmc_lm_22 <- do_lmer2(Dat_2022c$l10_LDMC)
 ## boundary (singular) fit: see help('isSingular')
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-49-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-49-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-49-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-36-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-36-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 125"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-36-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -2922,8 +2774,6 @@ ldmc_lm_22 <- do_lmer2(Dat_2022c$l10_LDMC)
 ## collapsing to unique 'x' values
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-49-4.png)<!-- -->
-
 ```
 ##                                   2.5 %       97.5 %
 ## .sig01                     0.0000000000  0.023499145
@@ -2975,11 +2825,13 @@ relative water content
 rwc_lm_22 <- do_lmer2(Dat_2022c$RWC)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-50-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-50-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-50-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-37-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-37-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 125"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-37-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3023,8 +2875,6 @@ rwc_lm_22 <- do_lmer2(Dat_2022c$RWC)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-50-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -3075,36 +2925,6 @@ geno_rwc_22$trait <- "RWC"
 
 ### Leaf Number
 
-leaf num at 4 weeks (note: not included in manuscript)
-
-``` r
-# pre vern leaf number
-LN_PreVern_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_PreVern)
-LN_PreVern_anov_22 <- do_anov2(LN_PreVern_lm_22)
-LN_PreVern_anov_22$trait <- "LeafNum_5wks"
-LN_PreVern_means_22 <- as.data.frame(get_table(LN_PreVern_lm_22))
-```
-
-leaf num first week post vern (note: not in final manuscript)
-
-``` r
-# june 6 leaf number
-LN_Jun6_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_Jun6)
-LN_Jun6_anov_22 <- do_anov2(LN_Jun6_lm_22)
-LN_Jun6_anov_22$trait <- "LeafNum_9wks"
-LN_Jun6_means_22 <- as.data.frame(get_table(LN_Jun6_lm_22))
-```
-
-leaf num second week post vern (not in final manuscript)
-
-``` r
-# june 14 leaf number
-LN_Jun13_lm_22 <- do_lmer2(Dat_2022c$LeafNumber_Jun13)
-LN_Jun13_anov_22 <- do_anov2(LN_Jun13_lm_22)
-LN_Jun13_anov_22$trait <- "LeafNum_10wks"
-LN_Jun13_means_22 <- as.data.frame(get_table(LN_Jun13_lm_22))
-```
-
 leaf num at bolting
 
 ``` r
@@ -3112,11 +2932,13 @@ leaf num at bolting
 LN_bolt_lm_22 <- do_lmer2(Dat_2022c$l10_LeafNumber_Total)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-54-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-54-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-54-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-38-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-38-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-38-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3161,8 +2983,6 @@ LN_bolt_lm_22 <- do_lmer2(Dat_2022c$l10_LeafNumber_Total)
 ## Computing profile confidence intervals ...
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-54-4.png)<!-- -->
-
 ```
 ##                                 2.5 %       97.5 %
 ## .sig01                     0.03264682  0.082698447
@@ -3206,8 +3026,6 @@ LN_bolt_pairs_22 <- as.data.frame(pairs(LN_bolt_emmeans_22))
 LN_bolt_pairs_22$trait <- "l10_LeafNumb_bolting"
 ```
 
-Not analyzing rosette leaf number or under leaves because this split was started partway through the experiment.
-
 ### Biomass
 
 above ground biomass
@@ -3217,11 +3035,13 @@ above ground biomass
 AG_lm_22 <- do_lmer2(Dat_2022c$l10_AG_DryBiomass)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-55-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-55-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-55-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-39-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-39-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-39-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3265,8 +3085,6 @@ AG_lm_22 <- do_lmer2(Dat_2022c$l10_AG_DryBiomass)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-55-4.png)<!-- -->
 
 ```
 ##                                  2.5 %      97.5 %
@@ -3316,6 +3134,100 @@ AG_pairs_22$trait <- "l10_Above Ground Biomass"
 
 geno_ag_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_AG_DryBiomass))
 geno_ag_22$trait <- "l10_AG"
+
+# check outliers.
+AG_outliers <- do_lmer2(Dat_2022c_outliers$l10_AG_DryBiomass, data = Dat_2022c_outliers)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-39-4.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-39-5.png)<!-- -->
+
+```
+## [1] "the number of complete cases is 118"
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-39-6.png)<!-- -->
+
+```
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## trait ~ Treatment * Population + Treatment/Chamber + (1 | Population:Line)
+##    Data: data
+## 
+## REML criterion at convergence: -109.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.5027 -0.4880  0.0549  0.6203  3.1209 
+## 
+## Random effects:
+##  Groups          Name        Variance Std.Dev.
+##  Population:Line (Intercept) 0.01318  0.1148  
+##  Residual                    0.01364  0.1168  
+## Number of obs: 118, groups:  Population:Line, 14
+## 
+## Fixed effects:
+##                             Estimate Std. Error         df t value Pr(>|t|)    
+## (Intercept)                -0.530579   0.032667  12.172996 -16.242 1.28e-09 ***
+## Treatment1                  0.028320   0.010809 100.443206   2.620 0.010156 *  
+## Population1                -0.169659   0.032668  12.174621  -5.193 0.000214 ***
+## Treatment1:Population1      0.024477   0.010813 100.445385   2.264 0.025738 *  
+## TreatmentCurrent:Chamber1  -0.003258   0.015150 100.602911  -0.215 0.830152    
+## TreatmentFuture:Chamber1    0.004496   0.015392 100.378657   0.292 0.770840    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Trtmn1 Ppltn1 Tr1:P1 TrC:C1
+## Treatment1  -0.001                            
+## Population1  0.001  0.006                     
+## Trtmnt1:Pp1  0.006 -0.064 -0.001              
+## TrtmntCr:C1 -0.005  0.000 -0.005  0.000       
+## TrtmntFt:C1 -0.001  0.003  0.008 -0.026  0.002
+```
+
+```
+## Computing profile confidence intervals ...
+```
+
+```
+##                                  2.5 %      97.5 %
+## .sig01                     0.070600325  0.16728284
+## .sigma                     0.100569502  0.13200386
+## (Intercept)               -0.594327316 -0.46719361
+## Treatment1                 0.007413119  0.04934388
+## Population1               -0.233420210 -0.10628173
+## Treatment1:Population1     0.003552322  0.04549512
+## TreatmentCurrent:Chamber1 -0.032570520  0.02619272
+## TreatmentFuture:Chamber1  -0.025409551  0.03429776
+```
+
+``` r
+do_anov2(AG_outliers)
+```
+
+```
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                       Sum Sq Mean Sq NumDF   DenDF F value   Pr(>F)    
+## Treatment            0.03503 0.03503     1 100.358  2.5677 0.112207    
+## Population           0.36792 0.36792     1  12.175 26.9721 0.000214 ***
+## Treatment:Population 0.06990 0.06990     1 100.445  5.1247 0.025738 *  
+## Treatment:Chamber    0.00180 0.00090     2 100.491  0.0659 0.936290    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+##                           Sum Sq      Mean Sq NumDF     DenDF     F value
+## Treatment            0.035025734 0.0350257338     1 100.35761  2.56772446
+## Population           0.367920133 0.3679201335     1  12.17462 26.97209799
+## Treatment:Population 0.069904598 0.0699045979     1 100.44539  5.12468195
+## Treatment:Chamber    0.001797125 0.0008985623     2 100.49062  0.06587329
+##                           Pr(>F)  exp
+## Treatment            0.112207488 2022
+## Population           0.000214032 2022
+## Treatment:Population 0.025738209 2022
+## Treatment:Chamber    0.936289879 2022
 ```
 
 below ground biomass
@@ -3325,11 +3237,13 @@ below ground biomass
 BG_lm_22 <- do_lmer2(Dat_2022c$BG_DryBiomass)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-56-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-56-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-56-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-40-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-40-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-40-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3373,8 +3287,6 @@ BG_lm_22 <- do_lmer2(Dat_2022c$BG_DryBiomass)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-56-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -3424,6 +3336,100 @@ BG_pairs_22$trait <- "Below Ground Biomass"
 
 geno_bg_22 <- as.data.frame(get_geno_table22(Dat_2022c$BG_DryBiomass))
 geno_bg_22$trait <- "BG_DryBiomass"
+
+# check outliers
+BG_outliers <- do_lmer2(Dat_2022c_outliers$BG_DryBiomass, data = Dat_2022c_outliers)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-40-4.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-40-5.png)<!-- -->
+
+```
+## [1] "the number of complete cases is 118"
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-40-6.png)<!-- -->
+
+```
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## trait ~ Treatment * Population + Treatment/Chamber + (1 | Population:Line)
+##    Data: data
+## 
+## REML criterion at convergence: -632
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.3977 -0.5557 -0.0419  0.4379  4.3635 
+## 
+## Random effects:
+##  Groups          Name        Variance  Std.Dev.
+##  Population:Line (Intercept) 5.392e-05 0.007343
+##  Residual                    1.398e-04 0.011823
+## Number of obs: 118, groups:  Population:Line, 14
+## 
+## Fixed effects:
+##                             Estimate Std. Error         df t value Pr(>|t|)    
+## (Intercept)                4.345e-02  2.262e-03  1.265e+01  19.207 9.74e-11 ***
+## Treatment1                 4.134e-03  1.094e-03  1.012e+02   3.780 0.000265 ***
+## Population1               -1.103e-02  2.262e-03  1.266e+01  -4.876 0.000327 ***
+## Treatment1:Population1    -3.758e-04  1.094e-03  1.012e+02  -0.343 0.731946    
+## TreatmentCurrent:Chamber1 -1.485e-03  1.532e-03  1.015e+02  -0.969 0.334618    
+## TreatmentFuture:Chamber1  -7.043e-04  1.558e-03  1.011e+02  -0.452 0.652106    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Trtmn1 Ppltn1 Tr1:P1 TrC:C1
+## Treatment1  -0.003                            
+## Population1 -0.002  0.007                     
+## Trtmnt1:Pp1  0.007 -0.065 -0.003              
+## TrtmntCr:C1 -0.005  0.000 -0.005  0.000       
+## TrtmntFt:C1 -0.002  0.003  0.012 -0.026  0.001
+```
+
+```
+## Computing profile confidence intervals ...
+```
+
+```
+##                                  2.5 %       97.5 %
+## .sig01                     0.003971424  0.011127043
+## .sigma                     0.010181784  0.013351168
+## (Intercept)                0.039027776  0.047827249
+## Treatment1                 0.002017511  0.006257759
+## Population1               -0.015449694 -0.006649521
+## Treatment1:Population1    -0.002493697  0.001747832
+## TreatmentCurrent:Chamber1 -0.004449027  0.001491091
+## TreatmentFuture:Chamber1  -0.003732013  0.002307541
+```
+
+``` r
+do_anov2(BG_outliers)
+```
+
+```
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                         Sum Sq   Mean Sq NumDF   DenDF F value    Pr(>F)    
+## Treatment            0.0008220 0.0008220     1 101.084  5.8805 0.0170835 *  
+## Population           0.0033234 0.0033234     1  12.658 23.7756 0.0003268 ***
+## Treatment:Population 0.0000165 0.0000165     1 101.204  0.1180 0.7319460    
+## Treatment:Chamber    0.0001598 0.0000799     2 101.295  0.5716 0.5664332    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+##                            Sum Sq      Mean Sq NumDF     DenDF    F value
+## Treatment            8.220020e-04 8.220020e-04     1 101.08419  5.8805317
+## Population           3.323439e-03 3.323439e-03     1  12.65801 23.7755973
+## Treatment:Population 1.649196e-05 1.649196e-05     1 101.20441  0.1179821
+## Treatment:Chamber    1.597999e-04 7.989996e-05     2 101.29473  0.5715975
+##                            Pr(>F)  exp
+## Treatment            0.0170835409 2022
+## Population           0.0003268166 2022
+## Treatment:Population 0.7319460011 2022
+## Treatment:Chamber    0.5664332332 2022
 ```
 
 Root to shoot ratio (below ground / above ground)
@@ -3433,11 +3439,13 @@ Root to shoot ratio (below ground / above ground)
 RS_lm_22 <- do_lmer2(Dat_2022c$l10_Root_to_Shoot)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-57-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-57-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-57-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-41-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-41-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-41-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3481,8 +3489,6 @@ RS_lm_22 <- do_lmer2(Dat_2022c$l10_Root_to_Shoot)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-57-4.png)<!-- -->
 
 ```
 ##                                 2.5 %       97.5 %
@@ -3528,6 +3534,122 @@ RS_pairs_22$trait <- "l10_Root to Shoot Ratio"
 
 geno_rs_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_Root_to_Shoot))
 geno_rs_22$trait <- "l10_Root_to_Shoot"
+
+# check outliers
+RS_outliers <- do_lmer2(Dat_2022c_outliers$l10_Root_to_Shoot, data = Dat_2022c_outliers)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-41-4.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-41-5.png)<!-- -->
+
+```
+## [1] "the number of complete cases is 118"
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-41-6.png)<!-- -->
+
+```
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## trait ~ Treatment * Population + Treatment/Chamber + (1 | Population:Line)
+##    Data: data
+## 
+## REML criterion at convergence: -311.5
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -2.35179 -0.59627 -0.04419  0.67807  2.94556 
+## 
+## Random effects:
+##  Groups          Name        Variance Std.Dev.
+##  Population:Line (Intercept) 0.001704 0.04128 
+##  Residual                    0.002312 0.04809 
+## Number of obs: 118, groups:  Population:Line, 14
+## 
+## Fixed effects:
+##                             Estimate Std. Error         df t value Pr(>|t|)    
+## (Intercept)                -0.872804   0.011957  12.535763 -72.997  < 2e-16 ***
+## Treatment1                  0.004371   0.004450 100.854668   0.982  0.32827    
+## Population1                 0.042748   0.011957  12.537887   3.575  0.00357 ** 
+## Treatment1:Population1     -0.021043   0.004451 100.857266  -4.728 7.39e-06 ***
+## TreatmentCurrent:Chamber1  -0.006117   0.006236 101.039269  -0.981  0.32897    
+## TreatmentFuture:Chamber1   -0.008173   0.006337 100.785848  -1.290  0.20009    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Trtmn1 Ppltn1 Tr1:P1 TrC:C1
+## Treatment1  -0.001                            
+## Population1  0.001  0.007                     
+## Trtmnt1:Pp1  0.007 -0.064 -0.002              
+## TrtmntCr:C1 -0.005  0.000 -0.005  0.000       
+## TrtmntFt:C1 -0.002  0.003  0.009 -0.026  0.001
+```
+
+```
+## Computing profile confidence intervals ...
+```
+
+```
+##                                  2.5 %       97.5 %
+## .sig01                     0.025020463  0.060534358
+## .sigma                     0.041408053  0.054316790
+## (Intercept)               -0.895983017 -0.849459122
+## Treatment1                -0.004281843  0.012974884
+## Population1                0.019576004  0.066102760
+## Treatment1:Population1    -0.029689744 -0.012428640
+## TreatmentCurrent:Chamber1 -0.018200426  0.005978794
+## TreatmentFuture:Chamber1  -0.020472140  0.004100693
+```
+
+``` r
+do_anov2(RS_outliers)
+```
+
+```
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                        Sum Sq  Mean Sq NumDF   DenDF F value    Pr(>F)    
+## Treatment            0.001709 0.001709     1 100.759  0.7392  0.391966    
+## Population           0.029554 0.029554     1  12.538 12.7814  0.003575 ** 
+## Treatment:Population 0.051681 0.051681     1 100.857 22.3509 7.387e-06 ***
+## Treatment:Chamber    0.006063 0.003031     2 100.912  1.3110  0.274107    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+##                           Sum Sq     Mean Sq NumDF     DenDF    F value
+## Treatment            0.001709176 0.001709176     1 100.75899  0.7391758
+## Population           0.029554138 0.029554138     1  12.53789 12.7814254
+## Treatment:Population 0.051681304 0.051681304     1 100.85727 22.3508708
+## Treatment:Chamber    0.006062685 0.003031342     2 100.91236  1.3109797
+##                           Pr(>F)  exp
+## Treatment            0.391965992 2022
+## Population           0.003574935 2022
+## Treatment:Population 0.000007387 2022
+## Treatment:Chamber    0.274106703 2022
+```
+
+``` r
+get_table_bt(RS_outliers)
+```
+
+```
+## NOTE: A nesting structure was detected in the fitted model:
+##     Chamber %in% Treatment
+```
+
+```
+##  Treatment Population response      SE   df lower.CL upper.CL
+##  Current   B             0.142 0.00591 15.2    0.130    0.155
+##  Future    B             0.154 0.00636 15.1    0.141    0.168
+##  Current   R             0.129 0.00535 15.6    0.118    0.141
+##  Future    R             0.115 0.00479 15.9    0.105    0.125
+## 
+## Results are averaged over the levels of: Chamber 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log10 scale
 ```
 
 Total biomass
@@ -3537,11 +3659,13 @@ Total biomass
 TotBio_lm_22 <- do_lmer2(Dat_2022c$TotalBiomass) # residuals pretty normal, don't worry about sqrt transformation
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-58-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-58-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-58-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-42-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-42-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-42-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3585,8 +3709,6 @@ TotBio_lm_22 <- do_lmer2(Dat_2022c$TotalBiomass) # residuals pretty normal, don'
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-58-4.png)<!-- -->
 
 ```
 ##                                  2.5 %      97.5 %
@@ -3632,6 +3754,100 @@ TotBio_pairs_22$trait <- "Total Biomass"
 
 geno_TotBio_22 <- as.data.frame(get_geno_table22(Dat_2022c$TotalBiomass))
 geno_TotBio_22$trait <- "TotalBiomass"
+
+# check outliers
+totbio_outliers <- do_lmer2(Dat_2022c_outliers$TotalBiomass, data = Dat_2022c_outliers)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-42-4.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-42-5.png)<!-- -->
+
+```
+## [1] "the number of complete cases is 118"
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-42-6.png)<!-- -->
+
+```
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+## lmerModLmerTest]
+## Formula: 
+## trait ~ Treatment * Population + Treatment/Chamber + (1 | Population:Line)
+##    Data: data
+## 
+## REML criterion at convergence: -128.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.3362 -0.4911 -0.0388  0.4105  4.9902 
+## 
+## Random effects:
+##  Groups          Name        Variance Std.Dev.
+##  Population:Line (Intercept) 0.003886 0.06234 
+##  Residual                    0.012707 0.11273 
+## Number of obs: 118, groups:  Population:Line, 14
+## 
+## Fixed effects:
+##                             Estimate Std. Error         df t value Pr(>|t|)    
+## (Intercept)                3.795e-01  1.980e-02  1.270e+01  19.168 9.43e-11 ***
+## Treatment1                 2.951e-02  1.043e-02  1.013e+02   2.831   0.0056 ** 
+## Population1               -1.227e-01  1.980e-02  1.270e+01  -6.197 3.58e-05 ***
+## Treatment1:Population1     1.147e-02  1.043e-02  1.014e+02   1.100   0.2741    
+## TreatmentCurrent:Chamber1 -6.178e-03  1.460e-02  1.016e+02  -0.423   0.6731    
+## TreatmentFuture:Chamber1  -4.365e-04  1.485e-02  1.013e+02  -0.029   0.9766    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Trtmn1 Ppltn1 Tr1:P1 TrC:C1
+## Treatment1  -0.004                            
+## Population1 -0.003  0.007                     
+## Trtmnt1:Pp1  0.007 -0.065 -0.004              
+## TrtmntCr:C1 -0.005  0.000 -0.005  0.000       
+## TrtmntFt:C1 -0.002  0.003  0.013 -0.026  0.001
+```
+
+```
+## Computing profile confidence intervals ...
+```
+
+```
+##                                  2.5 %      97.5 %
+## .sig01                     0.031251232  0.09609117
+## .sigma                     0.097082222  0.12728170
+## (Intercept)                0.340744044  0.41777470
+## Treatment1                 0.009352875  0.04977490
+## Population1               -0.161502315 -0.08445915
+## Treatment1:Population1    -0.008720718  0.03171099
+## TreatmentCurrent:Chamber1 -0.034440340  0.02217361
+## TreatmentFuture:Chamber1  -0.029272514  0.02829654
+```
+
+``` r
+do_anov2(totbio_outliers)
+```
+
+```
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                       Sum Sq Mean Sq NumDF   DenDF F value    Pr(>F)    
+## Treatment            0.04164 0.04164     1 101.228  3.2767   0.07324 .  
+## Population           0.48802 0.48802     1  12.704 38.4042 3.581e-05 ***
+## Treatment:Population 0.01537 0.01537     1 101.351  1.2092   0.27409    
+## Treatment:Chamber    0.00228 0.00114     2 101.458  0.0899   0.91409    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+##                           Sum Sq     Mean Sq NumDF     DenDF     F value
+## Treatment            0.041639074 0.041639074     1 101.22837  3.27673789
+## Population           0.488019995 0.488019995     1  12.70447 38.40415884
+## Treatment:Population 0.015365950 0.015365950     1 101.35146  1.20920535
+## Treatment:Chamber    0.002284922 0.001142461     2 101.45801  0.08990461
+##                            Pr(>F)  exp
+## Treatment            7.323535e-02 2022
+## Population           3.580811e-05 2022
+## Treatment:Population 2.740947e-01 2022
+## Treatment:Chamber    9.140911e-01 2022
 ```
 
 
@@ -3642,11 +3858,13 @@ geno_TotBio_22$trait <- "TotalBiomass"
 sto_den_lm_22 <- do_lmer2(Dat_2022c$l10_Stomata_density)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-59-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-59-2.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-59-3.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-43-1.png)<!-- -->![](02_Analysis_files/figure-html/unnamed-chunk-43-2.png)<!-- -->
 
 ```
 ## [1] "the number of complete cases is 126"
 ```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-43-3.png)<!-- -->
 
 ```
 ## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
@@ -3690,8 +3908,6 @@ sto_den_lm_22 <- do_lmer2(Dat_2022c$l10_Stomata_density)
 ```
 ## Computing profile confidence intervals ...
 ```
-
-![](02_Analysis_files/figure-html/unnamed-chunk-59-4.png)<!-- -->
 
 ```
 ##                                  2.5 %       97.5 %
@@ -3738,7 +3954,6 @@ sto_den_pairs_22$trait <- "l10_Stomatal Density"
 # check results don't change if using stomatal average - they didn't change, commented out with update
 #do_anov2(do_lmer2(Dat_2022c$l10_Stomata_avg))
 
-
 geno_stoden_22 <- as.data.frame(get_geno_table_bt22(Dat_2022c$l10_Stomata_density))
 geno_stoden_22$trait <- "l10_Stomata_density"
 ```
@@ -3766,7 +3981,6 @@ for (i in dfs3) {
   colnames(x) <- c("Treatment", "Population", "Mean", "SE", "Df", "LL_95", "UL_95")
   assign(i,x)
 }
-
 
 # create list of data frames
 Means_2022 <- list(fresh_means_22, hyd_means_22, dry_means_22, area_means_22, sla_means_22, ldmc_means_22, rwc_means_22, LN_bolt_means_22, AG_means_22, BG_means_22, RS_means_22, TotBio_means_22, sto_den_means_22)
@@ -3873,46 +4087,7 @@ n_2022 %>%
 ```
 
 # Notes
-The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx on 8/2/2024 to make formatting changes and color code for easier comparison and analysis. This was repeated on 7/22/2025 to update with the emmeans package outputs. It was also updated 3/10/2026 with adding total biomass as a trait.
-
-The spreadsheet is color coded so p values below 0.05 are green, between 0.1 and 0.05 are orange, and others are left white. The model terms are red if there is disagreement in significance between experiments for traits that were measured in both experiments. There is a post hoc results spreadsheet as well which is included in the tables for the manuscript.
-
-
-# Results Tables
-These tables were not ultimately used
-
-## Main Text Tables - auto formatted options
-
-``` r
-sjPlot::tab_model(eTof_lm_21, RWC_lm_21, rwc_lm_22, sto_den_lm_22, SLA_lm_21, sla_lm_22, RS_lm_22 ,  fitness_lm_21, 
-                   collapse.ci = TRUE, 
-                  dv.labels = c("Emergence To Flower 21", "RWC 21", "RWC 22", "Stomatal Density 22","SLA 21", "SLA 22",  "Root-to-Shoot 22", "Fitness 21"), 
-                 pred.labels = c("(Intercept)", "Treatment", "Population", "Trt x Pop Interaction", "Current Trt x Chamber", "Future Trt x Chamber")
-                 
-        )
-
-#show.reflvl = TRUE 
-#p.style = "stars" or "scientific"
-#digits.p=
-# I think I can use css code from this tutorial to remove the intercept row if I want?? https://strengejacke.github.io/sjPlot/articles/table_css.html
-```
-
-## Supplemental Tables
-
-``` r
-drought_extra <- sjPlot::tab_model(fresh_lm_21, fresh_lm_22, sat_lm_21, hyd_lm_22, dry_lm_21, dry_lm_22, area_lm_21, area_lm_22, per_lm_21, per_lm_22, LDMC_lm_21, ldmc_lm_22,
-                                   collapse.ci = TRUE, 
-                                   dv.labels = c("Fresh 21", "Fresh 22", "Sat 21", "Sat 22", "Dry 21", "Dry 22", "area 21", "area 22", "perimeter 21", "perimeter 22", "LDMC 21", "LDMC 22")
-                                   )
-growth_extra <- sjPlot::tab_model(emergence_lm_21, emergence_lm_22, bolting_lm_21, bolting_lm_22, Ros_lm_21, AG_lm_22, RR_lm_21, Repro_lm_21, AG_lm_21, LN_Vern_lm_21, LN_PreVern_lm_21, LN_PreVern_lm_22, LN_PostVern_lm_21, LN_Jun6_lm_22, LN_Jun13_lm_22, LN_harv_lm_21, LN_bolt_lm_22, BG_lm_22, AvSeedWt_lm_21,
-                                  collapse.ci = TRUE, 
-                                  dv.labels = c("Emergence 21", "Emergence 22", "Bolting 21", "Bolting 22", "Ros Biomass 21", "Ros Biomass 22", "Ros:Repro 21", "Repro 21", "AG 21", "LN Vern 21", "LN Prevern 21", "Ln Prevern 22", "LN Postvern 21", "LN June 6 22", "LN June 13 22", "LN harvest 21", "Ln bolt 22", "BG 22", "Avg. Seed Wt 21"))
-fitness_extra <- sjPlot::tab_model(seeds_lm_21, PrimStalks_lm_21, LatBranch_lm_21, height_lm_21, fruit_lm_21,
-                                   collapse.ci = TRUE,
-                                   dv.labels = c("SeedsPerFruit", "Primary Stalks", "Lateral Branches", "Height", "Fruit Number"))
-
-#flowering_lm_21 vs eTof_lm_21??
-```
+The AnovaResults_YEAR files that were output have been copied over to the data/ModelResults.xlsx  to make formatting changes and color code for easier comparison and analysis.
 
 # Problem Solve
 ## SLA and LDMC correlation
@@ -3920,56 +4095,284 @@ Choosing to only include SLA and move LDMC to the supplemental so I want correla
 
 ``` r
 # 2021
-# overall
-cor.test(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
-plot(Dat_2021_TwoTrt$SLA, Dat_2021_TwoTrt$LDMC)
+# overall -usng the most dataframe. this does include one genotype for sla that is only in one treatment but the other option is to not include one genotype for ldmc. check with la dataframe to make sure no major differences. 
+cor.test(Dat_2021_most$SLA, Dat_2021_most$LDMC)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_most$SLA and Dat_2021_most$LDMC
+## t = -8.2934, df = 77, p-value = 2.767e-12
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.7882727 -0.5491800
+## sample estimates:
+##        cor 
+## -0.6868827
+```
+
+``` r
+plot(Dat_2021_most$SLA, Dat_2021_most$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
+
+``` r
+cor.test(Dat_2021_la$SLA, Dat_2021_la$LDMC)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_la$SLA and Dat_2021_la$LDMC
+## t = -8.24, df = 76, p-value = 3.82e-12
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.7888568 -0.5481715
+## sample estimates:
+##        cor 
+## -0.6869095
+```
+
+``` r
+# slight difference but not meaningful interpretation wise -> round to same thing to the hundreths place
 
 # just in SW
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "RODA", ]$LDMC)
+cor.test(Dat_2021_most[Dat_2021_most$Population == "RODA", ]$SLA, Dat_2021_most[Dat_2021_most$Population == "RODA", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_most[Dat_2021_most$Population == "RODA", ]$SLA and Dat_2021_most[Dat_2021_most$Population == "RODA", ]$LDMC
+## t = -8.5531, df = 48, p-value = 3.255e-11
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.8677229 -0.6363454
+## sample estimates:
+##        cor 
+## -0.7770567
+```
+
+``` r
+plot(Dat_2021_most[Dat_2021_most$Population == "RODA", ]$SLA, Dat_2021_most[Dat_2021_most$Population == "RODA", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-2.png)<!-- -->
+
+``` r
 # just in IT
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Population == "BELM", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Population == "BELM", ]$SLA, Dat_2021_la[Dat_2021_la$Population == "BELM", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_la[Dat_2021_la$Population == "BELM", ]$SLA and Dat_2021_la[Dat_2021_la$Population == "BELM", ]$LDMC
+## t = -10.678, df = 26, p-value = 5.318e-11
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.9542183 -0.7979505
+## sample estimates:
+##       cor 
+## -0.902389
+```
+
+``` r
+plot(Dat_2021_la[Dat_2021_la$Population == "BELM", ]$SLA, Dat_2021_la[Dat_2021_la$Population == "BELM", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-3.png)<!-- -->
+
+``` r
 # just cur?
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Current", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$SLA and Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$LDMC
+## t = -6.0587, df = 37, p-value = 5.229e-07
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.8352434 -0.5019506
+## sample estimates:
+##        cor 
+## -0.7057027
+```
+
+``` r
+plot(Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Current", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-4.png)<!-- -->
+
+``` r
 # just fut?
-cor.test(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
-plot(Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$SLA, Dat_2021_TwoTrt[Dat_2021_TwoTrt$Treatment == "Future", ]$LDMC)
+cor.test(Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$SLA and Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$LDMC
+## t = -5.5666, df = 37, p-value = 2.426e-06
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.8166714 -0.4569261
+## sample estimates:
+##        cor 
+## -0.6751134
+```
+
+``` r
+plot(Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$SLA, Dat_2021_la[Dat_2021_la$Treatment == "Future", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-5.png)<!-- -->
+
+``` r
 # 2022
 # overall
 cor.test(Dat_2022c$SLA, Dat_2022c$LDMC)
-plot(Dat_2022c$SLA, Dat_2022c$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2022c$SLA and Dat_2022c$LDMC
+## t = -12.462, df = 123, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.8156319 -0.6576910
+## sample estimates:
+##       cor 
+## -0.747021
+```
+
+``` r
+plot(Dat_2022c$SLA, Dat_2022c$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-6.png)<!-- -->
+
+``` r
 # just in SW
 cor.test(Dat_2022c[Dat_2022c$Population == "R", ]$SLA, Dat_2022c[Dat_2022c$Population == "R", ]$LDMC)
-plot(Dat_2022c[Dat_2022c$Population == "R", ]$SLA, Dat_2022c[Dat_2022c$Population == "R", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2022c[Dat_2022c$Population == "R", ]$SLA and Dat_2022c[Dat_2022c$Population == "R", ]$LDMC
+## t = -14.604, df = 60, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.9283496 -0.8130558
+## sample estimates:
+##        cor 
+## -0.8834225
+```
+
+``` r
+plot(Dat_2022c[Dat_2022c$Population == "R", ]$SLA, Dat_2022c[Dat_2022c$Population == "R", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-7.png)<!-- -->
+
+``` r
 # just in IT
 cor.test(Dat_2022c[Dat_2022c$Population == "B", ]$SLA, Dat_2022c[Dat_2022c$Population == "B", ]$LDMC)
-plot(Dat_2022c[Dat_2022c$Population == "B", ]$SLA, Dat_2022c[Dat_2022c$Population == "B", ]$LDMC)
+```
 
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2022c[Dat_2022c$Population == "B", ]$SLA and Dat_2022c[Dat_2022c$Population == "B", ]$LDMC
+## t = -13.99, df = 61, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.9215464 -0.7980171
+## sample estimates:
+##        cor 
+## -0.8731435
+```
+
+``` r
+plot(Dat_2022c[Dat_2022c$Population == "B", ]$SLA, Dat_2022c[Dat_2022c$Population == "B", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-8.png)<!-- -->
+
+``` r
 # just cur?
 cor.test(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
-plot(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
-
-# just fut?
-cor.test(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
-plot(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
 ```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA and Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC
+## t = -5.7691, df = 62, p-value = 2.724e-07
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.7306769 -0.4038851
+## sample estimates:
+##        cor 
+## -0.5910188
+```
+
+``` r
+plot(Dat_2022c[Dat_2022c$Treatment == "Current", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Current", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-9.png)<!-- -->
+
+``` r
+# just fut?
+cor.test(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA and Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC
+## t = -16.554, df = 59, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.9434207 -0.8492816
+## sample estimates:
+##        cor 
+## -0.9071031
+```
+
+``` r
+plot(Dat_2022c[Dat_2022c$Treatment == "Future", ]$SLA, Dat_2022c[Dat_2022c$Treatment == "Future", ]$LDMC)
+```
+
+![](02_Analysis_files/figure-html/unnamed-chunk-49-10.png)<!-- -->
 ## Dry weight difference in signficance
 For dry weight, there is a huge difference in significance between 2021 (p value below 0.001) and 2022 (p value above 0.95). Quickly looking at the spreadsheets I can not tell a difference and the values are of similar magnitudes. I then did untransformed models and square root transformed models because those were reported as having the most normal residuals in the previous code. None of the models had differences in p values due to transformation that changed the interpretation of the results. I also excluded the "days between bolting and harvest" random effect for the 2022 data but did not find a major difference in the models but the denominator degrees of freedom for treatment did change a lot. As a final check for if there is a potential mistake, I am going to look at some data distributions.
 
 
 ``` r
-ggplot(dat = Dat_2021_TwoTrt)+
+ggplot(dat = Dat_2021_most)+
   geom_histogram(aes(x = DriedWt_g, fill = Population), alpha = 0.5, position = "identity")+
   theme_classic()
-ggplot(dat = Dat_2021_TwoTrt)+
+ggplot(dat = Dat_2021_RosSeed)+
   geom_histogram(aes(x = DriedWt_g, fill = Treatment), alpha = 0.5, position = "identity")+
   theme_classic()
 
@@ -3982,7 +4385,7 @@ ggplot(dat = Dat_2022c)+
   theme_classic()
 ```
 
-Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference. Scales of both are comparable. 
+Visually looking at the histograms it does seems like 2021 has a treatment difference and 2022 has a population difference. Scales of both are comparable. A log 10 transformation was chosen to be used and these hsitograms are commented out.
 
 ## 2021 Avg Seed per fruit
 Concerned that line does not explain any variance. Is it true that all the variation is within lines and not between lines? to check this: 1) make histogram of all the values (not line means) - done in CleanData but repeat here
@@ -3992,13 +4395,13 @@ Concerned that line does not explain any variance. Is it true that all the varia
 hist(Dat_2021_TwoTrt$AvgSeedNum)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-69-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-51-1.png)<!-- -->
 
 ``` r
 hist(Dat_2021_TwoTrt$l10_AvgSeedNum)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-69-2.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-51-2.png)<!-- -->
 2) look within lines for difference in avg seeds/fruit - maybe do subtraction and histogram the differences? but won't work if more than two values
 
 
@@ -4027,7 +4430,7 @@ df_seed_line$Population <- substr(df_seed_line$Line.ID.T, start = 1, stop = 4)
 hist(df_seed_line$AvgSeedNum_n)
 ```
 
-![](02_Analysis_files/figure-html/unnamed-chunk-70-1.png)<!-- -->
+![](02_Analysis_files/figure-html/unnamed-chunk-52-1.png)<!-- -->
 
 ``` r
 # some lines only have 1 pot per treatment -- 10 instances, 7 in Cur
@@ -4143,8 +4546,8 @@ ggplotly(plot_seed)
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-1f080258cafe28e80608" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-1f080258cafe28e80608">{"x":{"data":[{"x":[1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056],"y":[0.2674669162420692,0.50904300965489879,-1.6105696497567332,0.60814421963896215,0.52151324618914841,-0.93832041281694523,-3.7829828164833939,0.16301401842680832,-0.13315980453078638,-0.95391938521042907,0.60814421963896215,-0.11940180820462973,1.3729522074178417,0.34472423022904275,1.3947855616842038,0.2284926700882528,0.76604246385705199,0.75403111393582589],"text":["fitted: 1.684637<br />resid:  0.267466916<br />pop: BELM<br />trt: Current<br />B12-11-C","fitted: 1.684637<br />resid:  0.509043010<br />pop: BELM<br />trt: Current<br />B12-12-C","fitted: 1.684637<br />resid: -1.610569650<br />pop: BELM<br />trt: Current<br />B12-13-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B12-14-C","fitted: 1.684637<br />resid:  0.521513246<br />pop: BELM<br />trt: Current<br />B12-15-C","fitted: 1.684637<br />resid: -0.938320413<br />pop: BELM<br />trt: Current<br />B1-6-C","fitted: 1.684637<br />resid: -3.782982816<br />pop: BELM<br />trt: Current<br />B12-1-C","fitted: 1.684637<br />resid:  0.163014018<br />pop: BELM<br />trt: Current<br />B12-2-C","fitted: 1.684637<br />resid: -0.133159805<br />pop: BELM<br />trt: Current<br />B13-1-C","fitted: 1.684637<br />resid: -0.953919385<br />pop: BELM<br />trt: Current<br />B13-2-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B15-1-C","fitted: 1.684637<br />resid: -0.119401808<br />pop: BELM<br />trt: Current<br />B15-2-C","fitted: 1.684637<br />resid:  1.372952207<br />pop: BELM<br />trt: Current<br />B2-1-C","fitted: 1.684637<br />resid:  0.344724230<br />pop: BELM<br />trt: Current<br />B3-1-C","fitted: 1.684637<br />resid:  1.394785562<br />pop: BELM<br />trt: Current<br />B3-2-C","fitted: 1.684637<br />resid:  0.228492670<br />pop: BELM<br />trt: Current<br />B4-2-C","fitted: 1.684637<br />resid:  0.766042464<br />pop: BELM<br />trt: Current<br />B8-1-C","fitted: 1.684637<br />resid:  0.754031114<br />pop: BELM<br />trt: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599],"y":[1.1032209591299795,-0.51317827674814775,-0.32927409186512946,-1.465323663892748,1.1032209591299795,0.34492239843450484,1.2340289238737077,-1.6415249961527645,0.06491307539388981,-0.12757753348639503,-0.46671425967083219,-1.2530068422517888,1.58142221857721,-0.52874006442835919,0.89361119395706057],"text":["fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-11-F","fitted: 1.657389<br />resid: -0.513178277<br />pop: BELM<br />trt: Future<br />B12-12-F","fitted: 1.657389<br />resid: -0.329274092<br />pop: BELM<br />trt: Future<br />B12-13-F","fitted: 1.657389<br />resid: -1.465323664<br />pop: BELM<br />trt: Future<br />B12-14-F","fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-15-F","fitted: 1.657389<br />resid:  0.344922398<br />pop: BELM<br />trt: Future<br />B1-6-F","fitted: 1.657389<br />resid:  1.234028924<br />pop: BELM<br />trt: Future<br />B12-2-F","fitted: 1.657389<br />resid: -1.641524996<br />pop: BELM<br />trt: Future<br />B15-1-F","fitted: 1.657389<br />resid:  0.064913075<br />pop: BELM<br />trt: Future<br />B15-2-F","fitted: 1.657389<br />resid: -0.127577533<br />pop: BELM<br />trt: Future<br />B2-1-F","fitted: 1.657389<br />resid: -0.466714260<br />pop: BELM<br />trt: Future<br />B2-2-F","fitted: 1.657389<br />resid: -1.253006842<br />pop: BELM<br />trt: Future<br />B3-1-F","fitted: 1.657389<br />resid:  1.581422219<br />pop: BELM<br />trt: Future<br />B3-2-F","fitted: 1.657389<br />resid: -0.528740064<br />pop: BELM<br />trt: Future<br />B8-1-F","fitted: 1.657389<br />resid:  0.893611194<br />pop: BELM<br />trt: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935],"y":[-0.093351985339069174,0.014879333557095789,-0.35653853830621535,-0.84986952501221291,0.76967637412565504,0.6556826530604678,0.66452241993670469,0.47632612899565707,-2.3038033971827234,-0.18325930015027947,-1.1694939735967862,-0.39798735590111789,0.17869432945910024,0.41236876944442147,0.43985582832909204,0.28254299117243636,-1.2164594052325948,0.37553839338668527,0.53966296384139478,-0.0046660907456852023,0.51259381583553698,0.55764690590509425,0.37553839338668527,0.31990027103060731],"text":["fitted: 1.824436<br />resid: -0.093351985<br />pop: RODA<br />trt: Current<br />R11-1-C","fitted: 1.824436<br />resid:  0.014879334<br />pop: RODA<br />trt: Current<br />R11-2-C","fitted: 1.824436<br />resid: -0.356538538<br />pop: RODA<br />trt: Current<br />R15-1-C","fitted: 1.824436<br />resid: -0.849869525<br />pop: RODA<br />trt: Current<br />R15-2-C","fitted: 1.824436<br />resid:  0.769676374<br />pop: RODA<br />trt: Current<br />R2-1-C","fitted: 1.824436<br />resid:  0.655682653<br />pop: RODA<br />trt: Current<br />R2-2-C","fitted: 1.824436<br />resid:  0.664522420<br />pop: RODA<br />trt: Current<br />R21-1-C","fitted: 1.824436<br />resid:  0.476326129<br />pop: RODA<br />trt: Current<br />R21-2-C","fitted: 1.824436<br />resid: -2.303803397<br />pop: RODA<br />trt: Current<br />R26-1-C","fitted: 1.824436<br />resid: -0.183259300<br />pop: RODA<br />trt: Current<br />R29-1-C","fitted: 1.824436<br />resid: -1.169493974<br />pop: RODA<br />trt: Current<br />R29-2-C","fitted: 1.824436<br />resid: -0.397987356<br />pop: RODA<br />trt: Current<br />R33-2-C","fitted: 1.824436<br />resid:  0.178694329<br />pop: RODA<br />trt: Current<br />R35-1-C","fitted: 1.824436<br />resid:  0.412368769<br />pop: RODA<br />trt: Current<br />R40-1-C","fitted: 1.824436<br />resid:  0.439855828<br />pop: RODA<br />trt: Current<br />R40-2-C","fitted: 1.824436<br />resid:  0.282542991<br />pop: RODA<br />trt: Current<br />R47-1-C","fitted: 1.824436<br />resid: -1.216459405<br />pop: RODA<br />trt: Current<br />R47-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R47-3-C","fitted: 1.824436<br />resid:  0.539662964<br />pop: RODA<br />trt: Current<br />R47-6-C","fitted: 1.824436<br />resid: -0.004666091<br />pop: RODA<br />trt: Current<br />R5-1-C","fitted: 1.824436<br />resid:  0.512593816<br />pop: RODA<br />trt: Current<br />R8-1-C","fitted: 1.824436<br />resid:  0.557646906<br />pop: RODA<br />trt: Current<br />R8-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R9-1-C","fitted: 1.824436<br />resid:  0.319900271<br />pop: RODA<br />trt: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177],"y":[0.0023710566782874799,0.82518591138579434,-1.9082250124286038,0.77591649381805705,1.1949160746636953,0.77591649381805705,-1.2860242570637637,0.87408626618145535,1.4563049288487979,0.42020852944520692,0.48516594937326524,-0.29668123742194163,0.56227117849399566,0.72627240027592799,-2.3491126394401269,-0.90723494805496741,0.42020852944520692,-0.64074215706297744,-1.2690899626378249,-0.1099442615025865,0.24823066318501499],"text":["fitted: 1.671015<br />resid:  0.002371057<br />pop: RODA<br />trt: Future<br />R11-1-F","fitted: 1.671015<br />resid:  0.825185911<br />pop: RODA<br />trt: Future<br />R11-2-F","fitted: 1.671015<br />resid: -1.908225012<br />pop: RODA<br />trt: Future<br />R15-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R15-2-F","fitted: 1.671015<br />resid:  1.194916075<br />pop: RODA<br />trt: Future<br />R2-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R2-2-F","fitted: 1.671015<br />resid: -1.286024257<br />pop: RODA<br />trt: Future<br />R21-2-F","fitted: 1.671015<br />resid:  0.874086266<br />pop: RODA<br />trt: Future<br />R29-1-F","fitted: 1.671015<br />resid:  1.456304929<br />pop: RODA<br />trt: Future<br />R29-2-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R33-1-F","fitted: 1.671015<br />resid:  0.485165949<br />pop: RODA<br />trt: Future<br />R33-2-F","fitted: 1.671015<br />resid: -0.296681237<br />pop: RODA<br />trt: Future<br />R35-1-F","fitted: 1.671015<br />resid:  0.562271178<br />pop: RODA<br />trt: Future<br />R35-2-F","fitted: 1.671015<br />resid:  0.726272400<br />pop: RODA<br />trt: Future<br />R40-1-F","fitted: 1.671015<br />resid: -2.349112639<br />pop: RODA<br />trt: Future<br />R40-2-F","fitted: 1.671015<br />resid: -0.907234948<br />pop: RODA<br />trt: Future<br />R47-1-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R47-2-F","fitted: 1.671015<br />resid: -0.640742157<br />pop: RODA<br />trt: Future<br />R47-5-F","fitted: 1.671015<br />resid: -1.269089963<br />pop: RODA<br />trt: Future<br />R8-1-F","fitted: 1.671015<br />resid: -0.109944262<br />pop: RODA<br />trt: Future<br />R8-2-F","fitted: 1.671015<br />resid:  0.248230663<br />pop: RODA<br />trt: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":40.182648401826491,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.6490367618630581,1.8327886080992952],"tickmode":"array","ticktext":["1.65","1.70","1.75","1.80"],"tickvals":[1.6500000000000001,1.7000000000000002,1.7500000000000002,1.8000000000000003],"categoryorder":"array","categoryarray":["1.65","1.70","1.75","1.80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"fitted","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.0512030682364237,1.8496424703302403],"tickmode":"array","ticktext":["-4","-3","-2","-1","0","1"],"tickvals":[-4,-3,-2,-0.99999999999999956,0,1],"categoryorder":"array","categoryarray":["-4","-3","-2","-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"resid","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"trt<br />pop","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2ca0a9f34c8":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2ca0a9f34c8","visdat":{"2ca0a9f34c8":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-cbc24848e6a2412d080d" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-cbc24848e6a2412d080d">{"x":{"data":[{"x":[1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056,1.6846369645818056],"y":[0.2674669162420692,0.50904300965489879,-1.6105696497567332,0.60814421963896215,0.52151324618914841,-0.93832041281694523,-3.7829828164833939,0.16301401842680832,-0.13315980453078638,-0.95391938521042907,0.60814421963896215,-0.11940180820462973,1.3729522074178417,0.34472423022904275,1.3947855616842038,0.2284926700882528,0.76604246385705199,0.75403111393582589],"text":["fitted: 1.684637<br />resid:  0.267466916<br />pop: BELM<br />trt: Current<br />B12-11-C","fitted: 1.684637<br />resid:  0.509043010<br />pop: BELM<br />trt: Current<br />B12-12-C","fitted: 1.684637<br />resid: -1.610569650<br />pop: BELM<br />trt: Current<br />B12-13-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B12-14-C","fitted: 1.684637<br />resid:  0.521513246<br />pop: BELM<br />trt: Current<br />B12-15-C","fitted: 1.684637<br />resid: -0.938320413<br />pop: BELM<br />trt: Current<br />B1-6-C","fitted: 1.684637<br />resid: -3.782982816<br />pop: BELM<br />trt: Current<br />B12-1-C","fitted: 1.684637<br />resid:  0.163014018<br />pop: BELM<br />trt: Current<br />B12-2-C","fitted: 1.684637<br />resid: -0.133159805<br />pop: BELM<br />trt: Current<br />B13-1-C","fitted: 1.684637<br />resid: -0.953919385<br />pop: BELM<br />trt: Current<br />B13-2-C","fitted: 1.684637<br />resid:  0.608144220<br />pop: BELM<br />trt: Current<br />B15-1-C","fitted: 1.684637<br />resid: -0.119401808<br />pop: BELM<br />trt: Current<br />B15-2-C","fitted: 1.684637<br />resid:  1.372952207<br />pop: BELM<br />trt: Current<br />B2-1-C","fitted: 1.684637<br />resid:  0.344724230<br />pop: BELM<br />trt: Current<br />B3-1-C","fitted: 1.684637<br />resid:  1.394785562<br />pop: BELM<br />trt: Current<br />B3-2-C","fitted: 1.684637<br />resid:  0.228492670<br />pop: BELM<br />trt: Current<br />B4-2-C","fitted: 1.684637<br />resid:  0.766042464<br />pop: BELM<br />trt: Current<br />B8-1-C","fitted: 1.684637<br />resid:  0.754031114<br />pop: BELM<br />trt: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599,1.6573891185101599],"y":[1.1032209591299795,-0.51317827674814775,-0.32927409186512946,-1.465323663892748,1.1032209591299795,0.34492239843450484,1.2340289238737077,-1.6415249961527645,0.06491307539388981,-0.12757753348639503,-0.46671425967083219,-1.2530068422517888,1.58142221857721,-0.52874006442835919,0.89361119395706057],"text":["fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-11-F","fitted: 1.657389<br />resid: -0.513178277<br />pop: BELM<br />trt: Future<br />B12-12-F","fitted: 1.657389<br />resid: -0.329274092<br />pop: BELM<br />trt: Future<br />B12-13-F","fitted: 1.657389<br />resid: -1.465323664<br />pop: BELM<br />trt: Future<br />B12-14-F","fitted: 1.657389<br />resid:  1.103220959<br />pop: BELM<br />trt: Future<br />B12-15-F","fitted: 1.657389<br />resid:  0.344922398<br />pop: BELM<br />trt: Future<br />B1-6-F","fitted: 1.657389<br />resid:  1.234028924<br />pop: BELM<br />trt: Future<br />B12-2-F","fitted: 1.657389<br />resid: -1.641524996<br />pop: BELM<br />trt: Future<br />B15-1-F","fitted: 1.657389<br />resid:  0.064913075<br />pop: BELM<br />trt: Future<br />B15-2-F","fitted: 1.657389<br />resid: -0.127577533<br />pop: BELM<br />trt: Future<br />B2-1-F","fitted: 1.657389<br />resid: -0.466714260<br />pop: BELM<br />trt: Future<br />B2-2-F","fitted: 1.657389<br />resid: -1.253006842<br />pop: BELM<br />trt: Future<br />B3-1-F","fitted: 1.657389<br />resid:  1.581422219<br />pop: BELM<br />trt: Future<br />B3-2-F","fitted: 1.657389<br />resid: -0.528740064<br />pop: BELM<br />trt: Future<br />B8-1-F","fitted: 1.657389<br />resid:  0.893611194<br />pop: BELM<br />trt: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935,1.8244362514521935],"y":[-0.093351985339069174,0.014879333557095789,-0.35653853830621535,-0.84986952501221291,0.76967637412565504,0.6556826530604678,0.66452241993670469,0.47632612899565707,-2.3038033971827234,-0.18325930015027947,-1.1694939735967862,-0.39798735590111789,0.17869432945910024,0.41236876944442147,0.43985582832909204,0.28254299117243636,-1.2164594052325948,0.37553839338668527,0.53966296384139478,-0.0046660907456852023,0.51259381583553698,0.55764690590509425,0.37553839338668527,0.31990027103060731],"text":["fitted: 1.824436<br />resid: -0.093351985<br />pop: RODA<br />trt: Current<br />R11-1-C","fitted: 1.824436<br />resid:  0.014879334<br />pop: RODA<br />trt: Current<br />R11-2-C","fitted: 1.824436<br />resid: -0.356538538<br />pop: RODA<br />trt: Current<br />R15-1-C","fitted: 1.824436<br />resid: -0.849869525<br />pop: RODA<br />trt: Current<br />R15-2-C","fitted: 1.824436<br />resid:  0.769676374<br />pop: RODA<br />trt: Current<br />R2-1-C","fitted: 1.824436<br />resid:  0.655682653<br />pop: RODA<br />trt: Current<br />R2-2-C","fitted: 1.824436<br />resid:  0.664522420<br />pop: RODA<br />trt: Current<br />R21-1-C","fitted: 1.824436<br />resid:  0.476326129<br />pop: RODA<br />trt: Current<br />R21-2-C","fitted: 1.824436<br />resid: -2.303803397<br />pop: RODA<br />trt: Current<br />R26-1-C","fitted: 1.824436<br />resid: -0.183259300<br />pop: RODA<br />trt: Current<br />R29-1-C","fitted: 1.824436<br />resid: -1.169493974<br />pop: RODA<br />trt: Current<br />R29-2-C","fitted: 1.824436<br />resid: -0.397987356<br />pop: RODA<br />trt: Current<br />R33-2-C","fitted: 1.824436<br />resid:  0.178694329<br />pop: RODA<br />trt: Current<br />R35-1-C","fitted: 1.824436<br />resid:  0.412368769<br />pop: RODA<br />trt: Current<br />R40-1-C","fitted: 1.824436<br />resid:  0.439855828<br />pop: RODA<br />trt: Current<br />R40-2-C","fitted: 1.824436<br />resid:  0.282542991<br />pop: RODA<br />trt: Current<br />R47-1-C","fitted: 1.824436<br />resid: -1.216459405<br />pop: RODA<br />trt: Current<br />R47-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R47-3-C","fitted: 1.824436<br />resid:  0.539662964<br />pop: RODA<br />trt: Current<br />R47-6-C","fitted: 1.824436<br />resid: -0.004666091<br />pop: RODA<br />trt: Current<br />R5-1-C","fitted: 1.824436<br />resid:  0.512593816<br />pop: RODA<br />trt: Current<br />R8-1-C","fitted: 1.824436<br />resid:  0.557646906<br />pop: RODA<br />trt: Current<br />R8-2-C","fitted: 1.824436<br />resid:  0.375538393<br />pop: RODA<br />trt: Current<br />R9-1-C","fitted: 1.824436<br />resid:  0.319900271<br />pop: RODA<br />trt: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177,1.6710151051975177],"y":[0.0023710566782874799,0.82518591138579434,-1.9082250124286038,0.77591649381805705,1.1949160746636953,0.77591649381805705,-1.2860242570637637,0.87408626618145535,1.4563049288487979,0.42020852944520692,0.48516594937326524,-0.29668123742194163,0.56227117849399566,0.72627240027592799,-2.3491126394401269,-0.90723494805496741,0.42020852944520692,-0.64074215706297744,-1.2690899626378249,-0.1099442615025865,0.24823066318501499],"text":["fitted: 1.671015<br />resid:  0.002371057<br />pop: RODA<br />trt: Future<br />R11-1-F","fitted: 1.671015<br />resid:  0.825185911<br />pop: RODA<br />trt: Future<br />R11-2-F","fitted: 1.671015<br />resid: -1.908225012<br />pop: RODA<br />trt: Future<br />R15-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R15-2-F","fitted: 1.671015<br />resid:  1.194916075<br />pop: RODA<br />trt: Future<br />R2-1-F","fitted: 1.671015<br />resid:  0.775916494<br />pop: RODA<br />trt: Future<br />R2-2-F","fitted: 1.671015<br />resid: -1.286024257<br />pop: RODA<br />trt: Future<br />R21-2-F","fitted: 1.671015<br />resid:  0.874086266<br />pop: RODA<br />trt: Future<br />R29-1-F","fitted: 1.671015<br />resid:  1.456304929<br />pop: RODA<br />trt: Future<br />R29-2-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R33-1-F","fitted: 1.671015<br />resid:  0.485165949<br />pop: RODA<br />trt: Future<br />R33-2-F","fitted: 1.671015<br />resid: -0.296681237<br />pop: RODA<br />trt: Future<br />R35-1-F","fitted: 1.671015<br />resid:  0.562271178<br />pop: RODA<br />trt: Future<br />R35-2-F","fitted: 1.671015<br />resid:  0.726272400<br />pop: RODA<br />trt: Future<br />R40-1-F","fitted: 1.671015<br />resid: -2.349112639<br />pop: RODA<br />trt: Future<br />R40-2-F","fitted: 1.671015<br />resid: -0.907234948<br />pop: RODA<br />trt: Future<br />R47-1-F","fitted: 1.671015<br />resid:  0.420208529<br />pop: RODA<br />trt: Future<br />R47-2-F","fitted: 1.671015<br />resid: -0.640742157<br />pop: RODA<br />trt: Future<br />R47-5-F","fitted: 1.671015<br />resid: -1.269089963<br />pop: RODA<br />trt: Future<br />R8-1-F","fitted: 1.671015<br />resid: -0.109944262<br />pop: RODA<br />trt: Future<br />R8-2-F","fitted: 1.671015<br />resid:  0.248230663<br />pop: RODA<br />trt: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":40.182648401826491,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.6490367618630581,1.8327886080992952],"tickmode":"array","ticktext":["1.65","1.70","1.75","1.80"],"tickvals":[1.6500000000000001,1.7000000000000002,1.7500000000000002,1.8000000000000003],"categoryorder":"array","categoryarray":["1.65","1.70","1.75","1.80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"fitted","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.0512030682364237,1.8496424703302403],"tickmode":"array","ticktext":["-4","-3","-2","-1","0","1"],"tickvals":[-4,-3,-2,-0.99999999999999956,0,1],"categoryorder":"array","categoryarray":["-4","-3","-2","-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"resid","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"trt<br />pop","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"86bc2ea341ee":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"86bc2ea341ee","visdat":{"86bc2ea341ee":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 make a plot with genotype on the x axis and seed count per fruit on the y axis. color by pop and treatment.
@@ -4156,13 +4559,9 @@ make a plot with genotype on the x axis and seed count per fruit on the y axis. 
 ```
 
 ```{=html}
-<div class="plotly html-widget html-fill-item" id="htmlwidget-a850d28abd7e2e91176b" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-a850d28abd7e2e91176b">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[50.399999999999999,52.299999999999997,37.799999999999997,53.100000000000001,52.399999999999999,41.899999999999999,27.100000000000001,49.600000000000001,47.399999999999999,41.799999999999997,53.100000000000001,47.5,59.700000000000003,null,51,59.899999999999999,null,50.100000000000001,54.399999999999999,54.299999999999997],"text":["Line.ID.T: BELM12Current<br />AvgSeedNum: 50.40000<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.30000<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 37.80000<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.40000<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 27.10000<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 49.60000<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 47.40000<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 41.80000<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 47.50000<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />AvgSeedNum: 59.70000<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 51.00000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 59.90000<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />AvgSeedNum: 50.10000<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.40000<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.30000<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[53.799999999999997,42,43.200000000000003,36.299999999999997,53.799999999999997,47.899999999999999,null,54.8888888888889,null,null,35.3333333333333,45.8888888888889,44.5555555555556,42.299999999999997,37.5,57.8888888888889,null,null,41.899999999999999,52.100000000000001],"text":["Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 42.00000<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 43.20000<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 36.30000<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />AvgSeedNum: 47.90000<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 54.88889<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 35.33333<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 45.88889<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 44.55556<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 42.30000<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 37.50000<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 57.88889<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 52.10000<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[65.799999999999997,66.900000000000006,63.200000000000003,58.600000000000001,75.099999999999994,73.799999999999997,73.900000000000006,71.799999999999997,46.899999999999999,null,64.900000000000006,55.799999999999997,null,62.799999999999997,68.599999999999994,null,71.099999999999994,71.400000000000006,69.700000000000003,55.399999999999999,70.700000000000003,null,null,72.5,66.700000000000003,null,72.200000000000003,72.700000000000003,70.700000000000003,70.099999999999994],"text":["Line.ID.T: RODA11Current<br />AvgSeedNum: 65.80000<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />AvgSeedNum: 66.90000<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 63.20000<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 75.10000<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 73.80000<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 73.90000<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 71.80000<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 64.90000<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 55.80000<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />AvgSeedNum: 62.80000<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />AvgSeedNum: 68.60000<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.10000<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.40000<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 69.70000<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 55.40000<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 72.50000<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />AvgSeedNum: 66.70000<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.20000<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.70000<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.10000<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[46.899999999999999,53.200000000000003,35,52.799999999999997,56.299999999999997,52.799999999999997,null,38.5,null,null,53.600000000000001,58.600000000000001,50,50.5,44.799999999999997,51.100000000000001,52.399999999999999,32.714285714285701,40.799999999999997,50,null,null,42.5,null,null,null,38.600000000000001,46.100000000000001,null,48.700000000000003],"text":["Line.ID.T: RODA11Future<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />AvgSeedNum: 53.20000<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 35.00000<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 56.30000<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />AvgSeedNum: 38.50000<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 53.60000<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.50000<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 44.80000<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 51.10000<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 52.40000<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 32.71429<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 40.80000<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 42.50000<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 38.60000<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 46.10000<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />AvgSeedNum: 48.70000<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.700000000000003,77.5],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"AvgSeedNum","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"2ca04c691076":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"2ca04c691076","visdat":{"2ca04c691076":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-06d11e2ea80e93227962" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-06d11e2ea80e93227962">{"x":{"data":[{"x":[1,1,1,1,1,7,1,1,3,3,5,5,9,9,11,11,13,13,15,15],"y":[50.399999999999999,52.299999999999997,37.799999999999997,53.100000000000001,52.399999999999999,41.899999999999999,27.100000000000001,49.600000000000001,47.399999999999999,41.799999999999997,53.100000000000001,47.5,59.700000000000003,null,51,59.899999999999999,null,50.100000000000001,54.399999999999999,54.299999999999997],"text":["Line.ID.T: BELM12Current<br />AvgSeedNum: 50.40000<br />Population: BELM<br />Treatment: Current<br />B12-11-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.30000<br />Population: BELM<br />Treatment: Current<br />B12-12-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 37.80000<br />Population: BELM<br />Treatment: Current<br />B12-13-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B12-14-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 52.40000<br />Population: BELM<br />Treatment: Current<br />B12-15-C","Line.ID.T: BELM1Current<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Current<br />B1-6-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 27.10000<br />Population: BELM<br />Treatment: Current<br />B12-1-C","Line.ID.T: BELM12Current<br />AvgSeedNum: 49.60000<br />Population: BELM<br />Treatment: Current<br />B12-2-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 47.40000<br />Population: BELM<br />Treatment: Current<br />B13-1-C","Line.ID.T: BELM13Current<br />AvgSeedNum: 41.80000<br />Population: BELM<br />Treatment: Current<br />B13-2-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 53.10000<br />Population: BELM<br />Treatment: Current<br />B15-1-C","Line.ID.T: BELM15Current<br />AvgSeedNum: 47.50000<br />Population: BELM<br />Treatment: Current<br />B15-2-C","Line.ID.T: BELM2Current<br />AvgSeedNum: 59.70000<br />Population: BELM<br />Treatment: Current<br />B2-1-C","Line.ID.T: BELM2Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B2-2-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 51.00000<br />Population: BELM<br />Treatment: Current<br />B3-1-C","Line.ID.T: BELM3Current<br />AvgSeedNum: 59.90000<br />Population: BELM<br />Treatment: Current<br />B3-2-C","Line.ID.T: BELM4Current<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Current<br />B4-1-C","Line.ID.T: BELM4Current<br />AvgSeedNum: 50.10000<br />Population: BELM<br />Treatment: Current<br />B4-2-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.40000<br />Population: BELM<br />Treatment: Current<br />B8-1-C","Line.ID.T: BELM8Current<br />AvgSeedNum: 54.30000<br />Population: BELM<br />Treatment: Current<br />B8-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Current)","legendgroup":"(BELM,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,2,2,2,8,2,2,4,4,6,6,10,10,12,12,14,14,16,16],"y":[53.799999999999997,42,43.200000000000003,36.299999999999997,53.799999999999997,47.899999999999999,null,54.8888888888889,null,null,35.3333333333333,45.8888888888889,44.5555555555556,42.299999999999997,37.5,57.8888888888889,null,null,41.899999999999999,52.100000000000001],"text":["Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-11-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 42.00000<br />Population: BELM<br />Treatment: Future<br />B12-12-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 43.20000<br />Population: BELM<br />Treatment: Future<br />B12-13-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 36.30000<br />Population: BELM<br />Treatment: Future<br />B12-14-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 53.80000<br />Population: BELM<br />Treatment: Future<br />B12-15-F","Line.ID.T: BELM1Future<br />AvgSeedNum: 47.90000<br />Population: BELM<br />Treatment: Future<br />B1-6-F","Line.ID.T: BELM12Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B12-1-F","Line.ID.T: BELM12Future<br />AvgSeedNum: 54.88889<br />Population: BELM<br />Treatment: Future<br />B12-2-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-1-F","Line.ID.T: BELM13Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B13-2-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 35.33333<br />Population: BELM<br />Treatment: Future<br />B15-1-F","Line.ID.T: BELM15Future<br />AvgSeedNum: 45.88889<br />Population: BELM<br />Treatment: Future<br />B15-2-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 44.55556<br />Population: BELM<br />Treatment: Future<br />B2-1-F","Line.ID.T: BELM2Future<br />AvgSeedNum: 42.30000<br />Population: BELM<br />Treatment: Future<br />B2-2-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 37.50000<br />Population: BELM<br />Treatment: Future<br />B3-1-F","Line.ID.T: BELM3Future<br />AvgSeedNum: 57.88889<br />Population: BELM<br />Treatment: Future<br />B3-2-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-1-F","Line.ID.T: BELM4Future<br />AvgSeedNum:       NA<br />Population: BELM<br />Treatment: Future<br />B4-2-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 41.90000<br />Population: BELM<br />Treatment: Future<br />B8-1-F","Line.ID.T: BELM8Future<br />AvgSeedNum: 52.10000<br />Population: BELM<br />Treatment: Future<br />B8-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(BELM,Future)","legendgroup":"(BELM,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[17,17,19,19,27,27,21,21,23,23,25,25,29,29,31,31,33,33,35,35,35,35,35,35,37,37,39,39,41,41],"y":[65.799999999999997,66.900000000000006,63.200000000000003,58.600000000000001,75.099999999999994,73.799999999999997,73.900000000000006,71.799999999999997,46.899999999999999,null,64.900000000000006,55.799999999999997,null,62.799999999999997,68.599999999999994,null,71.099999999999994,71.400000000000006,69.700000000000003,55.399999999999999,70.700000000000003,null,null,72.5,66.700000000000003,null,72.200000000000003,72.700000000000003,70.700000000000003,70.099999999999994],"text":["Line.ID.T: RODA11Current<br />AvgSeedNum: 65.80000<br />Population: RODA<br />Treatment: Current<br />R11-1-C","Line.ID.T: RODA11Current<br />AvgSeedNum: 66.90000<br />Population: RODA<br />Treatment: Current<br />R11-2-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 63.20000<br />Population: RODA<br />Treatment: Current<br />R15-1-C","Line.ID.T: RODA15Current<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Current<br />R15-2-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 75.10000<br />Population: RODA<br />Treatment: Current<br />R2-1-C","Line.ID.T: RODA2Current<br />AvgSeedNum: 73.80000<br />Population: RODA<br />Treatment: Current<br />R2-2-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 73.90000<br />Population: RODA<br />Treatment: Current<br />R21-1-C","Line.ID.T: RODA21Current<br />AvgSeedNum: 71.80000<br />Population: RODA<br />Treatment: Current<br />R21-2-C","Line.ID.T: RODA26Current<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Current<br />R26-1-C","Line.ID.T: RODA26Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R26-2-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 64.90000<br />Population: RODA<br />Treatment: Current<br />R29-1-C","Line.ID.T: RODA29Current<br />AvgSeedNum: 55.80000<br />Population: RODA<br />Treatment: Current<br />R29-2-C","Line.ID.T: RODA33Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R33-1-C","Line.ID.T: RODA33Current<br />AvgSeedNum: 62.80000<br />Population: RODA<br />Treatment: Current<br />R33-2-C","Line.ID.T: RODA35Current<br />AvgSeedNum: 68.60000<br />Population: RODA<br />Treatment: Current<br />R35-1-C","Line.ID.T: RODA35Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R35-2-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.10000<br />Population: RODA<br />Treatment: Current<br />R40-1-C","Line.ID.T: RODA40Current<br />AvgSeedNum: 71.40000<br />Population: RODA<br />Treatment: Current<br />R40-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 69.70000<br />Population: RODA<br />Treatment: Current<br />R47-1-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 55.40000<br />Population: RODA<br />Treatment: Current<br />R47-2-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R47-3-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-4-C","Line.ID.T: RODA47Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R47-5-C","Line.ID.T: RODA47Current<br />AvgSeedNum: 72.50000<br />Population: RODA<br />Treatment: Current<br />R47-6-C","Line.ID.T: RODA5Current<br />AvgSeedNum: 66.70000<br />Population: RODA<br />Treatment: Current<br />R5-1-C","Line.ID.T: RODA5Current<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Current<br />R5-2-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.20000<br />Population: RODA<br />Treatment: Current<br />R8-1-C","Line.ID.T: RODA8Current<br />AvgSeedNum: 72.70000<br />Population: RODA<br />Treatment: Current<br />R8-2-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.70000<br />Population: RODA<br />Treatment: Current<br />R9-1-C","Line.ID.T: RODA9Current<br />AvgSeedNum: 70.10000<br />Population: RODA<br />Treatment: Current<br />R9-2-C"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Current)","legendgroup":"(RODA,Current)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18,18,20,20,28,28,22,22,24,24,26,26,30,30,32,32,34,34,36,36,36,36,36,36,38,38,40,40,42,42],"y":[46.899999999999999,53.200000000000003,35,52.799999999999997,56.299999999999997,52.799999999999997,null,38.5,null,null,53.600000000000001,58.600000000000001,50,50.5,44.799999999999997,51.100000000000001,52.399999999999999,32.714285714285701,40.799999999999997,50,null,null,42.5,null,null,null,38.600000000000001,46.100000000000001,null,48.700000000000003],"text":["Line.ID.T: RODA11Future<br />AvgSeedNum: 46.90000<br />Population: RODA<br />Treatment: Future<br />R11-1-F","Line.ID.T: RODA11Future<br />AvgSeedNum: 53.20000<br />Population: RODA<br />Treatment: Future<br />R11-2-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 35.00000<br />Population: RODA<br />Treatment: Future<br />R15-1-F","Line.ID.T: RODA15Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R15-2-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 56.30000<br />Population: RODA<br />Treatment: Future<br />R2-1-F","Line.ID.T: RODA2Future<br />AvgSeedNum: 52.80000<br />Population: RODA<br />Treatment: Future<br />R2-2-F","Line.ID.T: RODA21Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R21-1-F","Line.ID.T: RODA21Future<br />AvgSeedNum: 38.50000<br />Population: RODA<br />Treatment: Future<br />R21-2-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-1-F","Line.ID.T: RODA26Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R26-2-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 53.60000<br />Population: RODA<br />Treatment: Future<br />R29-1-F","Line.ID.T: RODA29Future<br />AvgSeedNum: 58.60000<br />Population: RODA<br />Treatment: Future<br />R29-2-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R33-1-F","Line.ID.T: RODA33Future<br />AvgSeedNum: 50.50000<br />Population: RODA<br />Treatment: Future<br />R33-2-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 44.80000<br />Population: RODA<br />Treatment: Future<br />R35-1-F","Line.ID.T: RODA35Future<br />AvgSeedNum: 51.10000<br />Population: RODA<br />Treatment: Future<br />R35-2-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 52.40000<br />Population: RODA<br />Treatment: Future<br />R40-1-F","Line.ID.T: RODA40Future<br />AvgSeedNum: 32.71429<br />Population: RODA<br />Treatment: Future<br />R40-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 40.80000<br />Population: RODA<br />Treatment: Future<br />R47-1-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 50.00000<br />Population: RODA<br />Treatment: Future<br />R47-2-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-3-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-4-F","Line.ID.T: RODA47Future<br />AvgSeedNum: 42.50000<br />Population: RODA<br />Treatment: Future<br />R47-5-F","Line.ID.T: RODA47Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R47-6-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-1-F","Line.ID.T: RODA5Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R5-2-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 38.60000<br />Population: RODA<br />Treatment: Future<br />R8-1-F","Line.ID.T: RODA8Future<br />AvgSeedNum: 46.10000<br />Population: RODA<br />Treatment: Future<br />R8-2-F","Line.ID.T: RODA9Future<br />AvgSeedNum:       NA<br />Population: RODA<br />Treatment: Future<br />R9-1-F","Line.ID.T: RODA9Future<br />AvgSeedNum: 48.70000<br />Population: RODA<br />Treatment: Future<br />R9-2-F"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":1,"size":5.6692913385826778,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(RODA,Future)","legendgroup":"(RODA,Future)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.228310502283104,"r":7.3059360730593621,"b":104.4748858447489,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,42.600000000000001],"tickmode":"array","ticktext":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"tickvals":[1,2.0000000000000004,3,4,5,6,7,8,9,10,11,11.999999999999998,13,14.000000000000002,15,16,17,18,19,20,21,21.999999999999996,23,24,25,26.000000000000004,27,28,29,30,30.999999999999996,32,33,34,35,36,37,38,39,40,41,42],"categoryorder":"array","categoryarray":["BELM12Current","BELM12Future","BELM13Current","BELM13Future","BELM15Current","BELM15Future","BELM1Current","BELM1Future","BELM2Current","BELM2Future","BELM3Current","BELM3Future","BELM4Current","BELM4Future","BELM8Current","BELM8Future","RODA11Current","RODA11Future","RODA15Current","RODA15Future","RODA21Current","RODA21Future","RODA26Current","RODA26Future","RODA29Current","RODA29Future","RODA2Current","RODA2Future","RODA33Current","RODA33Future","RODA35Current","RODA35Future","RODA40Current","RODA40Future","RODA47Current","RODA47Future","RODA5Current","RODA5Future","RODA8Current","RODA8Future","RODA9Current","RODA9Future"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-90,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Line.ID.T","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.700000000000003,77.5],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"AvgSeedNum","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Population<br />Treatment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"86bc1a255fa":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"86bc1a255fa","visdat":{"86bc1a255fa":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
-
-
-Compare that to a plot of a trait that does have a genotype effect (just the first plot)
-
 
 
 # test selection gradient

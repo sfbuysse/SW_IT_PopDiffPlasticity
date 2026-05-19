@@ -1,7 +1,7 @@
 ---
 title: "01_CleanData"
 author: "Sophie Buysse"
-date: "2026-01-14"
+date: "2026-05-19"
 output:
   html_document:
     toc: true
@@ -1698,7 +1698,7 @@ explore_trans(CleanData_2021$AvgSeedWt)
 
 ``` r
 #explore_trans(CleanData_2021$IJ_SeedCount)
-# did by hand becuase exp transformation is too big to show in r -> values become infinity
+# did by hand because exp transformation is too big to show in r -> values become infinity
 
 plotNormalHistogram(CleanData_2021$IJ_SeedCount)
 ```
@@ -2768,6 +2768,42 @@ explore_trans(CleanData_2022$Root_to_Shoot)
 
 ``` r
 CleanData_2022$l10_Root_to_Shoot <- log10(CleanData_2022$Root_to_Shoot)
+
+# added later, total biomass
+CleanData_2022$TotalBiomass <- CleanData_2022$AG_DryBiomass + CleanData_2022$BG_DryBiomass
+explore_trans(CleanData_2022$TotalBiomass)
+```
+
+![](01_CleanData_files/figure-html/unnamed-chunk-43-25.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-26.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-27.png)<!-- -->![](01_CleanData_files/figure-html/unnamed-chunk-43-28.png)<!-- -->
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  trait
+## W = 0.95125, p-value = 0.0001708
+## 
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  log10(trait)
+## W = 0.97354, p-value = 0.01362
+## 
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  exp(trait)
+## W = 0.87728, p-value = 7.748e-09
+## 
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  sqrt(trait)
+## W = 0.98743, p-value = 0.296
+```
+
+``` r
+CleanData_2022$SQR_TotalBiomass <- sqrt(CleanData_2022$TotalBiomass)
 ```
 
 Stomata
