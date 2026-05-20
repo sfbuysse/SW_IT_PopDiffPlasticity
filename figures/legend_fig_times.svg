@@ -30,10 +30,10 @@
 <polygon points='157.23,10.81 163.46,21.59 151.01,21.59 ' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <line x1='225.40' y1='18.00' x2='274.09' y2='18.00' style='stroke-width: 2.67; stroke-linecap: butt;' />
 <line x1='322.78' y1='18.00' x2='371.46' y2='18.00' style='stroke-width: 2.67; stroke-dasharray: 3.56,10.67; stroke-linecap: butt;' />
-<text x='128.02' y='21.95' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";' textLength='20.23px' lengthAdjust='spacingAndGlyphs'>Italy</text>
-<text x='186.45' y='21.95' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";' textLength='39.89px' lengthAdjust='spacingAndGlyphs'>Sweden</text>
-<text x='293.56' y='21.95' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";' textLength='24.56px' lengthAdjust='spacingAndGlyphs'>2021</text>
-<text x='390.94' y='21.95' text-anchor='middle' style='font-size: 11.04px; font-family: "Arial";' textLength='24.56px' lengthAdjust='spacingAndGlyphs'>2022</text>
+<text x='128.02' y='21.65' text-anchor='middle' style='font-size: 11.04px; font-family: "Times New Roman";' textLength='20.20px' lengthAdjust='spacingAndGlyphs'>Italy</text>
+<text x='186.45' y='21.65' text-anchor='middle' style='font-size: 11.04px; font-family: "Times New Roman";' textLength='34.92px' lengthAdjust='spacingAndGlyphs'>Sweden</text>
+<text x='293.56' y='21.65' text-anchor='middle' style='font-size: 11.04px; font-family: "Times New Roman";' textLength='22.06px' lengthAdjust='spacingAndGlyphs'>2021</text>
+<text x='390.94' y='21.65' text-anchor='middle' style='font-size: 11.04px; font-family: "Times New Roman";' textLength='22.06px' lengthAdjust='spacingAndGlyphs'>2022</text>
 </g>
 </g>
 </svg>

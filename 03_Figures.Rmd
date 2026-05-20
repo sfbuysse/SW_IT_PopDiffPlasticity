@@ -38,7 +38,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(ggpubr)
-#remove.packages("ragg")
+remove.packages("ragg")
 
 # functions used for growth curves
 std_mean <- function(x){
@@ -1094,22 +1094,22 @@ ggsave(figs3, filename = "figures/figs3.jpg", width = 9, height = 8, units = "in
 
 ```
 
-figs in vector format; need to have no 'ragg' package to actually be saved with times new roman font.
+figs in vector format; need to have no 'ragg' package to actually be saved with times new roman font for rasters. Need to specify within save line to embed in svg.
 ```{r}
 
 # trait figs
-ggsave(fig1, filename = "figures/fig1_times.svg", width = 6, height = 8, units = "in", dpi = 3000, device = "svg")
-ggsave(fig2, filename = "figures/fig2_times.svg", width = 6, height = 8, units = "in", dpi = 3000)
+ggsave(fig1, filename = "figures/fig1_times.svg", width = 6, height = 8, units = "in", dpi = 1000, device = "svg", system_fonts = list(Times = "Times New Roman"))
+ggsave(fig2, filename = "figures/fig2_times.svg", width = 6, height = 8, units = "in", dpi = 1000, system_fonts = list(Times = "Times New Roman"))
 
 # fitness fig
-ggsave(fitness_fig, filename = "figures/fig3_times.svg", width = 9, height = 4, units = "in", dpi = 3000)
+ggsave(fitness_fig, filename = "figures/fig3_times.svg", width = 9, height = 4, units = "in", dpi = 1000, system_fonts = list(Times = "Times New Roman"))
 
 # legend_fig
-ggsave(legend_fig, filename = "figures/legend_fig_times.svg", width = 6, height = 0.5, units = "in", dpi = 3000)
+ggsave(legend_fig, filename = "figures/legend_fig_times.svg", width = 6, height = 0.5, units = "in", dpi = 1000, system_fonts = list(Times = "Times New Roman"))
 
 #figs1
-ggsave(figs1, filename = "figures/figs1_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+ggsave(figs1, filename = "figures/figs1_times.svg", width = 9, height = 8, units = "in", dpi = 600, system_fonts = list(Times = "Times New Roman"))
 
 #figs2
-ggsave(figs3, filename = "figures/figs3_times.svg", width = 9, height = 8, units = "in", dpi = 600)
+ggsave(figs3, filename = "figures/figs3_times.svg", width = 9, height = 8, units = "in", dpi = 600, system_fonts = list(Times = "Times New Roman"))
 ```

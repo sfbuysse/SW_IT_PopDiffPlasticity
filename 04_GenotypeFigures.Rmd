@@ -242,5 +242,7 @@ fig1 <- ggarrange(rwc+rremove("xlab"), sla+rremove("xlab"), flowering, stoden, r
 
 fig1
 ggsave(fig1, filename = "figures/GenotypeRxnNorms.jpg", width = 12, height = 16, units = "in", dpi = 600)
+
+ggsave(fig1, filename = "figures/GenotypeRxnNorms_times.svg", width = 12, height = 16, units = "in", dpi = 600, system_fonts = list(Times = "Times New Roman"))
 ```
 
