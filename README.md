@@ -10,4 +10,4 @@ This contains the code used to analyze the 2021 and 2022 Experiments to identify
 
 03_Figures makes all figures at 600 dpi. It was cleaned for readability and some unused figures removed on 10/21/2025. Was last knitted 1/14/2026.
 
-You can find this manuscript on biorxiv: https://doi.org/10.64898/2026.01.07.698234
+You can find this manuscript on biorxiv: https://doi.org/10.64898/2026.01.07.698234 and it is now in press at _Annals of Botany._
